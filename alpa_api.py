@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 def call_alpa_endpoint(
-    text: str, max_tokens: int = 60, temperature: float = 0.7, top_p: float = 0.5, timeout: int = 180
+    text: str, max_tokens: int = 60, temperature: float = 0.0, top_p: float = 0.5, timeout: int = 180
 ) -> str:
     url = "https://opt.alpa.ai/completions"
     headers = {"Content-Type": "application/json"}
