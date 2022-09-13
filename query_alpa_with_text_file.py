@@ -85,7 +85,7 @@ if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("--task_id", type=str)
     args.add_argument("--num_questions_per_thread", type=int, default=100)
-    args.add_argument("--max_tokens", type=int, default=60)
+    args.add_argument("--max_tokens", type=int, default=100)
     args.add_argument("--num_examples", type=int, default=0)
     args.add_argument("--timeout", type=int, default=720)
     args.add_argument("--name", type=str)

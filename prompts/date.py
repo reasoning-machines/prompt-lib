@@ -280,4 +280,5 @@ date_task_id_to_prompt = {
     "date_text_yoda_both": yoda_both,
     "date_text_inter_shuf": inter_shuf,
     "date_text_intra_shuf": intra_shuf,
+    "date_ccot": brief
 }
