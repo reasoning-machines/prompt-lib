@@ -2,6 +2,7 @@
 from datetime import datetime
 from itertools import chain
 import pathlib
+from pprint import pprint
 import sys
 import time
 from typing import List
@@ -51,12 +52,15 @@ def query_alpa(task_config: TaskConfig) -> None:
         )
     else:
         outputs = []
+        accuracy_so_far = 0
+
         for (input, thread_id) in tqdm(load_per_task):
             thread_outputs = query_openai_over_inputs(input, thread_id, task_config)
             outputs.append(thread_outputs)
-            progress_perc = len(outputs) / len(load_per_task)
-            progress_perc = f"{progress_perc:.2%}"
-            wandb.log({"progress": progress_perc})
+            progress_perc = round(len(outputs) * 100 / len(load_per_task), 2)
+            wandb.log({"progress_so_far": progress_perc})
+            accuracy_so_far += get_exact_match_acc(pd.DataFrame(thread_outputs))
+            wandb.log({"accuracy_so_far": accuracy_so_far / len(outputs)})
 
             
             pd.DataFrame(thread_outputs).to_json(
@@ -122,14 +126,16 @@ def query_openai_over_inputs(
                 time_begin=time_begin,
                 max_requests_per_min=task_config.max_requests_per_min,
                 task_idx=thread_id,
+                model_name=task_config.model_name,
             )
             question = input["question"]
             response = OpenaiAPIWrapper.call(
                 prompt=question,
                 max_tokens=task_config.max_tokens,
                 engine=task_config.model_name,
-                stop_token=task_config.prompt_config.inter_example_sep,
+                stop_token=task_config.prompt_config.question_prefix,  # generate till the model starts generating a new question
             )
+            pprint(response)
             outputs.append(
                 {
                     "question": question,
@@ -141,6 +147,8 @@ def query_openai_over_inputs(
             pbar.update(1)
 
         except Exception as e:
+            if "code" not in task_config.model_name:  # usually codex models throw rate limit errors
+                i += 1
             print(f"Error: {e}")
             continue
     return outputs
@@ -162,6 +170,8 @@ if __name__ == "__main__":
     args.add_argument("--model_name", type=str, default="code-davinci-002")
     args.add_argument("--max_requests_per_min", type=int, default=20)
 
+    args.add_argument("--is_debug", action="store_true")
+
     args = args.parse_args()
 
     assert args.seed is not None
@@ -181,6 +191,9 @@ if __name__ == "__main__":
         max_requests_per_min=args.max_requests_per_min,
     )
 
-    wandb.init(project="alpa", config=dataclasses.asdict(task_config), name=args.name)
+    if args.is_debug:
+        wandb.init(mode="disabled")
+    else:
+        wandb.init(project="alpa", config=dataclasses.asdict(task_config), name=args.name)
 
     query_alpa(task_config=task_config)

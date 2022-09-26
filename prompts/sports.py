@@ -497,4 +497,5 @@ sports_task_id_to_prompt = {
     "sports_text_intra_shuf": text_shuf_intra,
     "sports_text_inter_shuf": text_shuf_inter,
     "sports_ccot": ccot,
+    "sports_text_rand": text_random
 }
