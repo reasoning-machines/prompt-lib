@@ -119,20 +119,22 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
         is_cot_prompt=task_config.is_cot_task,
     )
 
+    is_non_code_model = "code" not in task_config.model_name
     # add the prompt to the task file
     task_df["question"] = (
         prompt_str
         + task_config.prompt_config.question_prefix
         + task_df["input"]
         + task_config.prompt_config.intra_example_sep
-        + task_config.prompt_config.answer_prefix
+        + task_config.prompt_config.answer_prefix.strip() if is_non_code_model else task_config.prompt_config.answer_prefix
     )
+    # davinci doesn't like prompts that end with a space
     task_df["answer"] = task_df["target"]
     return task_df[["question", "answer"]]
 
 
 def maintain_request_per_minute(
-    num_requests: int, time_begin: float, max_requests_per_min: int, task_idx: int
+    num_requests: int, time_begin: float, max_requests_per_min: int, task_idx: int, model_name: str
 ) -> float:
     """Maintains the number of requests per minute to be less than max_requests_per_min.
     This is required for models like Codex.
@@ -144,9 +146,11 @@ def maintain_request_per_minute(
         logging.info(
             f"Task {task_idx} > Sleeping! (Requests/minute = {request_per_minute:.2f} > {max_requests_per_min:.2f})"
         )
-        time.sleep(10)
+        if "code" in model_name:
+            time.sleep(10)
         request_per_minute = get_request_per_minute(num_requests, time_begin)
-    time.sleep(4)
+    if "code" in model_name:
+        time.sleep(4)
     return request_per_minute
 
 
