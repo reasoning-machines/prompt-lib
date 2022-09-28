@@ -3,24 +3,21 @@ from datetime import datetime
 from itertools import chain
 import pathlib
 from pprint import pprint
-import sys
 import time
 from typing import List
 from tqdm import tqdm
 import pandas as pd
-from joblib import Parallel, delayed
 import wandb
 import dataclasses
 
 
-from alpa_api import call_alpa_endpoint
 from openai_api import OpenaiAPIWrapper
 from eval import get_exact_match_acc
 from prompts.utils import TaskConfig, make_task_file_from_config, maintain_request_per_minute
 
 
 def query_alpa(task_config: TaskConfig) -> None:
-    """Query alpa for each line in the file."""
+    """Query a language model API for each line in the file."""
 
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
     time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -45,29 +42,23 @@ def query_alpa(task_config: TaskConfig) -> None:
             (task_file[num_chunks * task_config.num_questions_per_thread :], num_chunks)
         )
 
-    if task_config.model_name == "alpa":
-        outputs = Parallel(n_jobs=-1, verbose=10)(
-            delayed(query_alpa_over_inputs)(input, thread_id, task_config)
-            for input, thread_id in load_per_task
+    outputs = []
+    accuracy_so_far = 0
+
+    for (input, thread_id) in tqdm(load_per_task):
+        thread_outputs = query_openai_over_inputs(input, thread_id, task_config)
+        outputs.append(thread_outputs)
+        progress_perc = round(len(outputs) * 100 / len(load_per_task), 2)
+        wandb.log({"progress_so_far": progress_perc})
+        accuracy_so_far += get_exact_match_acc(pd.DataFrame(thread_outputs))
+        wandb.log({"accuracy_so_far": accuracy_so_far / len(outputs)})
+
+        
+        pd.DataFrame(thread_outputs).to_json(
+            f"data/logs/{task_config.task_id}/{time_stamp}/outputs_part{thread_id}.jsonl",
+            orient="records",
+            lines=True,
         )
-    else:
-        outputs = []
-        accuracy_so_far = 0
-
-        for (input, thread_id) in tqdm(load_per_task):
-            thread_outputs = query_openai_over_inputs(input, thread_id, task_config)
-            outputs.append(thread_outputs)
-            progress_perc = round(len(outputs) * 100 / len(load_per_task), 2)
-            wandb.log({"progress_so_far": progress_perc})
-            accuracy_so_far += get_exact_match_acc(pd.DataFrame(thread_outputs))
-            wandb.log({"accuracy_so_far": accuracy_so_far / len(outputs)})
-
-            
-            pd.DataFrame(thread_outputs).to_json(
-                f"data/logs/{task_config.task_id}/{time_stamp}/outputs_part{thread_id}.jsonl",
-                orient="records",
-                lines=True,
-            )
 
     outputs = pd.DataFrame(chain(*outputs))
 
@@ -81,30 +72,6 @@ def query_alpa(task_config: TaskConfig) -> None:
     outputs.to_json(
         f"data/logs/{task_config.task_id}/{time_stamp}/outputs.jsonl", orient="records", lines=True
     )
-
-
-def query_alpa_over_inputs(
-    inputs: List[dict], thread_id: int, task_config: TaskConfig
-) -> List[dict]:
-    outputs = []
-    for input in tqdm(inputs, total=len(inputs), desc=f"Querying alpa [thread_id={thread_id}]"):
-        try:
-            question = input["question"]
-
-            generated_answer = call_alpa_endpoint(
-                text=question, max_tokens=task_config.max_tokens, timeout=task_config.timeout
-            )
-            outputs.append(
-                {
-                    "question": question,
-                    "generated_answer": generated_answer,
-                    "answer": input["answer"],
-                }
-            )
-        except Exception as e:
-            print(f"Error: {e}")
-            continue
-    return outputs
 
 
 def query_openai_over_inputs(
