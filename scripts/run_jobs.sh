@@ -52,7 +52,7 @@ for TASK in "${ALL_TASKS[@]}"; do
             --timeout 1440
             --model_name "${MODEL_NAME}"
             --max_requests_per_min ${REQ_PER_MIN}
-            --seed ${SEED})
+            --seed ${SEED} --is_debug)
         if [[ ! "${TASK}" == *"direct"* ]]; then
             ARGS+=("--cot_task")
         fi
