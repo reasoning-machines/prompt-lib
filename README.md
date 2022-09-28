@@ -14,3 +14,8 @@ export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 bash scripts/run_jobs.sh
 ```
+
+- To make the repo self-contained, we have included all the datasets and prompts:
+
+1. Prompts are located in `prompts/` directory.
+2. Datasets are located in `data/tasks/` directory.
