@@ -4,8 +4,6 @@ import openai
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# code: "code-davinci-001"
-
 class OpenaiAPIWrapper:
     @staticmethod
     def call(prompt: str, max_tokens: int, engine: str, stop_token: str) -> dict:
