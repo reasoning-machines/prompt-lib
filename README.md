@@ -87,3 +87,19 @@ bash scripts/run_jobs.sh
 2. `generated_answer` is the generated answer.
 3. `answer` is the correct answer.
 4. `is_correct` is 1 if the generated answer is correct, and 0 otherwise.
+
+
+----
+
+## Task files
+
+* The task files are located in `data/tasks/` directory.
+
+```
+data/tasks/
+├── date.jsonl
+├── gsm.jsonl
+├── sorting.jsonl
+├── sports.jsonl
+└── test.jsonl
+```

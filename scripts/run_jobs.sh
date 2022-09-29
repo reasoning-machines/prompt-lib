@@ -25,7 +25,10 @@ declare -a TEXT_INTER_SHUF=("gsm_text_inter_shuf" "date_text_inter_shuf" "sports
 
 declare -a YODA_TASKS=("gsm_text_yoda_thought" "date_text_yoda_thought" "sports_text_yoda_thought")
 
-declare -a ALL_TASKS=("test")
+declare -a ALL_TASKS=("${GSM_TASKS[@]}" "${DATE_TASKS[@]}" "${SPORTS_TASKS[@]}" "${SORTING_TASKS[@]}")
+
+# Change the following to any of the above arrays to run a specific task or to ALL_TASKS to run all tasks. By default, it runs a test over 10 examples.
+declare -a TASK_TO_RUN=("test")
 
 declare -a SEEDS=(0 1 2)
 
@@ -41,7 +44,7 @@ else
     exit 1
 fi
 
-for TASK in "${ALL_TASKS[@]}"; do
+for TASK in "${TASK_TO_RUN[@]}"; do
 
     for SEED in "${SEEDS[@]}"; do
 
