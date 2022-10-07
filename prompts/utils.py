@@ -45,7 +45,7 @@ class TaskConfig:
     prompt_config: PromptConfig = PromptConfig()
 
 
-def _format_prompt(
+def format_prompt(
     prompt_examples: List[Example],
     prompt_config: PromptConfig,
     num_examples: int,
@@ -111,7 +111,7 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     task_df = pd.read_json(task_file_path, lines=True, orient="records")
 
     # format the prompt
-    prompt_str = _format_prompt(
+    prompt_str = format_prompt(
         prompt_examples=task_id_to_prompt[task_config.task_id],
         prompt_config=task_config.prompt_config,
         num_examples=task_config.num_examples,
@@ -126,7 +126,7 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
         + task_config.prompt_config.question_prefix
         + task_df["input"]
         + task_config.prompt_config.intra_example_sep
-        + task_config.prompt_config.answer_prefix.strip() if is_non_code_model else task_config.prompt_config.answer_prefix
+        + (task_config.prompt_config.answer_prefix.strip() if is_non_code_model else task_config.prompt_config.answer_prefix)
     )
     # davinci doesn't like prompts that end with a space
     task_df["answer"] = task_df["target"]

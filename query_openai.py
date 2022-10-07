@@ -3,6 +3,7 @@ from datetime import datetime
 from itertools import chain
 import pathlib
 from pprint import pprint
+import sys
 import time
 from typing import List
 from tqdm import tqdm
@@ -16,7 +17,7 @@ from eval import get_exact_match_acc
 from prompts.utils import TaskConfig, make_task_file_from_config, maintain_request_per_minute
 
 
-def query_alpa(task_config: TaskConfig) -> None:
+def run_inference(task_config: TaskConfig) -> None:
     """Query a language model API for each line in the file."""
 
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
@@ -163,4 +164,4 @@ if __name__ == "__main__":
     else:
         wandb.init(project="alpa", config=dataclasses.asdict(task_config), name=args.name)
 
-    query_alpa(task_config=task_config)
+    run_inference(task_config=task_config)
