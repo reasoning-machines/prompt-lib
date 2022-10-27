@@ -626,4 +626,5 @@ gsm_task_id_to_prompt = {
     "gsm_pat_only": equation,
     "gsmsample_stream": math_qa_examples_original,
     "gsmsample_symb_abs": symbolic_greek,
+    "gsmhard_stream": math_qa_examples_original,
 }
