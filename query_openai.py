@@ -13,7 +13,7 @@ import dataclasses
 
 
 from openai_api import OpenaiAPIWrapper
-from eval import get_exact_match_acc
+from scripts.eval import get_exact_match_acc
 from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config, maintain_request_per_minute
 
 
