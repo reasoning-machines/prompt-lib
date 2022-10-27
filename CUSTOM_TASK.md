@@ -95,7 +95,7 @@ export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 
 ```bash
-bash run_single_task.sh boolsimplify_stream
+bash scripts/run_single_task.sh boolsimplify_stream
 ```
 
 
