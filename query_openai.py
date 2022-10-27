@@ -14,7 +14,7 @@ import dataclasses
 
 from openai_api import OpenaiAPIWrapper
 from eval import get_exact_match_acc
-from prompts.utils import TaskConfig, make_task_file_from_config, maintain_request_per_minute
+from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config, maintain_request_per_minute
 
 
 def run_inference(task_config: TaskConfig) -> None:
@@ -22,7 +22,11 @@ def run_inference(task_config: TaskConfig) -> None:
 
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
     time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    pathlib.Path(f"data/logs/{task_config.task_id}/{time_stamp}").mkdir(parents=True, exist_ok=True)
+    
+    outdir = f"data/logs/{task_config.task_id}/{time_stamp}/k{task_config.num_examples}/"
+    if task_config.tag is not None:
+        outdir += f"{task_config.tag}/"
+    pathlib.Path(f"{outdir}").mkdir(parents=True, exist_ok=True)
 
     num_chunks = len(task_file) // task_config.num_questions_per_thread
     load_per_task = []
@@ -56,7 +60,7 @@ def run_inference(task_config: TaskConfig) -> None:
 
         
         pd.DataFrame(thread_outputs).to_json(
-            f"data/logs/{task_config.task_id}/{time_stamp}/outputs_part{thread_id}.jsonl",
+            f"{outdir}/outputs_part{thread_id}.jsonl",
             orient="records",
             lines=True,
         )
@@ -71,7 +75,7 @@ def run_inference(task_config: TaskConfig) -> None:
     # store outputs in data/logs/task_id/time_stamp/outputs.csv
 
     outputs.to_json(
-        f"data/logs/{task_config.task_id}/{time_stamp}/outputs.jsonl", orient="records", lines=True
+        f"{outdir}/outputs.jsonl", orient="records", lines=True
     )
 
 
@@ -98,12 +102,15 @@ def query_openai_over_inputs(
             )
             question = input["question"]
             response = OpenaiAPIWrapper.call(
+                temperature=task_config.temperature,
                 prompt=question,
                 max_tokens=task_config.max_tokens,
                 engine=task_config.model_name,
                 stop_token=task_config.prompt_config.question_prefix,  # generate till the model starts generating a new question
             )
-            pprint(response)
+            print(question)
+
+            print(OpenaiAPIWrapper.parse_response(response))
             outputs.append(
                 {
                     "question": question,
@@ -140,8 +147,23 @@ if __name__ == "__main__":
 
     args.add_argument("--is_debug", action="store_true")
 
+
+    args.add_argument("--question_prefix", type=str, default="Q: ")
+    args.add_argument("--answer_prefix", type=str, default="A: ")
+    args.add_argument("--final_answer_prefix", type=str, default="The answer is ")
+    args.add_argument("--intra_example_sep", type=str, default="\n")
+    args.add_argument("--inter_example_sep", type=str, default="\n\n")
+    args.add_argument("--temperature", type=float, default=0.0)
+    
+    args.add_argument("--tag", type=str, default=None)
+    
+    
+    
     args = args.parse_args()
 
+    prompt_config = PromptConfig.from_args(args)
+    
+    pprint(prompt_config)
     assert args.seed is not None
 
     if args.name is None:
@@ -157,6 +179,9 @@ if __name__ == "__main__":
         is_cot_task=args.cot_task,
         model_name=args.model_name,
         max_requests_per_min=args.max_requests_per_min,
+        prompt_config=prompt_config,
+        tag=args.tag,
+        temperature=args.temperature
     )
 
     if args.is_debug:

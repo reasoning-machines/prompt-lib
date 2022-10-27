@@ -6,11 +6,11 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class OpenaiAPIWrapper:
     @staticmethod
-    def call(prompt: str, max_tokens: int, engine: str, stop_token: str) -> dict:
+    def call(prompt: str, max_tokens: int, engine: str, stop_token: str, temperature: float) -> dict:
         response = openai.Completion.create(
             engine=engine,
             prompt=prompt,
-            temperature=0.0,
+            temperature=temperature,
             max_tokens=max_tokens,
             top_p=1,
             frequency_penalty=0,
