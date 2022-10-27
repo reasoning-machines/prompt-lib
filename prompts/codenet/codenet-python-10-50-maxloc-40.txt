@@ -1,0 +1,251 @@
+# slower version:
+
+from math import gcd
+# def gcd(a, b):
+#     if a%b==0: return b
+#     return gcd(b, a%b)
+K=int(input())
+sum=0
+for a in range(1,K+1):
+    for b in range(1,K+1):
+        for c in range(1,K+1):
+            sum+=gcd(gcd(a,b),c)
+print(sum)
+
+# optimized version of the same code:
+
+def gcd(a, b):
+    if a%b==0: return b
+    return gcd(b, a%b)
+K=int(input())
+sum=0
+for a in range(1,K+1):
+    for b in range(a,K+1):
+        for c in range(b,K+1):
+            if a==b==c: sum+=a
+            elif a!=b!=c: sum+=gcd(gcd(a,b),c)*6 
+            else: sum+=gcd(gcd(a,b),c)*3
+print(sum)
+
+
+
+
+# slower version:
+
+n = int(input())
+s = list(input())
+ans = s[0]
+
+for x in s:
+  if x != ans[-1]:
+    ans += x
+
+print(len(ans))
+
+# optimized version of the same code:
+
+n = int(input())
+s = input()
+list1 = [s[0]]
+
+for x in s:
+  if x != list1[-1]:
+    list1.append(x)
+    
+print(len(list1))
+
+
+
+
+# slower version:
+
+N = int(input())
+A = list(map(int, input().split()))
+li = []
+for itr, val in enumerate(A):
+  li.append([val, itr + 1])
+li.sort()
+print(*[i[1] for i in li])
+
+
+# optimized version of the same code:
+
+n = int(input())
+A = list(map(int, input().split()))
+
+B = [(a, i + 1) for i, a in enumerate(A)]
+B.sort()
+
+ans = [j for _, j in B]
+
+print(*ans)
+
+
+
+
+# slower version:
+
+x = int(input())
+
+ans = 0
+for i in range(1, 1000):
+    for j in range(2, 10):
+        if i ** j <= x:
+            ans = max(i ** j, ans)
+            
+print(ans)
+
+# optimized version of the same code:
+
+x = int(input())
+
+ans = 0
+if x == 1:
+    ans = 1
+else:
+    for i in range(2, 100):
+        n = 2
+        while i ** n <= x:
+            ans = max(ans , i ** n)
+            n += 1
+            
+print(ans)
+
+
+
+
+# slower version:
+
+h, w = map(int,input().split())
+a = [list(input()) for _ in range(h)]
+b = [[0 for _ in range(w)]for _ in range(h)]
+H = [-1,-1,-1, 0, 0, 1, 1, 1]
+W = [-1, 0, 1,-1, 1,-1, 0, 1]
+for i in range(h):
+    for j in range(w):
+        if a[i][j] == '#':
+            b[i][j] = '#'
+            for k in range(len(H)):
+                if i+H[k] < 0 or i+H[k] >= h:continue
+                elif j+W[k] < 0 or j+W[k] >= w:continue
+                elif a[i+H[k]][j+W[k]] == '#':continue
+                b[i+H[k]][j+W[k]] += 1
+for i in range(h):
+    print(*b[i],sep='')
+
+# optimized version of the same code:
+
+h, w = map(int,input().split())
+a = ['.'+input()+'.' for _ in range(h)]
+a.insert(0,'.'*(w+2))
+a.append('.'*(w+2))
+y = [1,1, 1,-1,-1,-1,0, 0]
+x = [0,1,-1, 0, 1,-1,1,-1]
+for i in range(1,h+1):
+    l =[]
+    for j in range(1,w+1):
+        if a[i][j] == '#':
+            l += '#'
+        else: l += str(sum([1 for k in range(8) if a[i+y[k]][j+x[k]] == '#']))
+    print(''.join(l))
+
+
+
+
+# slower version:
+
+h, a = map(int, input().split())
+
+ans = 0
+while h > 0:
+  h -= a
+  ans += 1
+
+print(ans)
+
+# optimized version of the same code:
+
+import math
+h, a = map(int, input().split())
+
+ans = 0
+print(math.ceil(h/a))
+
+
+
+
+# slower version:
+
+n,x=map(int,input().split())
+m=[]
+
+for i in range(n):
+    m.append(int(input()))
+
+x-=sum(m)
+count=n
+minm=min(m)
+
+while minm<=x:
+    count+=1
+    x-=minm
+
+print(count)
+
+# optimized version of the same code:
+
+n,x=map(int,input().split())
+
+m=[0]*n
+
+for i in range(n):
+    m[i]=int(input())
+    x-=m[i]
+
+print(n+x//min(m))
+
+
+
+
+# slower version:
+
+import sys
+
+sr = lambda: sys.stdin.readline().rstrip()
+ir = lambda: int(sr())
+lr = lambda: list(map(int, sr().split()))
+
+N = ir()
+AB = [lr() for _ in range(N)]
+AB.sort(key=lambda x: x[1])
+answer = 'Yes'
+time = 0
+for i in range(N):
+    if time + AB[i][0] > AB[i][1]:
+        answer = 'No'
+    time += AB[i][0]
+
+print(answer)
+
+
+# optimized version of the same code:
+
+import sys
+import numpy as np
+
+sr = lambda: sys.stdin.readline().rstrip()
+ir = lambda: int(sr())
+lr = lambda: list(map(int, sr().split()))
+
+N = ir()
+AB = np.array([lr() for _ in range(N)])
+AB = AB[np.argsort(AB[:, 1])]
+A = AB[:, 0]
+B = AB[:, 1]
+bl = np.all(A.cumsum() <= B)
+print('Yes' if bl else 'No')
+# 
+
+
+
+

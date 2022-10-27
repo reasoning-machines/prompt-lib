@@ -1,0 +1,298 @@
+# slower version:
+
+import numpy
+a,b=map(int,input().split())
+print(a*b)
+
+# optimized version of the same code:
+
+a,b=map(int,input().split())
+print(a*b)
+
+
+
+
+# slower version:
+
+from sys import stdin, setrecursionlimit
+
+setrecursionlimit(10 ** 9)
+INF = 1 << 60
+
+
+def input():
+    return stdin.readline().strip()
+
+
+def main():
+    H, W = map(int, input().split())
+    C = [list(map(int, input().split())) for _ in range(10)]
+    A = [list(map(int, input().split())) for _ in range(H)]
+    
+    for k in range(10):
+        for i in range(10):
+            for j in range(10):
+                if C[i][j] > C[i][k] + C[k][j]:
+                    C[i][j] = C[i][k] + C[k][j]
+                    
+    ans = 0
+    for row in A:
+        for n in row:
+            if n != -1:
+                ans += C[n][1]
+    
+    print(ans)
+    return
+
+
+if __name__ == '__main__':
+    main()
+
+
+# optimized version of the same code:
+
+import sys
+from collections import Counter
+
+read = sys.stdin.read
+readline = sys.stdin.readline
+readlines = sys.stdin.readlines
+sys.setrecursionlimit(10 ** 9)
+INF = 1 << 60
+
+
+def main():
+    H, W = map(int, readline().split())
+    C = [list(map(int, readline().split())) for _ in range(10)]
+    A = list(map(int, read().split()))
+
+    counter = Counter(A)
+
+    for k in range(10):
+        for i in range(10):
+            for j in range(10):
+                if C[i][j] > C[i][k] + C[k][j]:
+                    C[i][j] = C[i][k] + C[k][j]
+
+    ans = 0
+    for n, freq in counter.items():
+        if n not in (-1, 1):
+            ans += C[n][1] * freq
+
+    print(ans)
+    return
+
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+
+# slower version:
+
+from collections import deque
+N=int(input())
+nums=['3','5','7']
+stack=deque(nums)
+cnt=0
+while stack:
+    cand=stack.pop()
+    if ('3' in cand) and ('5' in cand) and ('7' in cand):
+        cnt+=1
+    for c in nums:
+        if int(cand+c)<=N:
+            stack.append(cand+c)
+
+print(cnt)
+
+# optimized version of the same code:
+
+n=int(input())
+lim=len(str(n))
+cand=[3,5,7]
+ans=[]
+while cand:
+    i=cand.pop()
+    for j in [3,5,7]:
+        k=int(str(i)+str(j))
+        if k<=n:
+            cand.append(k)
+            if len(set(str(k)))==3:
+                ans.append(k)
+print(len(ans))
+
+
+
+
+# slower version:
+
+import copy
+import numpy as np
+
+
+def count_black(c):
+    count = 0
+    for row in c:
+        count += row.count('#')
+    return count
+
+
+h, w, k = map(int, input().split())
+c = [list(input()) for _ in range(h)]
+ans = 0
+
+for h_p in range(2 ** h):
+    for w_p in range(2 ** w):
+        c_cp = np.array(copy.deepcopy(c))
+        for i in range(h):
+            if (h_p >> i) & 1:
+                c_cp[i, :] = 'r'
+
+        for j in range(w):
+            if (w_p >> j) & 1:
+                c_cp[:, j] = 'r'
+
+        if count_black(c_cp.tolist()) == k:
+            ans += 1
+print(ans)
+
+
+# optimized version of the same code:
+
+h, w, k = map(int, input().split())
+c = [input() for _ in range(h)]
+ans = 0
+for h_p in range(2 ** h):
+    for w_p in range(2 ** w):
+        cnt = 0
+        for i in range(h):
+            for j in range(w):
+                if (h_p >> i) & 1 and (w_p >> j) & 1 and c[i][j] == '#':
+                    cnt += 1
+        if cnt == k:
+            ans += 1
+print(ans)
+
+
+
+
+# slower version:
+
+N = int(input())
+As = list(map(int,input().split()))
+
+
+def dfs(A_s, index,Bss):
+    if index == N:
+        tmp = 1
+        for b in Bss:
+            tmp *= b
+        return 1 if tmp % 2 == 0 else 0
+    b_mi = Bss.copy()
+    b_mi.append(A_s[index] - 1)
+
+    b = Bss.copy()
+    b.append(A_s[index])
+
+    b_pl = Bss.copy()
+    b_pl.append(A_s[index] + 1)
+    return dfs(A_s,index + 1, b_mi) + dfs(A_s,index + 1,b) + dfs(A_s,index + 1,b_pl)
+
+
+print(dfs(As,0,[]))
+
+
+# optimized version of the same code:
+
+N = int(input())
+As = list(map(int,input().split()))
+
+tmp = 1
+for i in range(N):
+    if As[i] % 2 == 0:
+       tmp *= 2
+
+print(3 ** N - tmp)
+
+
+
+
+# slower version:
+
+N, M, *A = map(int, open(0).read().split())
+
+match = {1: 2, 2: 5, 3: 5, 4: 4, 5: 5, 6: 6, 7: 3, 8: 7, 9: 6}
+dp = [[0] * M for _ in range(N + 1)]
+
+for i in range(N + 1):
+    for j in range(M):
+        for k in range(M):
+            if (i - match[A[k]] == 0) or \
+                   (i - match[A[k]] > 0 and dp[i - match[A[k]]][j] != 0):
+                dp[i][k] = max(dp[i][k], 
+                               dp[i - match[A[k]]][j] * 10 + A[k])
+
+print(max(dp[-1]))
+
+
+
+# optimized version of the same code:
+
+
+N, M = map(int, input().split())
+X = list(map(int, input().split()))
+
+X.sort(reverse=True)
+count = [0, 2, 5, 5, 4, 5, 6, 3, 7, 6]
+dp = [-1] * (N + 1)
+dp[0] = 0
+
+for a in X:
+    n = count[a]
+    for i in range(N - n + 1):
+        if dp[i] == -1:
+            continue
+        dp[i + n] = max(dp[i + n], dp[i] * 10 + a)
+
+print(dp[-1])
+
+
+
+
+
+# slower version:
+
+n,k=map(int, input().split())
+a=n//k
+print(min(abs(n-k*a), abs(n-k*(a+1))))
+
+# optimized version of the same code:
+
+n,k=map(int,input().split())
+print(min(n%k, k-n%k))
+
+
+
+
+# slower version:
+
+import fractions
+a, b = map(int, input().split())
+print(a * b // fractions.gcd(a, b))
+
+# optimized version of the same code:
+
+a, b = map(int, input().split())
+def gcd(x, y):
+    x, y = max(x, y), min(x, y)
+    if y == 0:
+        return x
+    return gcd(y, x % y)
+  
+print(a * b // gcd(a, b))
+
+
+
+

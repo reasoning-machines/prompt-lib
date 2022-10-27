@@ -3,6 +3,9 @@ from prompts.sports import sports_task_id_to_prompt
 from prompts.date import date_task_id_to_prompt
 from prompts.sorting import sorting_task_id_to_prompt
 from prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
+
+from prompts.codenet.codenet import codnet_task_id_to_prompt
+
 from prompts.plot_generation import plot_generation_task_id_to_prompt
 from prompts.human_eval import humaneval_task_id_to_prompt
 from prompts.effgen import effgen_task_id_to_prompt
@@ -21,6 +24,7 @@ task_id_to_prompt.update(plot_generation_task_id_to_prompt)
 task_id_to_prompt.update(humaneval_task_id_to_prompt)
 task_id_to_prompt.update(effgen_task_id_to_prompt)
 task_id_to_prompt.update(quco_gsm_task_id_to_prompt)
+task_id_to_prompt.update(codnet_task_id_to_prompt)
 
 
 for task_id, example_list_or_prompt_path in task_id_to_prompt.items():

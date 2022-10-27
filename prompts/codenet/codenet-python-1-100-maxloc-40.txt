@@ -1,0 +1,304 @@
+# slower version:
+
+N = int(input())
+S =0
+for i in range(N+1):
+    if (i%3==0) and (i%5==0):
+        S = S 
+    elif i%3==0:
+        S = S
+    elif i%5==0:
+        S = S
+    else:
+        S = S + i
+print(S)
+
+# optimized version of the same code:
+
+N = int(input())
+S =0
+for i in range(1, N+1):
+    if (i%3==0) and (i%5==0):
+        S = S 
+    elif i%3==0:
+        S = S
+    elif i%5==0:
+        S = S
+    else:
+        S = S + i
+print(S)
+
+
+
+
+# slower version:
+
+a, b, c, d, e, f = map(int, input().split())
+water = []
+for i in range(31):
+    for j in range(31):
+        if (a*i+b*j)*100<=f:
+            water.append(a*i+b*j)
+water = list(set(water))
+
+result = [[0,a*100,0]]
+for i in water:
+    for x in range(301):
+        for y in range(301):
+            if i > 0 and c*x+d*y > 0 and c*x+d*y<=i*e and (c*x+d*y+100*i)<=f:
+                result.append([100*(c*x+d*y)/(c*x+d*y+100*i), c*x+d*y+100*i, c*x+d*y])
+
+result.sort(reverse=True)
+print(result[0][1], result[0][2])
+
+# optimized version of the same code:
+
+a, b, c, d, e, f = map(int, input().split())
+water = []
+for i in range(31):
+    for j in range(31):
+        if a*i+b*j <= f//100:
+            water.append(a*i+b*j)
+water.pop(water.index(0))
+water = list(set(water))
+result = [[0,0,0]]
+for w in water:
+    for i in range(301):
+        for j in range(301):
+            sugar = c*i+d*j
+            if sugar <= w*e and sugar+w*100 <= f: 
+                result.append([100*sugar/(sugar+w*100), (sugar+w*100), sugar])
+result.sort(reverse=True)
+print(result[0][1], result[0][2])
+
+
+
+
+# slower version:
+
+mod = 10**9+7
+def powmod(x,y):
+    res = 1
+    for i in range(y):
+        res = res*x%mod
+    
+    return res
+
+N = int(input())
+ans = powmod(10,N)-powmod(9,N)-powmod(9,N)+powmod(8,N)
+ans %=mod
+ans = (ans+mod)%mod
+print(ans)
+
+# optimized version of the same code:
+
+mod = 10**9+7
+N = int(input())
+ans = 10**N-(9**N)*2+8**N
+ans %=mod
+print(ans)
+
+
+
+
+# slower version:
+
+inputStr = input()
+inputList = inputStr.split(' ')
+
+a = inputList[0]
+b = inputList[1]
+c = inputList[2]
+
+if (a==b and not a==c) or (c==b and not a==c) or (a==c and not b==c):
+    print('Yes')
+else:print('No')
+
+# optimized version of the same code:
+
+abc = input().split(' ')
+
+a = int(abc[0])
+b = int(abc[1])
+c = int(abc[2])
+
+d = 0
+
+if a == b:
+    d = d + 1
+
+if b == c:
+    d = d + 1
+
+if c == a:
+    d = d + 1
+
+if d == 1:
+    print('Yes')
+else:
+    print('No')
+
+
+
+
+# slower version:
+
+def euclid(a, b):
+  division = a if (a > b) else b
+  divider = b if (a > b) else a
+  reminder = 0
+  while divider != 0:
+    reminder = division % divider
+    division = divider
+    divider = reminder
+  
+  return division
+
+K = int(input())
+
+result = 0
+for k in range(1, K + 1):
+  for l in range(1, K + 1):
+    for m in range(1, K + 1):
+      gcd = euclid(euclid(k, l), m)
+      result += gcd
+
+print(result)
+
+
+# optimized version of the same code:
+
+from math import gcd
+K = int(input())
+
+result = 0
+for k in range(1, K + 1):
+  for l in range(1, K + 1):
+    for m in range(1, K + 1):
+      gcd_res = gcd(gcd(k, l), m)
+      result += gcd_res
+
+print(result)
+
+
+
+
+
+# slower version:
+
+from bisect import bisect_right
+N,C,K = map(int,input().split())
+T = sorted([int(input()) for _ in range(N)])
+cnt = 0
+cur = 0
+while cur<N:
+    i = min(cur+C,N)-1
+    if T[i]-T[cur]<=K:
+        cnt += 1
+        cur = i+1
+    else:
+        i = bisect_right(T,T[cur]+K)-1
+        cnt += 1
+        cur = i+1
+print(cnt)
+
+# optimized version of the same code:
+
+from bisect import bisect_right
+N,C,K = map(int,input().split())
+T = sorted([int(input()) for _ in range(N)])
+cur = 0
+cnt = 0
+while cur<N:
+    ind = bisect_right(T,T[cur]+K)
+    if ind-cur<=C:
+        cnt += 1
+        cur = ind
+    else:
+        cnt += 1
+        cur += C
+print(cnt)
+
+
+
+
+# slower version:
+
+a, b = map(int, input().split())
+ 
+kleine = 2018
+ 
+if b-a == 1:
+	print((a*b)%2019)
+elif b-a>= 2018:
+	print(0)    
+else:
+	for i in range (a, b):
+		for j in range (i+1, b+1):
+			k = (i*j)%2019
+			if k < kleine:
+				kleine = k
+			else:
+				continue
+	print(kleine)
+
+# optimized version of the same code:
+
+L, R = map(int, input().split())
+
+minimize = 2018
+P = 0
+
+if R-L >= 2019:
+	print(0)
+	exit()
+else:
+	for i in range (L, R):
+		for j in range (i+1, R+1):
+			P = (i*j)%2019
+			if P < minimize:
+				minimize = P
+print(minimize)
+
+
+
+
+# slower version:
+
+n, a, b = map(int, input().split())
+MOD = 10**9+7
+
+
+def COM(n, r):
+    X = Y = 1
+    if n-r < r:
+        r = n-r
+    for i in range(1, r+1):
+        Y = Y*i % MOD
+        X = X*(n-i+1) % MOD
+    Y = pow(Y, MOD-2, MOD)
+    return X*Y
+
+ans = pow(2, n, MOD)-1 - COM(n, a)-COM(n, b)
+ans %= MOD
+
+print(ans)
+
+
+# optimized version of the same code:
+
+n, a, b = map(int, input().split())
+MOD = 10**9+7
+ans = pow(2, n, MOD)-1
+X = Y = 1
+for i in range(1, b+1):
+    Y = Y*i % MOD
+    X = X*(n-i+1) % MOD
+    if i == a or i == b:
+        ans -= X*pow(Y, MOD-2, MOD)
+
+print(ans % MOD)
+
+
+
+
