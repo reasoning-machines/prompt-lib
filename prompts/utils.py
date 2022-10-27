@@ -18,6 +18,16 @@ class PromptConfig:
     final_answer_prefix: str = "The answer is "
     intra_example_sep: str = "\n"
     inter_example_sep: str = "\n\n"
+    
+    @staticmethod
+    def from_args(args):
+        return PromptConfig(
+            question_prefix=args.question_prefix.replace('\\n', '\n'),
+            answer_prefix=args.answer_prefix.replace('\\n', '\n'),
+            final_answer_prefix=args.final_answer_prefix.replace('\\n', '\n'),
+            intra_example_sep=args.intra_example_sep.replace('\\n', '\n'),
+            inter_example_sep=args.inter_example_sep.replace('\\n', '\n'),
+        )
 
 
 @dataclass
@@ -34,6 +44,7 @@ class TaskConfig:
     """
 
     task_id: str
+    tag: str
     num_examples: int
     max_tokens: int
     timeout: int
@@ -42,7 +53,8 @@ class TaskConfig:
     is_cot_task: bool
     model_name: str
     max_requests_per_min: int
-    prompt_config: PromptConfig = PromptConfig()
+    prompt_config: PromptConfig
+    temperature: float = 0.0
 
 
 def format_prompt(
@@ -63,7 +75,7 @@ def format_prompt(
         str: The prompt str
     """
     # shuffle the examples, but use the same seed for each prompt
-    if num_examples == 0:
+    if num_examples == -1:
         num_examples = len(prompt_examples)
     examples = random.Random(seed).sample(prompt_examples, num_examples)
     # format the prompt
@@ -79,7 +91,6 @@ def format_prompt(
             prompt_str += (
                 prompt_config.final_answer_prefix
                 + example.answer
-                + "."
                 + prompt_config.intra_example_sep
             )  # "The answer is " + answer + "\n"
         else:
@@ -87,7 +98,6 @@ def format_prompt(
                 prompt_config.answer_prefix
                 + prompt_config.final_answer_prefix
                 + example.answer
-                + "."
                 + prompt_config.intra_example_sep
             )  # "A: " + answer + "\n"
         prompt_str += prompt_config.inter_example_sep  # "\n\n"
@@ -150,7 +160,7 @@ def maintain_request_per_minute(
             time.sleep(10)
         request_per_minute = get_request_per_minute(num_requests, time_begin)
     if "code" in model_name:
-        time.sleep(4)
+        time.sleep(1)
     return request_per_minute
 
 
