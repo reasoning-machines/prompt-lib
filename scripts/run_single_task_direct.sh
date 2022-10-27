@@ -17,10 +17,8 @@ else
     exit 1
 fi
 
-MAX_TOKENS=600
-
-
 NUM_QUESTIONS_PER_THREAD=500
+MAX_TOKENS=600
 
 for TASK in "${TASK_TO_RUN[@]}"; do
 
@@ -32,15 +30,12 @@ for TASK in "${TASK_TO_RUN[@]}"; do
             --name "${TASK}_${MODEL_NAME}_s${SEED}"  # name of the run
             --timeout 1440  # timeout in minutes
             --model_name "${MODEL_NAME}"
-            --max_tokens ${MAX_TOKENS}
             --max_requests_per_min ${REQ_PER_MIN}
             --seed ${SEED}   # decides order of examples in the prompt
             --num_questions_per_thread ${NUM_QUESTIONS_PER_THREAD}  # number of questions to ask per thread
-            --is_debug)  # if set, wandb logging is disabled
+            --max_tokens ${MAX_TOKENS})  # number of tokens in completion
 
-        if [[ ! "${TASK}" == *"direct"* ]]; then
-            ARGS+=("--cot_task")
-        fi
+
         echo "python3 run.py ${ARGS[@]}"
         python -u query_openai.py "${ARGS[@]}"
     done
