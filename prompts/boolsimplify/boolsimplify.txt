@@ -1,0 +1,8 @@
+Q: !a & a & (a ^ c & d | !b)
+A: The answer is false
+
+
+Q: a & b | a & c
+A: The answer is a & (b | c)
+
+

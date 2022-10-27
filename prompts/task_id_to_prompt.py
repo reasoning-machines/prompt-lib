@@ -2,11 +2,13 @@ from prompts.gsm import gsm_task_id_to_prompt
 from prompts.sports import sports_task_id_to_prompt
 from prompts.date import date_task_id_to_prompt
 from prompts.sorting import sorting_task_id_to_prompt
-from prompts.boolsimplify import bool_simplify_taskid_to_prompt
+from prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
 from prompts.plot_generation import plot_generation_task_id_to_prompt
 from prompts.human_eval import humaneval_task_id_to_prompt
 from prompts.effgen import effgen_task_id_to_prompt
 from prompts.quco_gsm import quco_gsm_task_id_to_prompt
+
+from prompts.example import PromptStr
 
 
 task_id_to_prompt = dict()
@@ -20,19 +22,42 @@ task_id_to_prompt.update(humaneval_task_id_to_prompt)
 task_id_to_prompt.update(effgen_task_id_to_prompt)
 task_id_to_prompt.update(quco_gsm_task_id_to_prompt)
 
-if __name__ == '__main__':
-    import sys
-    from utils import format_prompt, PromptConfig
 
-    task_id = sys.argv[1]
-    is_cot = sys.argv[2] == 'cot'
-    seed = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+for task_id, example_list_or_prompt_path in task_id_to_prompt.items():
+    if isinstance(example_list_or_prompt_path, str):
+        with open(example_list_or_prompt_path) as f:
+            prompt_str = f.read()
+        task_id_to_prompt[task_id] = PromptStr(prompt_str)
+        
+
+if __name__ == '__main__':
+    import argparse
+    from prompts.utils import format_prompt, PromptConfig
+
+    args = argparse.ArgumentParser()
+    args.add_argument("--task_id", type=str)
+    args.add_argument("--num_examples", type=int, default=-1)
+    args.add_argument("--seed", type=int)
+    args.add_argument("--cot_task", action="store_true")
+
+    args.add_argument("--question_prefix", type=str, default="Q: ")
+    args.add_argument("--answer_prefix", type=str, default="A: ")
+    args.add_argument("--final_answer_prefix", type=str, default="The answer is ")
+    args.add_argument("--intra_example_sep", type=str, default="\n")
+    args.add_argument("--inter_example_sep", type=str, default="\n\n")
+    args.add_argument("--temperature", type=float, default=0.0)
+    
+    
+    args = args.parse_args()
+
+    prompt_config = PromptConfig.from_args(args)
+    
     prompt_str = format_prompt(
-        prompt_examples=task_id_to_prompt[task_id],
-        prompt_config=PromptConfig(),
-        num_examples=0,
-        seed=seed,
-        is_cot_prompt=is_cot,
+        prompt_examples=task_id_to_prompt[args.task_id],
+        prompt_config=prompt_config,
+        num_examples=args.num_examples,
+        seed=args.seed,
+        is_cot_prompt=args.cot_task,
     )
     
     print(prompt_str)

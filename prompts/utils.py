@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Union
 import pandas as pd
 import random
 import time
 import logging
+from prompts.example import PromptStr
 
 from prompts.example import Example
 from prompts.task_id_to_prompt import task_id_to_prompt
@@ -58,7 +59,7 @@ class TaskConfig:
 
 
 def format_prompt(
-    prompt_examples: List[Example],
+    prompt_examples: Union[List[Example], PromptStr],
     prompt_config: PromptConfig,
     num_examples: int,
     seed: int,
@@ -74,6 +75,8 @@ def format_prompt(
     Returns:
         str: The prompt str
     """
+    if isinstance(prompt_examples, PromptStr):
+        return prompt_examples.prompt_str
     # shuffle the examples, but use the same seed for each prompt
     if num_examples == -1:
         num_examples = len(prompt_examples)
@@ -121,13 +124,16 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     task_df = pd.read_json(task_file_path, lines=True, orient="records")
 
     # format the prompt
-    prompt_str = format_prompt(
-        prompt_examples=task_id_to_prompt[task_config.task_id],
-        prompt_config=task_config.prompt_config,
-        num_examples=task_config.num_examples,
-        seed=task_config.seed,
-        is_cot_prompt=task_config.is_cot_task,
-    )
+    if isinstance(task_id_to_prompt[task_config.task_id], PromptStr):
+        prompt_str = task_id_to_prompt[task_config.task_id].prompt_str
+    else:
+        prompt_str = format_prompt(
+            prompt_examples=task_id_to_prompt[task_config.task_id],
+            prompt_config=task_config.prompt_config,
+            num_examples=task_config.num_examples,
+            seed=task_config.seed,
+            is_cot_prompt=task_config.is_cot_task,
+        )
 
     is_non_code_model = "code" not in task_config.model_name
     # add the prompt to the task file

@@ -24,5 +24,6 @@ boolsimplify_examples = [
 ]
 
 bool_simplify_taskid_to_prompt = {
-    "boolsimplify_stream": boolsimplify_examples
+    "boolsimplify_stream": boolsimplify_examples,
+    "boolsimplify_txt": "prompts/boolsimplify/boolsimplify.txt"
 }
