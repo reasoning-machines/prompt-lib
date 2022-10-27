@@ -3,6 +3,10 @@ from prompts.sports import sports_task_id_to_prompt
 from prompts.date import date_task_id_to_prompt
 from prompts.sorting import sorting_task_id_to_prompt
 from prompts.boolsimplify import bool_simplify_taskid_to_prompt
+from prompts.plot_generation import plot_generation_task_id_to_prompt
+from prompts.human_eval import humaneval_task_id_to_prompt
+from prompts.effgen import effgen_task_id_to_prompt
+from prompts.quco_gsm import quco_gsm_task_id_to_prompt
 
 
 task_id_to_prompt = dict()
@@ -11,7 +15,10 @@ task_id_to_prompt.update(sports_task_id_to_prompt)
 task_id_to_prompt.update(date_task_id_to_prompt)
 task_id_to_prompt.update(sorting_task_id_to_prompt)
 task_id_to_prompt.update(bool_simplify_taskid_to_prompt)
-
+task_id_to_prompt.update(plot_generation_task_id_to_prompt)
+task_id_to_prompt.update(humaneval_task_id_to_prompt)
+task_id_to_prompt.update(effgen_task_id_to_prompt)
+task_id_to_prompt.update(quco_gsm_task_id_to_prompt)
 
 if __name__ == '__main__':
     import sys
