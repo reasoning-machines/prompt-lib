@@ -80,7 +80,7 @@ def run_inference(task_config: TaskConfig) -> None:
 
 
 def query_openai_over_inputs(
-    inputs: List[dict], thread_id: int, task_config: TaskConfig
+    inputs: List[dict], thread_id: int, task_config: TaskConfig, max_retries: int = 10
 ) -> List[dict]:
     outputs = []
     time_begin = time.time()
@@ -89,6 +89,7 @@ def query_openai_over_inputs(
     n = len(inputs)
 
     pbar = tqdm(total=n, desc=f"Querying openai [thread_id={thread_id}]")
+    num_retries = 0
     while i < n:
         input = inputs[i]
         try:
@@ -101,6 +102,7 @@ def query_openai_over_inputs(
                 model_name=task_config.model_name,
             )
             question = input["question"]
+
             response = OpenaiAPIWrapper.call(
                 temperature=task_config.temperature,
                 prompt=question,
@@ -108,9 +110,9 @@ def query_openai_over_inputs(
                 engine=task_config.model_name,
                 stop_token=task_config.prompt_config.question_prefix,  # generate till the model starts generating a new question
             )
-            print(question)
 
             print(OpenaiAPIWrapper.parse_response(response))
+            
             outputs.append(
                 {
                     "question": question,
@@ -122,10 +124,17 @@ def query_openai_over_inputs(
             pbar.update(1)
 
         except Exception as e:
+            print(f"Error: {e}")
             if "code" not in task_config.model_name:  # usually codex models throw rate limit errors
                 i += 1
-            print(f"Error: {e}")
-            continue
+            elif num_retries < max_retries:
+                num_retries += 1
+                print("Retrying...")
+                continue
+            else:
+                num_retries = 0
+                i += 1
+                print("Skipping...")
     return outputs
 
 
