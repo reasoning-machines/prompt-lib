@@ -1,105 +1,115 @@
-# Text and Patterns: For Effective Chain of Thought, It Takes Two to Tango
+# Prompt-lib
 
-## Reproducing the results in the paper
+- A library for hassle-free few-shot prompting.
 
-- This repo contains code and data required to reproduce the results in our submission. Note that we experiment with four different models: i) codex, ii) gpt-3, iii) PaLM-62B, and iv) PaLM-540B. Since the PaLM variants are not publicly available, this script allows you to reproduce the results for codex and gpt-3. While gpt-3 is not free, codex is free with a rate limit of 20 requests / min. Our code implements the rate limit and retries for code models. For both these models, a key is required to access the API. The key can be accessed from [this link](https://beta.openai.com/account/api-keys) after making an OpenAI account ([link](https://openai.com/join/)).
+TLDR: This library makes it easy to write prompts for few-shot prompting tasks. It includes rate-limiting and retry logic, and makes it easy to write prompts for different tasks.
 
-- The key needs to be exported as an environment variable. For example, if the key is `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`, then the following command can be used to export the key:
+- To get started, run:
+```bash
+export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+bash scripts/run_single_task.sh boolsimplify_stream
 
+```
+
+
+- The outputs are stored in `data/logs/boolsimplify_stream/`
+
+## Running on a custom task
+
+### Step 1: Defining a custom task
+
+- To begin we need a prompt. A prompt is a list of examples, where each example is an instantiation of the following:
+
+```py
+@dataclass
+class Example:
+    question: str
+    answer: str
+    thought: str
+```
+
+- The `question` is the input to the model, the `answer` is the expected output, and the `thought` is an intermediate reasoning step. The `thought` is optional, and can be left as an empty string if not needed (for direct prompting for example).
+
+- Let us define a prompt for the task of boolean expression simplification. The following is a list of examples for this task:
+
+```py
+[
+    Example(
+        question="!a & a & (a ^ c & d | !b)",
+        answer="false",
+        thought="false & expr is false",
+    ),
+    Example(
+        question="a & b | a & c",
+        answer="a & (b | c)",
+        thought="a & (b | c) is the same as a & b | a & c",
+    ),
+    Example(
+        question="a & b | a & b",
+        answer="a & b",
+        thought="expr | expr is the same as expr",
+    ),
+    Example(
+        question="(a | !a) | ((b & !c | c & !b) & (a | !a) | (b & !c | c & !b))",
+        answer="true",
+        thought="true | expr is true",
+    ),
+]
+```
+
+- The prompt can be added to any python file in scope, but for the sake of this example, we will add it to `prompts/boolsimplify.py`. Typically, you will try multiple variations of a prompt for a task.
+ To keep things manageable, we add a dictionary at the end of `prompts/boolsimplify.py` that gives a task_id to each prompt:
+
+```py
+ bool_simple_taskid_to_prompt = {
+    "boolsimplify_stream": bool_simple_examples
+}
+```
+
+- Note the id we give to our task: `boolsimplify_stream`. By convention, task_ids have two parts: `{dataset}_{prompt_type}`. Here, the `dataset` is `boolsimplify` and the `prompt_type` is `stream`. 
+
+### Step 2: Registering the task
+
+- The next step is to register the task. The file `task_id_to_prompt` maintains a global dictionary that maps task_ids to prompts. We can add our task to this dictionary by adding the following line to `task_id_to_prompt`:
+
+```py
+from prompts.boolsimplify import boolsimplify_taskid_to_prompt
+
+task_id_to_prompt.update(bool_simple_taskid_to_prompt)
+```
+
+- The task is now registered, and can be used to run a custom task.
+
+
+### Step 3: Defining inputs/outputs
+
+- We want to evaluate the model on some test file, and thus we need a file with inputs and expected outputs. The file `data/tasks/boolsimplify.jsonl` contains the inputs and outputs for the `boolsimplify` dataset. The file is a jsonl, and each line is a json object with the following keys:
+
+```py
+{
+    "input": "a & b | a & c",
+    "target": "a & (b | c)",
+}
+```
+
+- A simple task file with 5 lines has been added to `data/tasks/boolsimplify.jsonl` for this example. You can add more lines to this file to evaluate the model on more examples.
+
+
+### Step 4: Running the task
+
+
+- Now that the task is registered, and the inputs/outputs are defined, we can run the task. The following command will run the task:
+
+- Export your openai api key to the environment variable `OPENAI_API_KEY`:
 
 ```bash
 export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-- After this, all the jobs can be run using the following command:
- 
+
 ```bash
-bash scripts/run_jobs.sh
+bash scripts/run_single_task.sh boolsimplify_stream
 ```
 
-## Outputs and prompts
 
------------
-
-- The lightweight requirements are listed in `requirements.txt`. 
-
-- To make the repo self-contained, we have included all the datasets and prompts:
-
-1. Prompts are located in `prompts/` directory.
-2. Datasets are located in `data/tasks/` directory.
-
-
-## File listing
-
-----
-
-```
-📁 ./
-├─📁 utils/
-│ ├─📄 stats_test.py
-├─📄 query_openai.py
-├─📁 prompts/
-│ ├─📄 task_id_to_prompt.py
-│ ├─📄 gsm.py
-│ ├─📄 utils.py
-│ ├─📄 __init__.py
-│ ├─📄 example.py
-│ ├─📄 sports.py
-│ ├─📄 date.py
-│ └─📄 sorting.py
-├─📄 eval.py
-└─📄 openai_api.py
-```
-
-* Some notable files:
-
-1. `query_openai.py` contains the code to query the API.
-
-2. `prompts/` contains the prompts for each task (`gsms.py`, `sports.py`, `sorting.py`, `date.py`).
-
-3. `eval.py` contains the code to evaluate the outputs.
-
-4. `prompts/utils.py` includes rate-limiting and retry logic.
-
-
----
-
-## Outputs
-
-* The outputs are located in `outputs.zip`. 
-
-* Each file is a jsonl, and follows a specific naming format: `{task_id}-{model_name}_s{seed}.jsonl`. For example, `outputs/sports_stream_text-davinci-002_s1.jsonl` contains the outputs for the `sports_stream_text` task for the `text-davinci-002` model with seed 1.
-
-* A sample line in the output is as follows:
-
-```json
-{
-    "question": "Q: Is the following sentence plausible? 'Jonas Valanciunas beat the buzzer.'\nA: Jonas Valanciunas is a basketball player. Beating the buzzer is part of basketball. The answer is yes.\n\n\nQ: Is the following sentence plausible? 'Kyle Palmieri was called for slashing.'\nA: Kyle Palmieri is a hockey player. Being called for slashing is part of hockey. The answer is yes.\n\n\nQ: Is the following sentence plausible? 'Jamal Murray was perfect from the line.'\nA: Jamal Murray is a basketball player. Being perfect from the line is part of basketball. The answer is yes.\n\n\nQ: Is the following sentence plausible? 'Draymond Green threw a touchdown.'\nA: Draymond Green is an basketball player. Throwing a touchdown is part of football, not basketball. The answer is no.\n\n\nQ: Is the following sentence plausible? 'Carson Wentz set the pick and roll.'\nA: Carson Wentz is an American football player. Pick and roll is part of basketball, not football. The answer is no.\n\n\nQ: Is the following sentence plausible? 'Joao Moutinho caught the screen pass in the NFC championship.'\nA: Joao Moutinho is a soccer player. The NFC championship is part of American football, not soccer. The answer is no.\n\n\nQ: Is the following sentence plausible? 'Malcolm Brogdon banked the shot in.'\nA: Malcolm Brogdon is a basketball player. Banking the shot in is part of basketball. The answer is yes.\n\n\nQ: Is the following sentence plausible? 'Sam Darnold passed the puck.'\nA: Sam Darnold is a American football player. Passing the puck is part of hockey, not American football. The answer is no.\n\n\nQ: Yes or no: Is the following sentence plausible? \"Neal Pionk took the snap.\"\nA:",
-    "generated_answer": " Neal Pionk is a hockey player. Taking the snap is part of American football, not hockey. The answer is no.",
-    "answer": "no",
-    "is_correct": 1
-}
-```
-
-* Here:
-
-1. `question` is the prompt + test question.
-2. `generated_answer` is the generated answer.
-3. `answer` is the correct answer.
-4. `is_correct` is 1 if the generated answer is correct, and 0 otherwise.
-
-
-----
-
-## Task files
-
-* The task files are located in `data/tasks/` directory.
-
-```
-data/tasks/
-├── date.jsonl
-├── gsm.jsonl
-├── sorting.jsonl
-├── sports.jsonl
-└── test.jsonl
-```
+- The outputs are stored in `data/logs/boolsimplify_stream/`
