@@ -24,9 +24,7 @@ FINAL_ANSWER_PREFIX=""
 INTRA_EXAMPLE_SEP="\n\n"
 INTER_EXAMPLE_SEP="\n\n\n"
 
-declare -a ALL_TASKS=("effgengold_0_10" "effgengold_10_30" "effgengold_30_50" "effgengold_90_100")
-
-declare -a ALL_TASKS=("effgengold_0_10")
+declare -a ALL_TASKS=("effgengoldnocmt_0_10" "effgengoldnocmt_30_50" "effgengoldnocmt_10_30" "effgengoldnocmt_90_100")
 
 
 declare -a NUM_EXAMPLES=(8)
@@ -59,7 +57,6 @@ for TASK in "${ALL_TASKS[@]}"; do
 
         echo "python3 run.py ${ARGS[@]}"
         python -u query_openai.py "${ARGS[@]}"
-        exit 1
     done
 done
 

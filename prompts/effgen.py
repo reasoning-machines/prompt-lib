@@ -184,4 +184,8 @@ effgen_task_id_to_prompt = {
     "effgengold_30_50": improvements_30_50,
     "effgengold_10_30": improvements_10_30,
     "effgengold_90_100": improvements_90_100,
+    "effgengoldnocmt_0_10": improvements_0_10,
+    "effgengoldnocmt_30_50": improvements_30_50,
+    "effgengoldnocmt_10_30": improvements_10_30,
+    "effgengoldnocmt_90_100": improvements_90_100,
 }
