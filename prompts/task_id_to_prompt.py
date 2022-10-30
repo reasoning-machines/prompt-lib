@@ -54,6 +54,7 @@ def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
             task_id_to_prompt[task_id] = get_prompt_from_file(example_list_or_prompt_path)
 
 update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
+# TODO: make the above dynamic import more robust
 
 if __name__ == '__main__':
     import argparse
