@@ -1,3 +1,6 @@
+import sys
+sys.path.append("prompt-lib")  # to allow imports from outside the project directory
+import os
 from prompts.gsm import gsm_task_id_to_prompt
 from prompts.sports import sports_task_id_to_prompt
 from prompts.date import date_task_id_to_prompt
@@ -10,7 +13,6 @@ from prompts.plot_generation import plot_generation_task_id_to_prompt
 from prompts.human_eval import humaneval_task_id_to_prompt
 from prompts.effgen import effgen_task_id_to_prompt
 from prompts.quco_gsm import quco_gsm_task_id_to_prompt
-
 from prompts.example import PromptStr
 
 
@@ -27,12 +29,31 @@ task_id_to_prompt.update(quco_gsm_task_id_to_prompt)
 task_id_to_prompt.update(codnet_task_id_to_prompt)
 
 
+def get_prompt_from_file(prompt_path: str) -> PromptStr:
+    # see if path exists
+    if not os.path.exists(prompt_path):
+        if not os.path.exists("prompt-lib/" + prompt_path):
+            raise ValueError(f"Path {prompt_path} does not exist")
+        else:
+            prompt_path = "prompt-lib/" + prompt_path
+    with open(prompt_path) as f:
+        prompt_str = f.read()
+    return PromptStr(prompt_str)
+
 for task_id, example_list_or_prompt_path in task_id_to_prompt.items():
     if isinstance(example_list_or_prompt_path, str):
-        with open(example_list_or_prompt_path) as f:
-            prompt_str = f.read()
-        task_id_to_prompt[task_id] = PromptStr(prompt_str)
         
+        task_id_to_prompt[task_id] = get_prompt_from_file(example_list_or_prompt_path)
+
+def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
+    import importlib
+    import_module = importlib.import_module(import_module_name)
+    task_id_to_prompt.update(import_module.task_id_to_prompt)
+    for task_id, example_list_or_prompt_path in import_module.task_id_to_prompt.items():
+        if isinstance(example_list_or_prompt_path, str):
+            task_id_to_prompt[task_id] = get_prompt_from_file(example_list_or_prompt_path)
+
+update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
 
 if __name__ == '__main__':
     import argparse
@@ -65,3 +86,14 @@ if __name__ == '__main__':
     )
     
     print(prompt_str)
+    
+    # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
+    # prompt_str = format_prompt(
+    #     prompt_examples=task_id_to_prompt["gsmhard_interactive"],
+    #     prompt_config=prompt_config,
+    #     num_examples=args.num_examples,
+    #     seed=args.seed,
+    #     is_cot_prompt=args.cot_task,
+    # )
+    # print(prompt_str)
+    
