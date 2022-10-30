@@ -1,184 +1,280 @@
 # slower version:
 
-N = int(input())
-S =0
-for i in range(N+1):
-    if (i%3==0) and (i%5==0):
-        S = S 
-    elif i%3==0:
-        S = S
-    elif i%5==0:
-        S = S
-    else:
-        S = S + i
-print(S)
+a, b, c = map(int, input().split())
+if c-(a-b) <= 0:
+    print(0)
+else:
+    print(c-(a-b))
 
 # optimized version of the same code:
 
-N = int(input())
-S =0
-for i in range(1, N+1):
-    if (i%3==0) and (i%5==0):
-        S = S 
-    elif i%3==0:
-        S = S
-    elif i%5==0:
-        S = S
-    else:
-        S = S + i
-print(S)
+a, b, c = map(int, input().split())
+print(max(0,c-(a-b)))
 
 
 
 
 # slower version:
 
-a, b, c, d, e, f = map(int, input().split())
-water = []
-for i in range(31):
-    for j in range(31):
-        if (a*i+b*j)*100<=f:
-            water.append(a*i+b*j)
-water = list(set(water))
+import itertools
 
-result = [[0,a*100,0]]
-for i in water:
-    for x in range(301):
-        for y in range(301):
-            if i > 0 and c*x+d*y > 0 and c*x+d*y<=i*e and (c*x+d*y+100*i)<=f:
-                result.append([100*(c*x+d*y)/(c*x+d*y+100*i), c*x+d*y+100*i, c*x+d*y])
+N, M = map(int, input().split())
+ab = []
+for _ in range(M):
+    a, b = map(int, input().split())
+    ab.append({a-1, b-1})
 
-result.sort(reverse=True)
-print(result[0][1], result[0][2])
+ans = 0
+for v in itertools.permutations(range(1, N)):
+    ok = True
+    a = 0
+    for b in v:
+        if {a, b} not in ab:
+            ok = False
+            break
+        a = b
+    if ok:
+        ans += 1
+
+print(ans)
+
 
 # optimized version of the same code:
 
-a, b, c, d, e, f = map(int, input().split())
-water = []
-for i in range(31):
-    for j in range(31):
-        if a*i+b*j <= f//100:
-            water.append(a*i+b*j)
-water.pop(water.index(0))
-water = list(set(water))
-result = [[0,0,0]]
-for w in water:
-    for i in range(301):
-        for j in range(301):
-            sugar = c*i+d*j
-            if sugar <= w*e and sugar+w*100 <= f: 
-                result.append([100*sugar/(sugar+w*100), (sugar+w*100), sugar])
-result.sort(reverse=True)
-print(result[0][1], result[0][2])
+N, M = map(int, input().split())
+ab = [[] for _ in range(N)]
+for _ in range(M):
+    a, b = map(int, input().split())
+    ab[a-1].append(b-1)
+    ab[b-1].append(a-1)
+
+ans = 0
+def dfs(x, visited):
+    global ans
+    if len(visited) == N:
+        ans += 1
+        return
+
+    for b in ab[x]:
+        if b not in visited:
+            dfs(b, visited + [b])
+    return
+
+dfs(0, [0])
+print(ans)
+
 
 
 
 
 # slower version:
 
-mod = 10**9+7
-def powmod(x,y):
-    res = 1
-    for i in range(y):
-        res = res*x%mod
+x,t = map(int,input().split())
+
+if x < t:
+    print(0)
+else:
+    print(x-t)
+
+# optimized version of the same code:
+
+x,t = map(int,input().split())
+print(max(0,x-t))
+
+
+
+
+# slower version:
+
+n=int(input())
+a=[int(input()) for _ in range(n)]
+
+q=[]
+
+def bisect_desc(a,x):
+    r = len(a)
+    if r == 0:
+        return 0
+    l = 0
+    while l != r:
+        f = (l+r)//2
+        if a[f] >= x:
+            l = f+1
+        else:
+            r = f
+    return l
+
+for sa in a:
+    t = bisect_desc(q,sa)
+    if t ==len(q):
+        q.append(sa)
+    else:
+        q[t] = sa
+
+print(len(q))
+
+# optimized version of the same code:
+
+n=int(input())
+a=[int(input()) for _ in range(n)]
+
+q=[]
+
+def bisect_desc(a,x):
+    r = len(a)
+    if r == 0:
+        return 0
+    l = 0
+    while l != r:
+        f = (l+r)//2
+        if a[f] >= x:
+            l = f+1
+        else:
+            r = f
+    return l
+
+for sa in a:
+    t = bisect_desc(q,sa)
+    if t ==len(q):
+        q.append(sa)
+    else:
+        q[t] = sa
+
+print(len(q))
+
+
+
+
+
+# slower version:
+
+n=int(input())
+p=[int(i) for i in input().split()]
+for i in range(n):
+    if i!=0:p[i]=min(p[i-1],p[i])
+print(len(set(p)))
+
+
+# optimized version of the same code:
+
+n=int(input())
+p=[int(i) for i in input().split()]
+for i in range(1,n):p[i]=min(p[i-1],p[i])
+print(len(set(p)))
+
+
+
+
+
+# slower version:
+
+import sys
+input=sys.stdin.readline
+from bisect import bisect_left,insort_left
+d=int(input())
+c=list(map(int,input().split()))
+s=[list(map(int,input().split()))for _ in range(d)]
+t=[int(input())for _ in range(d)]
+m=int(input())
+dq=[list(map(int,input().split()))for _ in range(m)]
+x=[[0]for _ in range(26)]
+ans=0
+for i in range(d):
+  v=t[i]-1
+  ans+=s[i][v]-c[v]*(i-x[v][-1]+1)*(i-x[v][-1])//2
+  x[v].append(i+1)
+for i in range(26):
+  ans-=c[i]*(d+1-x[i][-1])*(d-x[i][-1])//2
+  x[i].append(d+1)
+for dd,q in dq:
+  p=t[dd-1]
+  t[dd-1]=q
+  ans-=s[dd-1][p-1]
+  ans+=s[dd-1][q-1]
+  pi=bisect_left(x[p-1],dd)
+  qi=bisect_left(x[q-1],dd)
+  pl=dd-x[p-1][pi-1]
+  pr=x[p-1][pi+1]-dd
+  ql=dd-x[q-1][qi-1]
+  qr=x[q-1][qi]-dd
+  del x[p-1][pi]
+  x[q-1].insert(qi,dd)
+  ans-=c[p-1]*pl*pr
+  ans+=c[q-1]*ql*qr
+  print(ans)
+
+# optimized version of the same code:
+
+import sys
+input=sys.stdin.readline
+from bisect import bisect_left,insort_left
+d=int(input())
+c=list(map(int,input().split()))
+s=[list(map(int,input().split()))for _ in range(d)]
+t=[int(input())for _ in range(d)]
+m=int(input())
+dq=[list(map(int,input().split()))for _ in range(m)]
+x=[[0]for _ in range(26)]
+ans=0
+for i in range(d):
+  v=t[i]-1
+  ans+=s[i][v]-c[v]*(i-x[v][-1]+1)*(i-x[v][-1])//2
+  x[v].append(i+1)
+for i in range(26):
+  ans-=c[i]*(d+1-x[i][-1])*(d-x[i][-1])//2
+  x[i].append(d+1)
+for dd,q in dq:
+  p=t[dd-1]
+  t[dd-1]=q
+  ans-=s[dd-1][p-1]
+  ans+=s[dd-1][q-1]
+  pi=bisect_left(x[p-1],dd)
+  qi=bisect_left(x[q-1],dd)
+  pl=dd-x[p-1][pi-1]
+  pr=x[p-1][pi+1]-dd
+  ql=dd-x[q-1][qi-1]
+  qr=x[q-1][qi]-dd
+  del x[p-1][pi]
+  x[q-1].insert(qi,dd)
+  ans-=c[p-1]*pl*pr
+  ans+=c[q-1]*ql*qr
+  print(ans)
+
+
+
+
+
+# slower version:
+
+n,m=map(int,input().split())
+li=[]
+for i in range(m):
+    a=list(map(int,input().split()))
+    li.append(a)
+l=0
+r=n
+for i in range(m):
+    if li[i][0]>l:
+        l=li[i][0]
+    if li[i][1]<r:
+        r=li[i][1]
+print(max(0,r-l+1))
     
-    return res
-
-N = int(input())
-ans = powmod(10,N)-powmod(9,N)-powmod(9,N)+powmod(8,N)
-ans %=mod
-ans = (ans+mod)%mod
-print(ans)
 
 # optimized version of the same code:
 
-mod = 10**9+7
-N = int(input())
-ans = 10**N-(9**N)*2+8**N
-ans %=mod
-print(ans)
+n,m=map(int,input().split())
+L=[]
+R=[]
+for i in range(m):
+    l,r=map(int,input().split())
+    L.append(l)
+    R.append(r)
+a=max(L)
+b=min(R)
+li=[i for i in range(a,b+1)]
+print(len(li))
 
-
-
-
-# slower version:
-
-inputStr = input()
-inputList = inputStr.split(' ')
-
-a = inputList[0]
-b = inputList[1]
-c = inputList[2]
-
-if (a==b and not a==c) or (c==b and not a==c) or (a==c and not b==c):
-    print('Yes')
-else:print('No')
-
-# optimized version of the same code:
-
-abc = input().split(' ')
-
-a = int(abc[0])
-b = int(abc[1])
-c = int(abc[2])
-
-d = 0
-
-if a == b:
-    d = d + 1
-
-if b == c:
-    d = d + 1
-
-if c == a:
-    d = d + 1
-
-if d == 1:
-    print('Yes')
-else:
-    print('No')
-
-
-
-
-# slower version:
-
-def euclid(a, b):
-  division = a if (a > b) else b
-  divider = b if (a > b) else a
-  reminder = 0
-  while divider != 0:
-    reminder = division % divider
-    division = divider
-    divider = reminder
-  
-  return division
-
-K = int(input())
-
-result = 0
-for k in range(1, K + 1):
-  for l in range(1, K + 1):
-    for m in range(1, K + 1):
-      gcd = euclid(euclid(k, l), m)
-      result += gcd
-
-print(result)
-
-
-# optimized version of the same code:
-
-from math import gcd
-K = int(input())
-
-result = 0
-for k in range(1, K + 1):
-  for l in range(1, K + 1):
-    for m in range(1, K + 1):
-      gcd_res = gcd(gcd(k, l), m)
-      result += gcd_res
-
-print(result)
 
 
 
@@ -186,118 +282,40 @@ print(result)
 
 # slower version:
 
-from bisect import bisect_right
-N,C,K = map(int,input().split())
-T = sorted([int(input()) for _ in range(N)])
-cnt = 0
-cur = 0
-while cur<N:
-    i = min(cur+C,N)-1
-    if T[i]-T[cur]<=K:
-        cnt += 1
-        cur = i+1
-    else:
-        i = bisect_right(T,T[cur]+K)-1
-        cnt += 1
-        cur = i+1
-print(cnt)
+n = int(input())
+d = list(map(int, input().split()))
+mod = 998244353
+
+a = [0] * n
+for d_ in d:
+    a[d_] += 1
+
+res = d[0] == 0 and a[0] == 1
+pre = 1
+for a_ in a:
+    res *= pre ** a_
+    res %= mod
+    pre = a_
+
+print(res)
 
 # optimized version of the same code:
 
-from bisect import bisect_right
-N,C,K = map(int,input().split())
-T = sorted([int(input()) for _ in range(N)])
-cur = 0
-cnt = 0
-while cur<N:
-    ind = bisect_right(T,T[cur]+K)
-    if ind-cur<=C:
-        cnt += 1
-        cur = ind
-    else:
-        cnt += 1
-        cur += C
-print(cnt)
+n = int(input())
+d = list(map(int, input().split()))
+mod = 998244353
 
+a = [0] * n
+for d_ in d:
+    a[d_] += 1
 
+res = d[0] == 0 and a[0] == 1
+pre = 1
+for a_ in a:
+    res = res * pre ** a_ % mod
+    pre = a_
 
-
-# slower version:
-
-a, b = map(int, input().split())
- 
-kleine = 2018
- 
-if b-a == 1:
-	print((a*b)%2019)
-elif b-a>= 2018:
-	print(0)    
-else:
-	for i in range (a, b):
-		for j in range (i+1, b+1):
-			k = (i*j)%2019
-			if k < kleine:
-				kleine = k
-			else:
-				continue
-	print(kleine)
-
-# optimized version of the same code:
-
-L, R = map(int, input().split())
-
-minimize = 2018
-P = 0
-
-if R-L >= 2019:
-	print(0)
-	exit()
-else:
-	for i in range (L, R):
-		for j in range (i+1, R+1):
-			P = (i*j)%2019
-			if P < minimize:
-				minimize = P
-print(minimize)
-
-
-
-
-# slower version:
-
-n, a, b = map(int, input().split())
-MOD = 10**9+7
-
-
-def COM(n, r):
-    X = Y = 1
-    if n-r < r:
-        r = n-r
-    for i in range(1, r+1):
-        Y = Y*i % MOD
-        X = X*(n-i+1) % MOD
-    Y = pow(Y, MOD-2, MOD)
-    return X*Y
-
-ans = pow(2, n, MOD)-1 - COM(n, a)-COM(n, b)
-ans %= MOD
-
-print(ans)
-
-
-# optimized version of the same code:
-
-n, a, b = map(int, input().split())
-MOD = 10**9+7
-ans = pow(2, n, MOD)-1
-X = Y = 1
-for i in range(1, b+1):
-    Y = Y*i % MOD
-    X = X*(n-i+1) % MOD
-    if i == a or i == b:
-        ans -= X*pow(Y, MOD-2, MOD)
-
-print(ans % MOD)
+print(res)
 
 
 

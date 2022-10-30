@@ -1,201 +1,71 @@
 # slower version:
 
-n, k = map(int, input().split())
-s = input().rstrip()
+import sys
+sys.setrecursionlimit(10 ** 9)
+# input = sys.stdin.readline    ####
+def int1(x): return int(x) - 1
+def II(): return int(input())
+def MI(): return map(int, input().split())
+def MI1(): return map(int1, input().split())
+def LI(): return list(map(int, input().split()))
+def LI1(): return list(map(int1, input().split()))
+def LLI(rows_number): return [LI() for _ in range(rows_number)]
+def MS(): return input().split()
+def LS(): return list(input())
+def LLS(rows_number): return [LS() for _ in range(rows_number)]
+def printlist(lst, k=' '): print(k.join(list(map(str, lst))))
+INF = float('inf')
+# from math import ceil, floor, log2
+# from collections import deque, defaultdict
+# from itertools import combinations as comb, combinations_with_replacement as comb_w, accumulate, product, permutations
+# from heapq import heapify, heappop, heappush
+# import numpy as np    # cumsum
+# from bisect import bisect_left, bisect_right
 
-#s = '0001111011110'
-#n, k = len(s), 1
+def solve():
+    N, D = MI()
+    ans = 0
+    while N > 0:
+        N -= 1 + 2 * D
+        ans += 1
+    print(ans)
 
-s='1'+s
+if __name__ == '__main__':
+    solve()
 
-k_pt = 0
-cur_tail = 0
-for cur in range(1, len(s)):
-  cur_tail+=1
-
-  if  s[cur-1] == '1' and s[cur] == '0':
-    k_pt+=1
-
-  if k_pt <= k:
-      cur_tail-=1
-  elif  s[cur_tail] == '0' and s[cur_tail+1] == '1':
-    k_pt-=1
-
-print(cur-cur_tail)
 
 
 # optimized version of the same code:
-
-n, k = map(int, input().split())
-s = input().rstrip()
-
-#s = '0001111011110'
-#n, k = len(s), 1
-
-s='1'+s
-
-k_pt = 0
-cur_tail = 0
-for cur in range(1, len(s)):
-
-  if  s[cur-1] == '1' and s[cur] == '0':
-    k_pt+=1
-
-  if k_pt > k:
-    cur_tail+=1
-    if s[cur_tail] == '0' and s[cur_tail+1] == '1':
-      k_pt-=1
-
-  #print((cur_tail, cur,k_pt))
-
-print(cur-cur_tail)
-
-
-
-
-
-# slower version:
 
 import sys
-s = input()
+sys.setrecursionlimit(10 ** 9)
+# input = sys.stdin.readline    ####
+def int1(x): return int(x) - 1
+def II(): return int(input())
+def MI(): return map(int, input().split())
+def MI1(): return map(int1, input().split())
+def LI(): return list(map(int, input().split()))
+def LI1(): return list(map(int1, input().split()))
+def LLI(rows_number): return [LI() for _ in range(rows_number)]
+def MS(): return input().split()
+def LS(): return list(input())
+def LLS(rows_number): return [LS() for _ in range(rows_number)]
+def printlist(lst, k=' '): print(k.join(list(map(str, lst))))
+INF = float('inf')
+# from math import ceil, floor, log2
+# from collections import deque, defaultdict
+# from itertools import combinations as comb, combinations_with_replacement as comb_w, accumulate, product, permutations
+# from heapq import heapify, heappop, heappush
+# import numpy as np    # cumsum
+# from bisect import bisect_left, bisect_right
 
-for i in range(len(s)):
-  if (i+1) % 2 != 0:
-    if s[i] == 'L':
-      print('No')
-      sys.exit()
-      
-  if (i+1) % 2 == 0:
-    if s[i] == 'R':
-      print('No')
-      sys.exit()
-print('Yes')
-
-# optimized version of the same code:
-
-s = input()
-
-for i in range(len(s)):
-  if (i+1) % 2 == 0:
-    if s[i] == 'R':
-      print('No')
-      exit()
-  else:
-    if s[i] == 'L':
-      print('No')
-      exit()
-print('Yes')
-
-
-
-
-# slower version:
-
-N = int(input())
-my_array = []
-for A in range (1, N):
-    my_array.append(sum(map(int, str(A))) + sum(map(int, str(N - A))))
-print(min(my_array))
-
-# optimized version of the same code:
-
-N = int(input())
-temp_min = sum(map(int, str(1))) + sum(map(int, str(N - 1)))
-for A in range (2, N):
-    x = sum(map(int, str(A))) + sum(map(int, str(N - A)))
-    if x < temp_min:
-        temp_min = x
-print(temp_min)
-
-
-
-
-# slower version:
-
-a, b, c, d = map(int, input().split())
-
-alice = list(range(a, b+1))
-bob = list(range(c, d+1))
-
-d = [i for i in alice if i in bob]
-
-if d == []:
-    print(0)
-else:
-    print(d[-1]-d[0])
-
-# optimized version of the same code:
-
-A, B, C, D = map(int, input().split())
-
-x = [i for i in range(A, B+1)] + [i for i in range(C, D+1)]
-l = len(x) - len(set(x))
-if l > 0:
-    print(l-1)
-else:
-    print(0)
-
-
-
-
-# slower version:
-
-input()
-from collections import *
-c=Counter(map(int,input().split()))
-print(sum(v-k*(k<=v) for k,v in c.items()))
-
-# optimized version of the same code:
-
-from collections import*;input();print(sum(v-k*(k<=v)for k,v in Counter(map(int,input().split())).items()))
-
-
-
-
-# slower version:
-
-def main():
-    n, x, *a = map(int, open(0).read().split())
-    a = [0] + a
-    ans = 0
-    tmp = 0
-    for i, j in zip(a, a[1:]):
-        i -= tmp
-        if i + j - x > 0:
-            c = i + j - x
-            ans += c
-            tmp = c
-        else:
-            tmp = 0
-
-    print(ans)
-
+def solve():
+    N, D = MI()
+    print((N+2*D)//(1+2*D))
 
 if __name__ == '__main__':
-    main()
+    solve()
 
-
-# optimized version of the same code:
-
-def main():
-    n, x, *a = map(int, open(0).read().split())
-    a = [0] + a
-    ans = 0
-    tmp = 0
-    for i, j in zip(a, a[1:]):
-        i -= tmp
-        if (i + j - x) > 0:
-            c = (i + j - x)
-            ans += c
-            tmp = c
-        else:
-            tmp = 0
-
-    print(ans)
-
-
-if __name__ == '__main__':
-    main()
 
 
 
@@ -203,69 +73,284 @@ if __name__ == '__main__':
 
 # slower version:
 
-n = int(input())
-can = []
+n=int(input())
+A=list(map(int,input().split()))
+L=[0]*(n+1)
+R=[0]*(n+1)
+def gcd(a,b):
+    while b!=0:
+        a,b=b,a%b
+    return a
 for i in range(n):
-  raw = input()
-  now = []
-  for j in range(len(raw)):
-    now.append(raw[j])
-  now.sort()
-  can.append(now)
-can.sort()
-cnt = 0
-ans = 0
-for i in range(1,n):
-  if can[i-1] == can[i]:
-    cnt += 1
-    ans += cnt
-  else:
-    cnt = 0
-print(ans)
+    L[i+1]=gcd(L[i],A[i])
+for i in range(n,0,-1):
+    R[i-1]=gcd(R[i],A[i-1])
+ans=[]
+for k in range(n):
+    ans.append(gcd(L[k],R[k+1]))
+print(max(ans))
+
 
 # optimized version of the same code:
 
-#16:15
-n = int(input())
-can = []
-for _ in range(n):
-  raw = input()
-  made = []
-  for k in range(10):
-    made.append(raw[k])
-  made.sort()
-  can.append(made)
-can.sort()
-ans = 0
-combo = 0
-for i in range(1,n):
-  if can[i] == can[i-1]:
-    combo += 1
-  else:
-    combo = 0
-  ans += combo
-print(ans)
+n=int(input())
+A=list(map(int,input().split()))
+def gcd(a,b):
+    while b!=0:
+        a,b=b,a%b
+    return a
+L=[0]
+R=[0]
+for i in range(n):
+    L.append(gcd(L[i],A[i]))
+    R.append(gcd(R[i],A[-(i+1)]))
+R=R[::-1]
+
+ans=[]
+for i in range(n):
+    ans.append(gcd(L[i],R[i+1]))
+print(max(ans))
+
 
 
 
 
 # slower version:
 
-a,b = map(int,input().split())
-if (a*b)%2 != 0:
-    print('Odd')
-else:
-    print('Even')
+# import sys
+# sys.stdin = open('a2.in')
+
+n, c, k = map(int, input().split())
+arrivals = [int(input()) for i in range(n)]
+arrivals.sort()
+
+res = 0
+room = c
+bus_start = None
+
+for t in arrivals:
+
+    if room == c:
+        bus_start = t
+
+    has_left_because_angry_passenger = bus_start + k < t
+    if has_left_because_angry_passenger:
+        res += 1
+        room = c
+        bus_start = t
+
+    room -= 1
+
+    if room == 0:
+        res += 1
+        room = c
+
+if room < c:
+    res += 1
+
+print(res)
 
 
 # optimized version of the same code:
 
-a, b = map(int, input().split())
-num = a*b
-if num % 2==0:
-    print('Even')
+n, c, k = map(int, input().split())
+arrivals = [int(input()) for i in range(n)]
+arrivals.sort()
+ 
+res = 0
+room = c
+bus_start = None
+ 
+for t in arrivals:
+ 
+    previous_bus_has_left = bus_start is not None and bus_start + k < t
+    if previous_bus_has_left:
+        res += 1
+        room = c
+ 
+    if room == c:
+        bus_start = t
+ 
+    room -= 1
+ 
+    if room == 0:
+        res += 1
+        room = c
+        bus_start = None
+ 
+if room < c:
+    res += 1
+ 
+print(res)
+
+
+
+
+# slower version:
+
+N = int(input())
+txy = [[0, 0, 0]] + [list(map(int, input().split())) for _ in range(N)]
+flag = True
+for i in range(N):
+    nt = txy[i+1][0]
+    nx = txy[i+1][1]
+    ny = txy[i+1][2]
+    t = txy[i][0]
+    x = txy[i][1]
+    y = txy[i][2]
+    move = nt - t
+    tmp = abs(nx-x)+abs(ny-y)
+    if move >= tmp:
+        if abs(move-tmp) % 2 != 0:
+            flag = False
+            break
+    else:
+        flag = False
+        break
+print('Yes' if flag else 'No')
+
+
+# optimized version of the same code:
+
+N = int(input())
+txy = [[0, 0, 0]] + [list(map(int, input().split())) for _ in range(N)]
+flag = True
+for i in range(N):
+    nt = txy[i+1][0]
+    nx = txy[i+1][1]
+    ny = txy[i+1][2]
+    t = txy[i][0]
+    x = txy[i][1]
+    y = txy[i][2]
+    move = nt - t
+    tmp = abs(nx-x)+abs(ny-y)
+    if move >= tmp:
+        if abs(move-tmp) % 2 != 0:
+            print('No')
+            exit()
+    else:
+        print('No')
+        exit()
+print('Yes')
+
+
+
+
+
+# slower version:
+
+from collections import Counter
+def i(): return int(input())
+def l(): return list(map(int,input().split()))
+
+N = i();A = l();A.sort()
+dp = [1]*(10**6+1);C = Counter(A);ans = 0
+for a,b in C.items():
+    if b != 1:dp[a] = 0
+    elif dp[a]:ans += 1
+    for j in range(a,10**6+1,a):dp[j] = 0
+print(ans)
+
+# optimized version of the same code:
+
+from collections import Counter
+def i(): return int(input())
+def l(): return list(map(int,input().split()))
+
+N = i();A = l()
+A.sort()
+dp = [1]*(10**6+1)
+C = Counter(A)
+ans = 0
+for a,b in C.items():
+    if b != 1:dp[a] = 0
+    elif dp[a]:ans += 1
+    for j in range(a,10**6+1,a):dp[j] = 0
+print(ans)
+
+
+
+
+
+# slower version:
+
+l=list(map(int,input()))
+
+def dfs(i,s,sum):
+    if i==3:
+        if sum==7:
+            print(s+'=7')
+            exit()
+    else:
+        dfs(i+1,s+'-'+str(l[i+1]),sum-l[i+1])
+        dfs(i+1,s+'+'+str(l[i+1]),sum+l[i+1])
+    return -1
+
+dfs(0,str(l[0]),l[0])
+
+# optimized version of the same code:
+
+s=input()
+
+for i in range(2**3):
+    S=s[0]
+    Sum=int(s[0])
+    for j in range(3):
+        if (i>>j)&1:
+            S+='+'+s[j+1]
+            Sum+=int(s[j+1])
+        else:
+            S+='-'+s[j+1]
+            Sum-=int(s[j+1])
+    if Sum == 7:
+        print(S+'=7')
+        exit()
+
+
+
+
+# slower version:
+
+x,a = map(int,input().split())
+if x<a:
+  print(0)
 else:
-    print('Odd')
+  print(10)
+
+# optimized version of the same code:
+
+x,a = map(int,input().split())
+print(0 if x < a else 10)
+
+
+
+
+# slower version:
+
+A, B = map(int, input().split())
+
+if A <= 5:
+    print(0)
+    exit()
+
+if A <= 12:
+    print(int(B/2))
+    exit()
+
+print(B)
+
+
+# optimized version of the same code:
+
+A, B = map(int, input().split())
+
+if 5 >= A:
+    print(0)
+elif 12 >= A:
+    print(int(B/2))
+else:
+    print(B)
+
 
 
 

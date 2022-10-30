@@ -1,90 +1,276 @@
 # slower version:
 
-import numpy
-a,b=map(int,input().split())
-print(a*b)
+N = int(input())
+a = [int(input()) for _ in range(N)]
+
+cnt, i = 0, 0
+for j in range(10 ** 6):
+    cnt += 1
+    if a[i] == 2:
+        print(cnt)
+        #break
+        quit()
+    else:
+        i = a[i] - 1
+print(-1)
 
 # optimized version of the same code:
 
-a,b=map(int,input().split())
-print(a*b)
+N = int(input())
+a = [int(input()) for _ in range(N)]
+
+cnt, i = 0, 0
+for j in range(len(a)):
+    cnt += 1
+    if a[i] == 2:
+        print(cnt)
+        #break
+        quit()
+    else:
+        i = a[i] - 1
+print(-1)
 
 
 
 
 # slower version:
 
-from sys import stdin, setrecursionlimit
+A = [list(map(int,input().split())) for _ in range(3)]
+N = int(input())
+B = [int(input()) for _ in range(N)]
+for i in range(3):
+    bng = 1
+    for j in range(3):
+        if A[i][j] in B:
+            continue
+        else:
+            bng = 0
+            break
+    if bng ==1:break
+if bng==1:
+    print('Yes')
+else:
+    for j in range(3):
+        bng = 1
+        for i in range(3):
+            if A[i][j] in B:
+                continue
+            else:
+                bng = 0
+                break
+        if bng==1:break
+    if bng==1:
+        print('Yes')
+    else:
+        if A[0][0] in B and A[1][1] in B and A[2][2] in B:
+            print('Yes')
+        elif A[0][2] in B and A[1][1] in B and A[2][0] in B:
+            print('Yes')
+        else:
+            print('No')
 
-setrecursionlimit(10 ** 9)
-INF = 1 << 60
+# optimized version of the same code:
+
+A = [list(map(int,input().split())) for _ in range(3)]
+N = int(input())
+B = [[0 for _ in range(3)] for _ in range(3)]
+for _ in range(N):
+    b = int(input())
+    for i in range(3):
+        for j in range(3):
+            if A[i][j]==b:
+                B[i][j] = 1
+flag = 0
+for i in range(3):
+    if sum(B[i])==3:
+        flag = 1
+        break
+for j in range(3):
+    cnt = 0
+    for i in range(3):
+        cnt += B[i][j]
+    if cnt==3:
+        flag = 1
+        break
+if B[0][0]+B[1][1]+B[2][2]==3:
+    flag = 1
+if B[2][0]+B[1][1]+B[0][2]==3:
+    flag = 1
+if flag==1:
+    print('Yes')
+else:
+    print('No')
 
 
-def input():
-    return stdin.readline().strip()
 
 
-def main():
-    H, W = map(int, input().split())
-    C = [list(map(int, input().split())) for _ in range(10)]
-    A = [list(map(int, input().split())) for _ in range(H)]
-    
-    for k in range(10):
-        for i in range(10):
-            for j in range(10):
-                if C[i][j] > C[i][k] + C[k][j]:
-                    C[i][j] = C[i][k] + C[k][j]
-                    
-    ans = 0
-    for row in A:
-        for n in row:
-            if n != -1:
-                ans += C[n][1]
-    
-    print(ans)
-    return
+# slower version:
 
+N = int(input())
+A = list(map(int, input().split()))
+mod = int(1e+9 + 7)
+L = A[0]
+p = mod - 2
+X = []
+while p != 0:
+  X = [p%2] + X[:]
+  p //= 2
 
-if __name__ == '__main__':
-    main()
+def inved(x):
+  y = 1
+  for i in range(len(X)):
+    if X[i] == 1:
+      y *= x
+      y %= mod
+    if i != len(X) - 1:
+      y *= y
+      y %= mod
+  return y
+
+for i in range(N-1):
+  a, b = L, A[i+1]
+  while b != 0:
+    a, b = b, a % b
+  b = A[i+1] // a
+  L = b * L
+S = 0
+for i in range(N):
+  S += (L * inved(A[i])) % mod
+  S %= mod
+print(S)
+
 
 
 # optimized version of the same code:
 
-import sys
-from collections import Counter
-
-read = sys.stdin.read
-readline = sys.stdin.readline
-readlines = sys.stdin.readlines
-sys.setrecursionlimit(10 ** 9)
-INF = 1 << 60
-
-
-def main():
-    H, W = map(int, readline().split())
-    C = [list(map(int, readline().split())) for _ in range(10)]
-    A = list(map(int, read().split()))
-
-    counter = Counter(A)
-
-    for k in range(10):
-        for i in range(10):
-            for j in range(10):
-                if C[i][j] > C[i][k] + C[k][j]:
-                    C[i][j] = C[i][k] + C[k][j]
-
-    ans = 0
-    for n, freq in counter.items():
-        if n not in (-1, 1):
-            ans += C[n][1] * freq
-
-    print(ans)
-    return
+N = int(input())
+A = list(map(int, input().split()))
+mod = int(1e+9 + 7)
+L = A[0]
+def inved(a):
+  x, y, u, v, k, l = 1, 0, 0, 1, a, mod
+  while l != 0:
+    x, y, u, v = u, v, x - u * (k // l), y - v * (k // l)
+    k, l = l, k % l
+  return x % mod
+for i in range(N-1):
+  a, b = L, A[i+1]
+  while b != 0:
+    a, b = b, a % b
+  b = A[i+1] // a
+  L = b * L
+L %= mod
+S = 0
+for i in range(N):
+  S += inved(A[i])
+  S %= mod
+S *= L
+S %= mod
+print(S)
 
 
-if __name__ == '__main__':
-    main()
+
+
+# slower version:
+
+class BIT:
+    def __init__(self,n):
+        self.size=n
+        self.tree=[0]*-~n
+    def sum(self,i):
+        s=0
+        while i:
+            s+=self.tree[i]
+            i-=i&-i
+        return s
+    def add(self,i,x):
+        while i<=self.size:
+            self.tree[i]+=x
+            i+=i&-i
+n,k,*a=map(int,open(0).read().split())
+a=[t-k for t in a]
+for i in range(1,n):
+    a[i]+=a[i-1]
+d={}
+for i,v in enumerate(sorted(set(a+[0])),1):
+    d[v]=i
+for i in range(n):
+    a[i]=d[a[i]]
+b=BIT(max(a))
+b.add(d[0],1)
+c=0
+for i,p in enumerate(a):
+    c+=b.sum(p)
+    b.add(p,1)
+print(c)
+
+# optimized version of the same code:
+
+class BIT:
+    def __init__(self,n):
+        self.size=n
+        self.tree=[0]*-~n
+    def sum(self,i):
+        s=0
+        while i:
+            s+=self.tree[i]
+            i-=i&-i
+        return s
+    def add(self,i,x):
+        while i<=self.size:
+            self.tree[i]+=x
+            i+=i&-i
+n,k,*a=map(int,open(0).read().split())
+a=[t-k for t in a]
+for i in range(1,n):
+    a[i]+=a[i-1]
+d={}
+for i,v in enumerate(sorted(set(a+[0])),1):
+    d[v]=i
+for i in range(n):
+    a[i]=d[a[i]]
+b=BIT(max(a))
+b.add(d[0],1)
+c=0
+for p in a:
+    c+=b.sum(p)
+    b.add(p,1)
+print(c)
+
+
+
+
+# slower version:
+
+S = input()
+ans = 0
+mods = [0] * 2019
+mods[0] = 1
+curr = 0
+x = 1
+for d in S:
+    curr = curr * 10 + int(d)
+    ans += mods[curr * x % 2019]
+    mods[curr * x % 2019] += 1
+    x = x * 202 % 2019
+    curr %= 2019
+print(ans)
+
+
+# optimized version of the same code:
+
+S = input()
+ans = 0
+mods = [0] * 2019
+mods[0] = 1
+curr = 0
+x = 1
+for d in reversed(S):
+    curr = (curr + int(d) * x) % 2019
+    ans += mods[curr % 2019]
+    mods[curr % 2019] += 1
+    x = x * 10 % 2019
+print(ans)
 
 
 
@@ -92,206 +278,128 @@ if __name__ == '__main__':
 
 # slower version:
 
-from collections import deque
-N=int(input())
-nums=['3','5','7']
-stack=deque(nums)
-cnt=0
-while stack:
-    cand=stack.pop()
-    if ('3' in cand) and ('5' in cand) and ('7' in cand):
-        cnt+=1
-    for c in nums:
-        if int(cand+c)<=N:
-            stack.append(cand+c)
-
-print(cnt)
-
-# optimized version of the same code:
-
-n=int(input())
-lim=len(str(n))
-cand=[3,5,7]
-ans=[]
-while cand:
-    i=cand.pop()
-    for j in [3,5,7]:
-        k=int(str(i)+str(j))
-        if k<=n:
-            cand.append(k)
-            if len(set(str(k)))==3:
-                ans.append(k)
-print(len(ans))
-
-
-
-
-# slower version:
-
-import copy
 import numpy as np
 
+h, w = map(int, input().split())
+al = list(list(input()) for _ in range(h))
+al_n = np.array(al)
+row = [0]*w
+col = [0]*h
+for i in range(h):
+    for j in range(w):
+        if al_n[i][j] == '.':
+            row[j] += 1
+            col[i] += 1
+row_ = []
+col_ = []
+for i in range(w):
+    if row[i] == h:
+        row_.append(i)
 
-def count_black(c):
-    count = 0
-    for row in c:
-        count += row.count('#')
-    return count
+for j in range(h):
+    if col[j] == w:
+        col_.append(j)
 
+if len(col_) > 0:
+    al_n = np.delete(al_n, col_, axis=0)
 
-h, w, k = map(int, input().split())
-c = [list(input()) for _ in range(h)]
-ans = 0
+if len(row_) > 0:
+    al_n = np.delete(al_n, row_, axis=1)
 
-for h_p in range(2 ** h):
-    for w_p in range(2 ** w):
-        c_cp = np.array(copy.deepcopy(c))
-        for i in range(h):
-            if (h_p >> i) & 1:
-                c_cp[i, :] = 'r'
+for a in al_n:
+    print(*a, sep='')
 
+# optimized version of the same code:
+
+h, w = map(int, input().split())
+al = list(list(input()) for _ in range(h))
+row = [0]*w
+col = [0]*h
+
+for i in range(h):
+    for j in range(w):
+        if al[i][j] == '#':
+            col[i] += 1
+            row[j] += 1
+ans = []
+w_len = len(row) - row.count(0)
+for i in range(h):
+    tmp = ''
+    if col[i] != 0:
         for j in range(w):
-            if (w_p >> j) & 1:
-                c_cp[:, j] = 'r'
+            if row[j] != 0:
+                tmp += al[i][j]
+        ans.append(tmp)
 
-        if count_black(c_cp.tolist()) == k:
-            ans += 1
-print(ans)
-
-
-# optimized version of the same code:
-
-h, w, k = map(int, input().split())
-c = [input() for _ in range(h)]
-ans = 0
-for h_p in range(2 ** h):
-    for w_p in range(2 ** w):
-        cnt = 0
-        for i in range(h):
-            for j in range(w):
-                if (h_p >> i) & 1 and (w_p >> j) & 1 and c[i][j] == '#':
-                    cnt += 1
-        if cnt == k:
-            ans += 1
-print(ans)
+for a in ans:
+    print(*a, sep='')
 
 
 
 
 # slower version:
 
-N = int(input())
-As = list(map(int,input().split()))
-
-
-def dfs(A_s, index,Bss):
-    if index == N:
-        tmp = 1
-        for b in Bss:
-            tmp *= b
-        return 1 if tmp % 2 == 0 else 0
-    b_mi = Bss.copy()
-    b_mi.append(A_s[index] - 1)
-
-    b = Bss.copy()
-    b.append(A_s[index])
-
-    b_pl = Bss.copy()
-    b_pl.append(A_s[index] + 1)
-    return dfs(A_s,index + 1, b_mi) + dfs(A_s,index + 1,b) + dfs(A_s,index + 1,b_pl)
-
-
-print(dfs(As,0,[]))
-
+S=input()
+stack=[]
+count=0
+for s in S:
+    if not stack:
+        stack.append(s)
+    elif stack[-1]!=s:
+        stack.pop()
+        count+=2
+    else:
+        stack.append(s)
+print(count)
 
 # optimized version of the same code:
 
-N = int(input())
-As = list(map(int,input().split()))
-
-tmp = 1
-for i in range(N):
-    if As[i] % 2 == 0:
-       tmp *= 2
-
-print(3 ** N - tmp)
+S=input()
+A=S.count('0')
+B=S.count('1')
+C=min(A,B)
+print(C*2)
 
 
 
 
 # slower version:
 
-N, M, *A = map(int, open(0).read().split())
-
-match = {1: 2, 2: 5, 3: 5, 4: 4, 5: 5, 6: 6, 7: 3, 8: 7, 9: 6}
-dp = [[0] * M for _ in range(N + 1)]
-
-for i in range(N + 1):
-    for j in range(M):
-        for k in range(M):
-            if (i - match[A[k]] == 0) or \
-                   (i - match[A[k]] > 0 and dp[i - match[A[k]]][j] != 0):
-                dp[i][k] = max(dp[i][k], 
-                               dp[i - match[A[k]]][j] * 10 + A[k])
-
-print(max(dp[-1]))
-
+import collections
+s = input()
+t = input()
+s = collections.Counter(s)
+t = collections.Counter(t)
+if sorted(s.values()) == sorted(t.values()):
+  print('Yes')
+else:
+  print('No')
 
 
 # optimized version of the same code:
 
+s = input()
+t = input()
 
-N, M = map(int, input().split())
-X = list(map(int, input().split()))
+dict_st = {}
+dict_ts = {}
 
-X.sort(reverse=True)
-count = [0, 2, 5, 5, 4, 5, 6, 3, 7, 6]
-dp = [-1] * (N + 1)
-dp[0] = 0
+for x, y in zip(s, t):
+    if x not in dict_st:
+        dict_st[x] = y 
+    else:
+        if dict_st[x] != y:
+            print('No')
+            break
 
-for a in X:
-    n = count[a]
-    for i in range(N - n + 1):
-        if dp[i] == -1:
-            continue
-        dp[i + n] = max(dp[i + n], dp[i] * 10 + a)
-
-print(dp[-1])
-
-
-
-
-
-# slower version:
-
-n,k=map(int, input().split())
-a=n//k
-print(min(abs(n-k*a), abs(n-k*(a+1))))
-
-# optimized version of the same code:
-
-n,k=map(int,input().split())
-print(min(n%k, k-n%k))
-
-
-
-
-# slower version:
-
-import fractions
-a, b = map(int, input().split())
-print(a * b // fractions.gcd(a, b))
-
-# optimized version of the same code:
-
-a, b = map(int, input().split())
-def gcd(x, y):
-    x, y = max(x, y), min(x, y)
-    if y == 0:
-        return x
-    return gcd(y, x % y)
-  
-print(a * b // gcd(a, b))
+    if y not in dict_ts:
+        dict_ts[y]=x
+    else:
+        if dict_ts[y]!=x:
+            print('No')
+            break
+else:
+    print('Yes')
 
 
 

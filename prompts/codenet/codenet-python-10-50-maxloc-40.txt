@@ -1,250 +1,327 @@
 # slower version:
 
-from math import gcd
-# def gcd(a, b):
-#     if a%b==0: return b
-#     return gcd(b, a%b)
-K=int(input())
-sum=0
-for a in range(1,K+1):
-    for b in range(1,K+1):
-        for c in range(1,K+1):
-            sum+=gcd(gcd(a,b),c)
-print(sum)
+scores = [list(map(int, input().split())) for _ in range(2)]
+print(max(sum(scores[0]), sum(scores[1])))
 
 # optimized version of the same code:
 
-def gcd(a, b):
-    if a%b==0: return b
-    return gcd(b, a%b)
-K=int(input())
-sum=0
-for a in range(1,K+1):
-    for b in range(a,K+1):
-        for c in range(b,K+1):
-            if a==b==c: sum+=a
-            elif a!=b!=c: sum+=gcd(gcd(a,b),c)*6 
-            else: sum+=gcd(gcd(a,b),c)*3
-print(sum)
+print(max(sum(map(int, input().split())), sum(map(int, input().split()))))
 
 
 
 
 # slower version:
 
-n = int(input())
-s = list(input())
-ans = s[0]
+import math
+#X=int(input())
+N,M,Q=map(int,input().split())
+S=[[]for i in range(Q)]
+for i in range(Q):
+    a=list(map(int,input().split()))
+    S[i]=a
+ans=0
+T=0
+for a in range(1,M+1):
+    for b in range(a, M+1):
+        for c in range(b, M+1):
+            for d in range(c, M+1):
+                for e in range(d, M+1):
+                    for f in range(e, M+1):
+                        for g in range(f, M+1):
+                            for h in range(g, M+1):
+                                for i in range(h, M+1):
+                                    for j in range(i, M+1):
+                                        D=[a,b,c,d,e,f,g,h,i,j]
+                                        for k in range(Q):
+                                            if D[S[k][1]-1]-D[S[k][0]-1]==S[k][2]:
+                                                ans+=S[k][3]
+                                        if ans>=T:
+                                            T=ans
+                                        ans = 0
+print(T)
 
-for x in s:
-  if x != ans[-1]:
-    ans += x
-
-print(len(ans))
-
-# optimized version of the same code:
-
-n = int(input())
-s = input()
-list1 = [s[0]]
-
-for x in s:
-  if x != list1[-1]:
-    list1.append(x)
-    
-print(len(list1))
-
-
-
-
-# slower version:
-
-N = int(input())
-A = list(map(int, input().split()))
-li = []
-for itr, val in enumerate(A):
-  li.append([val, itr + 1])
-li.sort()
-print(*[i[1] for i in li])
-
-
-# optimized version of the same code:
-
-n = int(input())
-A = list(map(int, input().split()))
-
-B = [(a, i + 1) for i, a in enumerate(A)]
-B.sort()
-
-ans = [j for _, j in B]
-
-print(*ans)
-
-
-
-
-# slower version:
-
-x = int(input())
-
-ans = 0
-for i in range(1, 1000):
-    for j in range(2, 10):
-        if i ** j <= x:
-            ans = max(i ** j, ans)
-            
-print(ans)
-
-# optimized version of the same code:
-
-x = int(input())
-
-ans = 0
-if x == 1:
-    ans = 1
-else:
-    for i in range(2, 100):
-        n = 2
-        while i ** n <= x:
-            ans = max(ans , i ** n)
-            n += 1
-            
-print(ans)
-
-
-
-
-# slower version:
-
-h, w = map(int,input().split())
-a = [list(input()) for _ in range(h)]
-b = [[0 for _ in range(w)]for _ in range(h)]
-H = [-1,-1,-1, 0, 0, 1, 1, 1]
-W = [-1, 0, 1,-1, 1,-1, 0, 1]
-for i in range(h):
-    for j in range(w):
-        if a[i][j] == '#':
-            b[i][j] = '#'
-            for k in range(len(H)):
-                if i+H[k] < 0 or i+H[k] >= h:continue
-                elif j+W[k] < 0 or j+W[k] >= w:continue
-                elif a[i+H[k]][j+W[k]] == '#':continue
-                b[i+H[k]][j+W[k]] += 1
-for i in range(h):
-    print(*b[i],sep='')
-
-# optimized version of the same code:
-
-h, w = map(int,input().split())
-a = ['.'+input()+'.' for _ in range(h)]
-a.insert(0,'.'*(w+2))
-a.append('.'*(w+2))
-y = [1,1, 1,-1,-1,-1,0, 0]
-x = [0,1,-1, 0, 1,-1,1,-1]
-for i in range(1,h+1):
-    l =[]
-    for j in range(1,w+1):
-        if a[i][j] == '#':
-            l += '#'
-        else: l += str(sum([1 for k in range(8) if a[i+y[k]][j+x[k]] == '#']))
-    print(''.join(l))
-
-
-
-
-# slower version:
-
-h, a = map(int, input().split())
-
-ans = 0
-while h > 0:
-  h -= a
-  ans += 1
-
-print(ans)
 
 # optimized version of the same code:
 
 import math
-h, a = map(int, input().split())
+import sys
+sys.setrecursionlimit(10**7)
+#X=int(input())
+N,M,Q=map(int,input().split())
+S=[[]for i in range(Q)]
+for i in range(Q):
+    a=list(map(int,input().split()))
+    S[i]=a
+ans=0
+T=0
+def solve(l):
+    global ans
+    if len(l)>=N:
+        tmp=0
+        for k in range(Q):
+            if l[S[k][1]-1]-l[S[k][0]-1]==S[k][2]:
+                tmp+=S[k][3]
+        ans=max(ans,tmp)
+        return
+    for i in range(l[-1],M+1):
+        solve(l+[i])
+solve([1])
+print(ans)
+
+
+
+
+# slower version:
+
+import sys
+
+N, M = map(int, sys.stdin.readline().split())
+a_list = list(map(int, sys.stdin.readline().split()))
+items = []
+for i in range(M):
+    items.append(tuple(map(int, sys.stdin.readline().split())))
+
+
+from collections import defaultdict
+
+tar = defaultdict(int)
+for a in a_list:
+    tar[a] += 1
+
+for i in range(M):
+    b, c = items[i]
+    tar[c] += b
+
+tar = sorted(tar.items(), key=lambda x: -x[0])
+
+cnt = 0
+ans = 0
+for k, v in tar:
+    if cnt + v <= N:
+        cnt +=v
+        ans += k*v
+    else:
+        ans += k*(N-cnt)
+        cnt = N
+    if cnt >= N:
+        break
+print(ans)
+
+
+# optimized version of the same code:
+
+import sys
+
+N, M = map(int, sys.stdin.readline().split())
+a_list = list(map(int, sys.stdin.readline().split()))
+items = []
+for i in range(M):
+    items.append(tuple(map(int, sys.stdin.readline().split())))
+
+from heapq import *
+
+que = []
+
+for i in range(N):
+    a = a_list[i]
+    heappush(que, (-a, 1))
+
+for b, c in items:
+    heappush(que, (-c, b))
+
+cnt = 0
+ans = 0
+while cnt < N:
+    k, v = heappop(que)
+    if cnt + v <= N:
+        cnt += v
+        ans += -(k * v)
+    else:
+        ans += -(k) * (N-cnt)
+        cnt = N
+print(ans)
+
+
+
+
+
+# slower version:
+
+from collections import deque
+n,*L=map(int,open(0).read().split())
+G=[[]for _ in range(n)]
+db=[-1]*n;db[0]=0
+dw=[-1]*n;dw[-1]=0
+for a,b in zip(*[iter(L)]*2):
+	G[a-1]+=[b-1]
+	G[b-1]+=[a-1]
+q=deque([0])
+while q:
+	cur=q.popleft()
+	for nxt in G[cur]:
+		if db[nxt]<0:
+			q.append(nxt)
+			db[nxt]=db[cur]+1
+q=deque([n-1])
+while q:
+	cur=q.popleft()
+	for nxt in G[cur]:
+		if dw[nxt]<0:
+			q.append(nxt)
+			dw[nxt]=dw[cur]+1
+b=w=0
+for i,j in zip(db,dw):
+	if i<=j:b+=1
+	else:w+=1
+if b<=w:print('Snuke')
+else:print('Fennec')
+
+# optimized version of the same code:
+
+from collections import*
+n,*L=map(int,open(0).read().split())
+G=[[]for _ in range(n)]
+for a,b in zip(*[iter(L)]*2):
+	G[a-1]+=[b-1]
+	G[b-1]+=[a-1]
+def F(m):
+	q=deque([m])
+	d=[-1]*n
+	while q:
+		cur=q.popleft()
+		for nxt in G[cur]:
+			if d[nxt]<0:
+				q.append(nxt)
+				d[nxt]=d[cur]+1
+	return d
+print('FSennunkeec'[sum(i>j or-1 for i,j in zip(F(0),F(n-1)))>=0::2])
+
+
+
+
+# slower version:
+
+n = int(input())
+bt, bx, by = 0, 0, 0
+ans = 'Yes'
+for i in range(n):
+    t, x, y = map(int, input().split())
+    if ((t % 2 == 0 and (x + y) % 2 == 0) or (t % 2 == 1 and (x + y) % 2 == 1)) and (abs(x - bx) + abs(y - by) <= t - bt):
+        bt, bx, by = t, x, y
+        continue
+    else:
+        ans = 'No'
+        break
+print(ans)
+
+
+# optimized version of the same code:
+
+n = int(input())
+ans = 'Yes'
+for _ in range(n):
+    t, x, y = map(int, input().split())
+    if (t < x + y) or (t + x + y) % 2 == 1:
+        ans = 'No'
+print(ans)
+
+
+
+
+
+# slower version:
+
+N, M = map(int, input().split())
+g = [[False]*N for _ in range(N)]
+for _ in range(M):
+	a, b = map(int, input().split())
+	g[a-1][b-1] = True
+	g[b-1][a-1] = True
+
+stack = [[0,[1]+[0]*(N-1)]]
+ans = 0
+while stack:
+	cur, passed = stack.pop()
+	if passed == [1]*N:
+		ans += 1
+	else:
+		for i, j in enumerate(g[cur]):
+			if j and not passed[i]:
+				t = passed.copy()
+				t[i] = 1
+				stack.append([i, t])
+print(ans)
+
+# optimized version of the same code:
+
+N, M = map(int, input().split())
+g = [[] for i in range(N)]
+for i in range(M):
+	a, b = map(int, input().split())
+	g[a-1].append(b-1)
+	g[b-1].append(a-1)
 
 ans = 0
-print(math.ceil(h/a))
+passed = [0]
+n = 0
+s = [[n,passed]]
+while s:
+	n, passed = s.pop()
+	if len(passed) == N:
+		ans += 1
+	else:
+		for i in g[n]:
+			if i not in passed:
+				s.append([i, passed + [i]])
+print(ans)
 
 
 
 
 # slower version:
 
-n,x=map(int,input().split())
-m=[]
-
-for i in range(n):
-    m.append(int(input()))
-
-x-=sum(m)
-count=n
-minm=min(m)
-
-while minm<=x:
-    count+=1
-    x-=minm
-
-print(count)
+n = int(input())
+sum = 0
+for num in range(1,n + 1):
+    sum += num
+print(sum)
 
 # optimized version of the same code:
 
-n,x=map(int,input().split())
-
-m=[0]*n
-
-for i in range(n):
-    m[i]=int(input())
-    x-=m[i]
-
-print(n+x//min(m))
+n = int(input())
+print(sum(list(range(1,n+1))))
 
 
 
 
 # slower version:
 
-import sys
+cnt500 = int(input())
+cnt100 = int(input())
+cnt50 = int(input())
+X = int(input())
 
-sr = lambda: sys.stdin.readline().rstrip()
-ir = lambda: int(sr())
-lr = lambda: list(map(int, sr().split()))
-
-N = ir()
-AB = [lr() for _ in range(N)]
-AB.sort(key=lambda x: x[1])
-answer = 'Yes'
-time = 0
-for i in range(N):
-    if time + AB[i][0] > AB[i][1]:
-        answer = 'No'
-    time += AB[i][0]
-
-print(answer)
-
+all = []
+for a in range(cnt500+1):
+    for b in range(cnt100+1):
+        for c in range(cnt50+1):
+            all.append(a*500 + b*100 + c*50)
+print(all.count(X))
 
 # optimized version of the same code:
 
-import sys
-import numpy as np
+cnt500 = int(input())
+cnt100 = int(input())
+cnt50 = int(input())
+X = int(input())
 
-sr = lambda: sys.stdin.readline().rstrip()
-ir = lambda: int(sr())
-lr = lambda: list(map(int, sr().split()))
-
-N = ir()
-AB = np.array([lr() for _ in range(N)])
-AB = AB[np.argsort(AB[:, 1])]
-A = AB[:, 0]
-B = AB[:, 1]
-bl = np.all(A.cumsum() <= B)
-print('Yes' if bl else 'No')
-# 
+result = 0
+for a in range(cnt500+1):
+    for b in range(cnt100+1):
+        for c in range(cnt50+1):
+           if (a*500 + b*100 + c*50) == X:
+               result += 1
+print(result)
 
 
 

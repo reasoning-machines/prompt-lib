@@ -1,226 +1,239 @@
 # slower version:
 
-X = list(map(int,input().split()))
-c=100000
-b=200000
-a=300000
-X.sort()
-ans=0
-cnt=0
-for i in X:
-    if i==1:
-        ans+=a
-        cnt+=1
-    elif i==2:
-        ans+=b
-    elif i==3:
-        ans+=c
-if cnt==2:
-    ans += 400000
+import numpy as np
+N = int(input())
+A = list(map(int, input().split()))
+A = list(np.array(A) - 1)
+B = list(map(int, input().split()))
+C = list(map(int, input().split()))
+
+sum_ = 0
+diff = list(np.array(A[1:]) - np.array(A[:-1]))
+diff.insert(0, -1)
+for i in range(N):
+  sum_ += B[A[i]]
+  
+  if diff[i] == 1:
+    sum_ += C[A[i-1]]
+  
+print(sum_)
+
+# optimized version of the same code:
+
+N = int(input())
+A = list(map(int, input().split()))
+B = list(map(int, input().split()))
+C = list(map(int, input().split()))
+
+ans = 0
+for i in range(len(A)):
+  ans += B[A[i]-1]
+
+  if i != 0:
+    if A[i-1] + 1 == A[i]:
+      ans += C[A[i-1]-1]
+
 print(ans)
+
+
+
+
+# slower version:
+
+n,x = map(int,input().split())
+ans = 0
+if 2*x == n:
+    ans = 3*x
+else:
+    ans += n
+    a = x
+    b = n - x
+    while True:
+        ans += (a//b)*2*b
+        c = b
+        b = a%b
+        a = c
+        if b == 0:
+            ans -= a
+            break
+    
+print(ans)
+
+# optimized version of the same code:
+
+n,x = map(int,input().split())
+ans = 0
+if 2*x == n:
+    ans = 3*x
+else:
+    ans += n
+    a = x
+    b = n - x
+    while True:
+        ans += (a//b)*2*b
+        c = b
+        b = a%b
+        a = c
+        if b == 0:
+            ans -= a
+            break
+    
+print(ans)
+
+
+
+
+
+# slower version:
+
+n = int(input())
+a = [int(i) for i in input().split()]
+
+ret = 1000
+for i in range(1, n):
+    s = abs(sum(a[:i]) - sum(a[i:]))
+    if s < ret:
+        ret = s
+print(ret)
+
+# optimized version of the same code:
+
+from sys import stdin
+n = int(input())
+a = [int(i) for i in stdin.readline().rstrip().split()]
+
+ret = 1000
+for i in range(1, n):
+    s = abs(sum(a[:i]) - sum(a[i:]))
+    if s < ret:
+        ret = s
+print(ret)
+
+
+
+
+
+# slower version:
+
+# -*- coding:utf-8 -*-
+
+def cmb(n, r):
+    if n == 0 or r == 0:
+        return 1
+    if n < r:
+        return 0
+    a = b = 1
+    r = min(n-r,r)
+    for i in range(1, r + 1):
+        a *= i
+    for i in range(n-r+1,n+1):
+        b *= i
+    return b//a
+
+N = list(map(int,input().split()))
+M = 10**9 + 7
+red = N[0]-N[1]
+for i in range(1,N[1]+1):
+    x = cmb(red + 1, i) * cmb(N[1] - 1,i-1)
+    print(x%M)
+
+
+# optimized version of the same code:
+
+N = list(map(int,input().split()))
+M = 10**9 + 7
+red = N[0] - N[1]
+x = red+1
+print(x)
+for i in range(2,N[1]+1):
+    x = x*(red+2-i)*(N[1]-i+1)//(i*(i-1))
+    print(int(x%M))
+
+
+
+
+# slower version:
+
+# coding: utf-8
+import sys
+#from operator import itemgetter
+sysread = sys.stdin.buffer.readline
+read = sys.stdin.buffer.read
+#from heapq import heappop, heappush
+#from collections import defaultdict
+sys.setrecursionlimit(10**7)
+import math
+#from itertools import product, accumulate, combinations, product
+#import bisect
+#import numpy as np
+#from copy import deepcopy
+#from collections import deque
+#from decimal import Decimal
+#from numba import jit
+
+INF = 1 << 50
+EPS = 1e-8
+mod = 10 ** 9 + 7
+
+
+def run():
+    N = int(input())
+    for h in range(1, 3501):
+        for n in range(1, 3501):
+            v = N * h * n
+            a = 4 * h * n - N * n - N * h
+            if a <= 0:continue
+            if not v % a:
+                w = v // a
+                print(f'{h} {n} {w}')
+                return
+
+if __name__ == '__main__':
+    run()
+
 
 # optimized version of the same code:
 
 # coding: utf-8
-
-x, y = map(int,input().split())
-
-l1 = [1,2,3]
-l2 = [300000,200000,100000]
-
-ans = 0
-if x in l1:
-    ans += l2[l1.index(x)]
-    
-if y in l1:
-    ans += l2[l1.index(y)]
-
-if x == 1 and y == 1:
-    ans += 400000
-
-print(ans)
-
-
-
-
-# slower version:
-
-N,i= map(int,input().split())                                                                                     
-
-print (N-i+1)
-
-# optimized version of the same code:
-
-n, i = map(int, input().split())
-print(n + 1 - i)
-
-
-
-
-
-# slower version:
-
-h, w = map(int, input().split())
-for i in range(h):
-    c = input()
-    print(c)
-    print(c)
-
-
-# optimized version of the same code:
-
-h, w = map(int, input().split())
-a = [tuple(input()) for _ in range(h)]
-for i in a:
-    print(''.join(i))
-    print(''.join(i))
-
-
-
-
-
-# slower version:
-
+import sys
+#from operator import itemgetter
+sysread = sys.stdin.buffer.readline
+read = sys.stdin.buffer.read
+#from heapq import heappop, heappush
+#from collections import defaultdict
+sys.setrecursionlimit(10**7)
 import math
+#from itertools import product, accumulate, combinations, product
+#import bisect
+#import numpy as np
+#from copy import deepcopy
+#from collections import deque
+#from decimal import Decimal
+#from numba import jit
 
-def cmb(n, r, mod):
-    if ( r<0 or r>n ):
-        return 0
-    r = min(r, n-r)
-    return g1[n] * g2[r] * g2[n-r] % mod
-
-mod = 10**9+7 
-N = 10**6
-g1 = [1, 1] 
-g2 = [1, 1] 
-inverse = [0, 1] 
-
-for i in range( 2, N + 1 ):
-    g1.append( ( g1[-1] * i ) % mod )
-    inverse.append( ( -inverse[mod % i] * (mod//i) ) % mod )
-    g2.append( (g2[-1] * inverse[-1]) % mod )
-
-X, Y = [int(i) for i in input().split()]
-
-if (2*Y - X) % 3 != 0:
-    print(0)
-elif (2*X - Y) % 3 != 0:
-    print(0)
-else:
-    x = (2*X - Y) // 3
-    y = (2*Y - X) // 3
-    print(cmb(x+y, x , mod))
+INF = 1 << 50
+EPS = 1e-8
+mod = 10 ** 9 + 7
 
 
-# optimized version of the same code:
+def run():
+    N = int(input())
+    for h in range(1, 3501):
+        if 4 * h - N <= 0:
+            continue
+        s = math.ceil(N * h / (4 * h - N))
+        for n in range(s, 3501):
+            v = N * h * n
+            a = 4 * h * n - N * n - N * h
+            if a <= 0:continue
+            if not v % a:
+                w = v // a
+                print(f'{h} {n} {w}')
+                return
 
-import math
+if __name__ == '__main__':
+    run()
 
-def cmb(n, r, mod):
-    r = min(r, n-r)
-
-    a = 1
-    b = 1
-    for i in range(r):
-        a = (a * (n-i)) % mod
-        b = (b * (i+1)) % mod
-    
-    return a * pow(b, mod-2, mod) % mod
-
-X, Y = [int(i) for i in input().split()]
-mod = 10**9+7 
-x_tmp = 2*X - Y
-y_tmp = 2*Y - X
-
-if x_tmp < 0 or y_tmp < 0:
-    ans = 0
-elif x_tmp % 3 != 0 or y_tmp % 3 != 0:
-    ans = 0
-else:
-    x = x_tmp // 3
-    y = y_tmp // 3
-    ans = cmb(x + y, y, mod)
-
-print(ans)
-
-
-
-
-# slower version:
-
-n,l=map(int, input().split())
-s=[list(input()) for i in range(n)]
-s.sort()
-for i in s:
-    for j in i:
-        print(j,end='')
-print()
-
-# optimized version of the same code:
-
-n, m = list(map(int, input().split()))
-
-s = []
-
-for i in range(n):
-    s.append(input())
-
-s.sort()
-
-for i in range(n):
-    print(s[i], end = '')
-
-
-
-
-# slower version:
-
-N, X = [int(i) for i in input().split()]
-donut_type = [int(input()) for i in range(N)]
-X = X - sum(donut_type)
-result = N
-while X >= sorted(donut_type)[0]:
-    X = X - sorted(donut_type)[0]
-    result += 1
-
-print(result)
-
-# optimized version of the same code:
-
-import math
-N, X = [int(i) for i in input().split()]
-donut_type = [int(input()) for i in range(N)]
-X = X - sum(donut_type)
-result = N
-result += math.floor(X / min(donut_type))
-
-print(result)
-
-
-
-
-# slower version:
-
-n,m,k = map(int,input().split())
-
-for i in range(m+1):
-  for j in range(n+1):
-    if n*i + m*j - 2*i*j == k:
-      print('Yes')
-      exit()
-print('No')
-
-# optimized version of the same code:
-
-n,m,k = map(int,input().split())
-
-for i in range(m+1):
-    a = k - i * n
-    b = m - 2 * i
-    if b != 0 and a % b == 0 and 0 <= a // b <= n:
-        print('Yes')
-        exit()
-print('No')
 
 
 
@@ -228,37 +241,193 @@ print('No')
 # slower version:
 
 def main():
-    n, x, y = map(int, input().split()) 
+    import sys
+    input = sys.stdin.readline
+    sys.setrecursionlimit(10**7)
+    from collections import Counter, deque
+    #from collections import defaultdict
+    from itertools import combinations, permutations, accumulate, groupby
+    #from itertools import product
+    from bisect import bisect_left,bisect_right
+    from heapq import heapify, heappop, heappush
+    from math import floor, ceil
+    #from operator import itemgetter
 
-    ans = [0] * n
-    for i in range(1,n):
-        for j in range(i+1, n+1):
-            r1 = j-i
-            r2 = abs(x-i) + 1 + abs(j-y)
-            r3 = abs(y-i) + 1 + abs(j-x)
-            ans[min(r1,r2,r3)] += 1
+    #inf = 10**17
+    #mod = 10**9 + 7
 
-    for i in range(1,n):
-        print(ans[i])
+    n,m = map(int, input().split())
+    a = m // n
+    for i in range(a, 0, -1):
+        if m % i == 0:
+            print(i)
+            break
 
 if __name__ == '__main__':
     main()
 
 # optimized version of the same code:
 
-n,x,y = map(int, input().split())
+def main():
+    import sys
+    input = sys.stdin.readline
+    sys.setrecursionlimit(10**7)
+    from collections import Counter, deque
+    #from collections import defaultdict
+    from itertools import combinations, permutations, accumulate, groupby
+    #from itertools import product
+    from bisect import bisect_left,bisect_right
+    from heapq import heapify, heappop, heappush
+    from math import floor, ceil
+    #from operator import itemgetter
 
-ans = [0]*n
-for i in range(1,n):
-    for j in range(i+1,n+1):
-        v1 = j-i
-        v2 = abs(x-i) + 1 + abs(y-j)
-        v3 = abs(y-i) + 1 + abs(x-j)
-        minv = min(v1,v2,v3)
-        ans[minv] += 1
+    #inf = 10**17
+    #mod = 10**9 + 7
 
-for a in ans[1:]:
-    print(a)
+    n,m = map(int, input().split())
+    def yakusuu(N):
+        n = int(N**.5)+1
+        res1 = []
+        res2 = []
+        for i in range(1, n):
+            if N%i==0:
+                res1.append(i)
+                if N!=i**2:
+                    res2.append(N//i)
+        res2.reverse()
+        return res1+res2
+    a = yakusuu(m)
+    a.sort(reverse=True)
+    for i in a:
+        if m//i >= n:
+            print(i)
+            break
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+# slower version:
+
+import queue
+K = int(input())
+q = queue.Queue()
+for i in range(1,10):
+    q.put(i)
+
+for i in range(K):
+    x = q.get()
+    a = x%10
+    if a !=0:
+        q.put(10*x +a -1)
+    q.put(10*x +a )
+    if a != 9:
+        q.put(10*x +a +1)
+print(x)
+
+# optimized version of the same code:
+
+def main():
+    import sys
+    def input(): return sys.stdin.readline().rstrip()
+    k = int(input())
+    from collections import deque
+    que = deque(range(1, 10))
+    for i in range(k):
+        now = que.popleft()
+        r = now%10
+        nx = now*10
+        if r == 0:
+            for j in [0, 1]:
+                que.append(nx+r+j)
+        elif r == 9:
+            for j in [-1, 0]:
+                que.append(nx+r+j)
+        else:
+            for j in [-1, 0, 1]:
+                que.append(nx+r+j)
+    print(now)
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+# slower version:
+
+from numba import njit
+from sys import stdin
+
+
+@njit(cache=True)
+def gcd(x, y):
+    if x % y == 0:
+        return y
+    return gcd(y, x % y)
+
+
+@njit(cache=True)
+def fact(x):
+    if x == 1:
+        return x
+    return x * fact(x - 1)
+
+
+def main():
+    k = int(stdin.readline())
+
+    ans = 0
+
+    for a in range(1, k + 1):
+        for b in range(a, k + 1):
+            d = gcd(a, b)
+            for c in range(b, k + 1):
+                e = gcd(d, c)
+                ans += e * fact(3) // fact(3 - len(set([a, b, c])) + 1)
+
+    print(ans)
+
+
+if __name__ == '__main__':
+    main()
+
+
+# optimized version of the same code:
+
+from sys import stdin, setrecursionlimit
+
+
+def gcd(x, y):
+    if x % y == 0:
+        return y
+    return gcd(y, x % y)
+
+
+def main():
+    input = stdin.buffer.readline
+    k = int(input())
+    g = []
+    for i in range(1, k + 1):
+        gi = []
+        for j in range(1, k + 1):
+            gi.append(gcd(i, j))
+        g.append(gi)
+    ans = 0
+    for a in range(k):
+        for b in range(k):
+            for c in range(k):
+                tmp = g[a][b] - 1
+                ans += g[tmp][c]
+    print(ans)
+
+
+if __name__ == '__main__':
+    setrecursionlimit(10000)
+    main()
+
 
 
 
