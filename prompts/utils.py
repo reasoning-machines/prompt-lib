@@ -121,7 +121,15 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     # read the task file
 
     task_file_path = f"data/tasks/{task_config.task_id.split('_')[0]}.jsonl"
-    task_df = pd.read_json(task_file_path, lines=True, orient="records")
+    import json
+    rows = []
+    with open(task_file_path, "r") as f:
+        for line in f:
+            rows.append(json.loads(line))
+    
+    task_df = pd.DataFrame(rows)
+        
+    # task_df = pd.read_json(task_file_path, lines=True, orient="records")
 
     # format the prompt
     if isinstance(task_id_to_prompt[task_config.task_id], PromptStr):
@@ -166,7 +174,7 @@ def maintain_request_per_minute(
             time.sleep(10)
         request_per_minute = get_request_per_minute(num_requests, time_begin)
     if "code" in model_name:
-        time.sleep(1)
+        time.sleep(4)
     return request_per_minute
 
 
