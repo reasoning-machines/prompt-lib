@@ -4,21 +4,18 @@ from datetime import datetime
 from itertools import chain
 import pathlib
 from pprint import pprint
-import sys
-import time
 from typing import List
 from tqdm import tqdm
 import pandas as pd
 import wandb
 import dataclasses
 import glob
-import json
 import re
 import os
 
 from openai_api import OpenaiAPIWrapper
 from scripts.eval import get_exact_match_acc
-from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config, maintain_request_per_minute
+from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config
 
 
 def run_inference(task_config: TaskConfig) -> None:
@@ -126,29 +123,19 @@ def query_openai_over_inputs(
     max_retries: int = 10,
 ) -> List[dict]:
     outputs = []
-    time_begin = time.time()
-    num_requests = 0
     i = 0
     n = len(inputs)
 
     pbar = tqdm(total=n, desc=f"Querying openai [thread_id={thread_id}]")
     num_retries = 0
+
     while i < n:
-        input = inputs[i]
+
         try:
-            num_requests += 1
-            maintain_request_per_minute(
-                num_requests=num_requests,
-                time_begin=time_begin,
-                max_requests_per_min=task_config.max_requests_per_min,
-                task_idx=thread_id,
-                model_name=task_config.model_name,
-            )
-            question = input["question"]
 
             response = OpenaiAPIWrapper.call(
                 temperature=task_config.temperature,
-                prompt=question,
+                prompt=inputs[i]["question"],
                 max_tokens=task_config.max_tokens,
                 engine=task_config.model_name,
                 stop_token=task_config.prompt_config.question_prefix,  # generate till the model starts generating a new question
@@ -158,16 +145,16 @@ def query_openai_over_inputs(
             
             outputs.append(
                 {
-                    "question": question,
+                    "question": inputs[i]["question"],
                     "generated_answer": OpenaiAPIWrapper.parse_response(response),
-                    "answer": input["answer"],
+                    "answer": inputs[i]["answer"],
                 }
             )
             i += 1
             pbar.update(1)
 
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Exception: {e}")
             if "code" not in task_config.model_name:  # usually codex models throw rate limit errors
                 i += 1
             elif num_retries < max_retries:
