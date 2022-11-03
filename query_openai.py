@@ -1,4 +1,5 @@
 # Given the path to a text file, queries alpa for each line in the file.
+import os.path
 from datetime import datetime
 from itertools import chain
 import pathlib
@@ -10,7 +11,10 @@ from tqdm import tqdm
 import pandas as pd
 import wandb
 import dataclasses
-
+import glob
+import json
+import re
+import os
 
 from openai_api import OpenaiAPIWrapper
 from scripts.eval import get_exact_match_acc
@@ -21,11 +25,32 @@ def run_inference(task_config: TaskConfig) -> None:
     """Query a language model API for each line in the file."""
 
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
-    time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    
+    if task_config.cached_timestamp is None:
+        time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    else:
+        time_stamp = task_config.cached_timestamp
+
     outdir = f"data/logs/{task_config.task_id}/{time_stamp}/k{task_config.num_examples}/"
     if task_config.tag is not None:
         outdir += f"{task_config.tag}/"
+
+    cached_examples = set()
+    thread_offset = 0
+    if pathlib.Path(outdir).exists():
+        for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
+            cached = pd.read_json(r_file, orient="records", lines=True)
+            for i, row in cached.iterrows():
+                cached_examples.add(row["question"])
+            part_idx = re.search('outputs_part(\d+).jsonl',
+                                  os.path.basename(r_file)).group(1)
+            thread_offset = max(thread_offset, int(part_idx))
+        thread_offset += 1
+
+
+    # remove cached examples from task_file
+    task_file = [example for example in task_file if example['question'] not in cached_examples]
+    print(f'Found {len(cached_examples)} cached examples, {len(task_file)} examples to query')
+
     pathlib.Path(f"{outdir}").mkdir(parents=True, exist_ok=True)
 
     num_chunks = len(task_file) // task_config.num_questions_per_thread
@@ -60,7 +85,7 @@ def run_inference(task_config: TaskConfig) -> None:
 
         
         pd.DataFrame(thread_outputs).to_json(
-            f"{outdir}/outputs_part{thread_id}.jsonl",
+            f"{outdir}/outputs_part{thread_id + thread_offset}.jsonl",
             orient="records",
             lines=True,
         )
@@ -74,13 +99,28 @@ def run_inference(task_config: TaskConfig) -> None:
 
     # store outputs in data/logs/task_id/time_stamp/outputs.csv
 
+
+    # post-process cached examples and newly queried examples
+    for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
+        cached = pd.read_json(r_file, orient="records", lines=True)
+        outputs = pd.concat([outputs, cached])
+    # remove duplicates
+    outputs = outputs.drop_duplicates(subset=["question"])
+    # delete bck_outdir
+
+
+    print(f"Number of successful queries: {len(outputs)}")
     outputs.to_json(
         f"{outdir}/outputs.jsonl", orient="records", lines=True
     )
 
 
+
 def query_openai_over_inputs(
-    inputs: List[dict], thread_id: int, task_config: TaskConfig, max_retries: int = 10
+    inputs: List[dict],
+    thread_id: int,
+    task_config: TaskConfig,
+    max_retries: int = 10,
 ) -> List[dict]:
     outputs = []
     time_begin = time.time()
@@ -153,7 +193,7 @@ if __name__ == "__main__":
 
     args.add_argument("--model_name", type=str, default="code-davinci-002")
     args.add_argument("--max_requests_per_min", type=int, default=20)
-
+    args.add_argument("--cached_timestamp", type=str, default=None)
     args.add_argument("--is_debug", action="store_true")
 
 
@@ -187,6 +227,7 @@ if __name__ == "__main__":
         seed=args.seed,
         is_cot_task=args.cot_task,
         model_name=args.model_name,
+        cached_timestamp=args.cached_timestamp,
         max_requests_per_min=args.max_requests_per_min,
         prompt_config=prompt_config,
         tag=args.tag,

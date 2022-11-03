@@ -53,6 +53,7 @@ class TaskConfig:
     num_questions_per_thread: int
     is_cot_task: bool
     model_name: str
+    cached_timestamp: str # reload a cached folder and rerun the error examples
     max_requests_per_min: int
     prompt_config: PromptConfig
     temperature: float = 0.0
