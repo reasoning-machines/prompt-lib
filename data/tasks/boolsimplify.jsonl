@@ -1,0 +1,5 @@
+{"input": "!a & a & (a ^ c & d | !b)", "target": "false"}
+{"input": "a & b | a & c", "target": "a & (b | c)"}
+{"input": "a & b | a & b", "target": "a & b"}
+{"input": "(a | !a) | ((b & !c | c & !b) & (a | !a) | (b & !c | c & !b))", "target": "true"}
+{"input": "a & b | a & c", "target": "a & (b | c)"}

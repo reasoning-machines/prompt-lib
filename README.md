@@ -57,8 +57,8 @@ class Example:
 ]
 ```
 
-- The prompt can be added to any python file in scope, but for the sake of this example, we will add it to `prompts/boolsimplify.py`. Typically, you will try multiple variations of a prompt for a task.
- To keep things manageable, we add a dictionary at the end of `prompts/boolsimplify.py` that gives a task_id to each prompt:
+- The prompt can be added to any python file in scope, but for the sake of this example, we will add it to `prompts/boolsimplify/boolsimplify.py`. Typically, you will try multiple variations of a prompt for a task.
+ To keep things manageable, we add a dictionary at the end of `prompts/boolsimplify/boolsimplify.py` that gives a task_id to each prompt:
 
 ```py
  bool_simple_taskid_to_prompt = {
@@ -66,7 +66,19 @@ class Example:
 }
 ```
 
-- Note the id we give to our task: `boolsimplify_stream`. By convention, task_ids have two parts: `{dataset}_{prompt_type}`. Here, the `dataset` is `boolsimplify` and the `prompt_type` is `stream`. 
+- Note the id we give to our task: `boolsimplify_stream`. By convention, task_ids have two parts: `{dataset}_{prompt_type}`. Here, the `dataset` is `boolsimplify` and the `prompt_type` is `stream`.  This is important: we expect `dataset.jsonl` to be present in `data/tasks/`
+
+
+**Text-file based prompt:**
+- For many use cases, you may not want to define a prompt in a text file. This is easily done by specifying a path in `bool_simple_taskid_to_prompt`:
+
+```py
+ bool_simple_taskid_to_prompt = {
+    "boolsimplify_txt": "prompts/boolsimplify/boolsimplify.txt"
+}
+```
+
+- All the steps below remain the same. When running a job, you need to specify boolsimplify_txt as the task_id.
 
 ### Step 2: Registering the task
 
