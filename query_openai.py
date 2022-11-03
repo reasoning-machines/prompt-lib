@@ -92,6 +92,15 @@ def run_inference(task_config: TaskConfig) -> None:
 
     outputs = pd.DataFrame(chain(*outputs))
 
+    # post-process cached examples and newly queried examples
+    for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
+        cached = pd.read_json(r_file, orient="records", lines=True)
+        outputs = pd.concat([outputs, cached])
+
+    # remove duplicates
+    outputs = outputs.drop_duplicates(subset=["question"])
+    # delete bck_outdir
+
     wandb.log({"accuracy": get_exact_match_acc(outputs)})
     wandb.log({"num_examples": len(outputs)})
     wandb.log({"num_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
@@ -100,13 +109,7 @@ def run_inference(task_config: TaskConfig) -> None:
     # store outputs in data/logs/task_id/time_stamp/outputs.csv
 
 
-    # post-process cached examples and newly queried examples
-    for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
-        cached = pd.read_json(r_file, orient="records", lines=True)
-        outputs = pd.concat([outputs, cached])
-    # remove duplicates
-    outputs = outputs.drop_duplicates(subset=["question"])
-    # delete bck_outdir
+
 
 
     print(f"Number of successful queries: {len(outputs)}")
