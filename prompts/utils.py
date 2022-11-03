@@ -156,30 +156,3 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     # davinci doesn't like prompts that end with a space
     task_df["answer"] = task_df["target"]
     return task_df[["question", "answer"]]
-
-
-def maintain_request_per_minute(
-    num_requests: int, time_begin: float, max_requests_per_min: int, task_idx: int, model_name: str
-) -> float:
-    """Maintains the number of requests per minute to be less than max_requests_per_min.
-    This is required for models like Codex.
-    """
-
-    request_per_minute = get_request_per_minute(num_requests, time_begin)
-    logging.info("\n")
-    while request_per_minute > max_requests_per_min:
-        logging.info(
-            f"Task {task_idx} > Sleeping! (Requests/minute = {request_per_minute:.2f} > {max_requests_per_min:.2f})"
-        )
-        if "code" in model_name:
-            time.sleep(10)
-        request_per_minute = get_request_per_minute(num_requests, time_begin)
-    if "code" in model_name:
-        time.sleep(4)
-    return request_per_minute
-
-
-def get_request_per_minute(num_request: int, begin_time: float) -> float:
-    elapsed_time = time.time() - begin_time
-    request_per_minute = (num_request / elapsed_time) * 60
-    return request_per_minute
