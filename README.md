@@ -125,3 +125,16 @@ bash scripts/run_single_task.sh boolsimplify_stream
 
 
 - The outputs are stored in `data/logs/boolsimplify_stream/`
+
+
+
+
+### Additional notes
+
+- If you are using text prompts, seeds are not supported. Instead, you can use 'scripts/shuffle_prompt.py' to create a shuffled version of the prompt.
+
+```bash
+python prompt-lib/scripts/shuffle_prompt.py --prompt_path quco_prompts/gsm/function_with_comments.txt --seeds 1 2 3 --example_sep $'\n\n\n'
+```
+
+(note the $'\n\n\n' to separate examples--this is needed for passing newlines to the script)
