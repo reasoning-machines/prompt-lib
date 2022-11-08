@@ -4,9 +4,13 @@ def make_shuffled_prompt(prompt_path: str, seed: int, example_sep: str):
         prompt = f.read()
     random.seed(seed)
     prompt_parts = prompt.split(example_sep)
+    prompt_parts = [p for p in prompt_parts if p.strip()]
+    print(prompt_parts)
     print(f"Found {len(prompt_parts)} examples")
     random.shuffle(prompt_parts)
-    shuffled_prompt = example_sep.join(prompt_parts)
+    
+    shuffled_prompt = example_sep.join(prompt_parts).strip() + example_sep # add back the separator at the end
+    
     with open(f"{prompt_path}.s{seed}", "w") as f:
         f.write(shuffled_prompt)
     print(f"Shuffled prompt written to {prompt_path}.s{seed}")
