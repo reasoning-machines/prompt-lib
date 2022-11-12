@@ -607,6 +607,29 @@ equation = [
 ]
 
 
+
+aqua_prompts = [
+    Example(
+    question="A person is traveling at 20 km/hr and reached his destiny in 2.5 hr then find the distance?",
+    thought="The distance that the person traveled would have been 20 km/hr * 2.5 hrs = 50 km.",
+    answer="(e)",
+),
+Example(
+    question="John found that the average of 15 numbers is 40. If 10 is added to each number then the mean of the numbers is?",
+    thought="If 10 is added to each number, then the mean of the numbers also increases by 10. So the new mean would be 50. So the answer is (a).",
+    answer="(a)",
+),
+Example(
+    question="If a / b = 3/4 and 8a + 5b = 22,then find the value of a.",
+    thought="If a / b = 3/4, then b = 4a / 3. So 8a + 5(4a / 3) = 22. This simplifies to 8a + 20a / 3 = 22, which means 44a / 3 = 22. So a is equal to 3/2. So the answer is (b).",
+    answer="(b)",
+),
+Example(
+    question="How many keystrokes are needed to type the numbers from 1 to 500?",
+    thought="There are 9 one-digit numbers from 1 to 9. There are 90 two-digit numbers from 10 to 99. There are 401 three-digit numbers from 100 to 500. 9 + 90(2) + 401(3) = 1392 So the answer is (b).",
+    answer="(b)",
+)]
+
 gsm_task_id_to_prompt = {
     "test": math_qa_examples_original,
     "gsm_stream": math_qa_examples_original,
@@ -627,4 +650,6 @@ gsm_task_id_to_prompt = {
     "gsmsample_stream": math_qa_examples_original,
     "gsmsample_symb_abs": symbolic_greek,
     "gsmhard_stream": math_qa_examples_original,
+    
+    "aqua_stream": aqua_prompts,
 }
