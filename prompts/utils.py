@@ -2,10 +2,9 @@ from dataclasses import dataclass
 from typing import List, Union
 import pandas as pd
 import random
-import time
 import logging
 from prompts.example import PromptStr
-
+from scripts import eval
 from prompts.example import Example
 from prompts.task_id_to_prompt import task_id_to_prompt
 
@@ -57,7 +56,22 @@ class TaskConfig:
     max_requests_per_min: int
     prompt_config: PromptConfig
     temperature: float = 0.0
-
+    eval_function: str = "get_exact_match_acc"
+    
+    def __post_init__(self):
+        # we want to be able to configure the eval function. It is provided by the user as a string,
+        # and then initialized here.
+        self.eval_function = getattr(eval, self.eval_function)
+    
+    def to_dict(self):
+        res = self.__dict__.copy()
+        for k, v in self.__dict__.items():
+            if isinstance(v, PromptConfig):
+                res[k] = v.__dict__
+            elif not isinstance(v, (int, float, str, bool)):
+                res[k] = str(v)
+        return res
+            
 
 def format_prompt(
     prompt_examples: Union[List[Example], PromptStr],

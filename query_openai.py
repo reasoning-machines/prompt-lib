@@ -1,4 +1,5 @@
 # Given the path to a text file, queries alpa for each line in the file.
+import json
 import os.path
 from datetime import datetime
 from itertools import chain
@@ -14,7 +15,6 @@ import re
 import os
 
 from openai_api import OpenaiAPIWrapper
-from scripts.eval import get_exact_match_acc
 from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config
 
 
@@ -77,7 +77,7 @@ def run_inference(task_config: TaskConfig) -> None:
         outputs.append(thread_outputs)
         progress_perc = round(len(outputs) * 100 / len(load_per_task), 2)
         wandb.log({"progress_so_far": progress_perc})
-        accuracy_so_far += get_exact_match_acc(pd.DataFrame(thread_outputs))
+        accuracy_so_far += task_config.eval_function(pd.DataFrame(thread_outputs))
         wandb.log({"accuracy_so_far": accuracy_so_far / len(outputs)})
 
         
@@ -98,7 +98,7 @@ def run_inference(task_config: TaskConfig) -> None:
     outputs = outputs.drop_duplicates(subset=["question"])
     # delete bck_outdir
 
-    wandb.log({"accuracy": get_exact_match_acc(outputs)})
+    wandb.log({"accuracy": task_config.eval_function(outputs)})
     wandb.log({"num_examples": len(outputs)})
     wandb.log({"num_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
     wandb.log({"outputs": wandb.Table(dataframe=outputs)})
@@ -113,6 +113,10 @@ def run_inference(task_config: TaskConfig) -> None:
     outputs.to_json(
         f"{outdir}/outputs.jsonl", orient="records", lines=True
     )
+    
+    with open(f"{outdir}/task_config.json", "w") as f:
+        f.write(json.dumps(task_config.to_dict(), indent=4))
+
 
 
 
@@ -194,7 +198,10 @@ if __name__ == "__main__":
     args.add_argument("--inter_example_sep", type=str, default="\n\n")
     args.add_argument("--temperature", type=float, default=0.0)
     
+    args.add_argument("--eval_function", type=str, default="get_exact_match_acc", help="The function to use for evaluation. Should be defined in scripts/eval.py. The signature should be the same as `get_exact_match_acc`")
+    
     args.add_argument("--tag", type=str, default=None)
+    args.add_argument("--wandb_project", type=str, default="cot")
     
     
     
@@ -221,12 +228,13 @@ if __name__ == "__main__":
         max_requests_per_min=args.max_requests_per_min,
         prompt_config=prompt_config,
         tag=args.tag,
-        temperature=args.temperature
+        temperature=args.temperature,
+        eval_function=args.eval_function,
     )
 
     if args.is_debug:
         wandb.init(mode="disabled")
     else:
-        wandb.init(project="alpa", config=dataclasses.asdict(task_config), name=args.name)
+        wandb.init(project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name)
 
     run_inference(task_config=task_config)

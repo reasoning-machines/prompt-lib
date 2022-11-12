@@ -138,3 +138,8 @@ python prompt-lib/scripts/shuffle_prompt.py --prompt_path quco_prompts/gsm/funct
 ```
 
 (note the $'\n\n\n' to separate examples--this is needed for passing newlines to the script)
+
+
+### Custom Evaluation
+
+- You can also run custom evaluation scripts. This is highly recommended. If you are running a large number of prompt variations, consider writing the custom evaluation function in `scripts/eval.py`, and then passing it as an argument `--eval_function`. Combined with `wandb`, this can be a powerful way to track the performance of your prompts without having to track the outputs of each prompt variation.

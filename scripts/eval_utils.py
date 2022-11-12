@@ -1,16 +1,14 @@
 # evaluates the generated output
-import re
-from importlib import reload
 import pandas as pd
-from tqdm import tqdm
 from contextlib import contextmanager
 import signal
-from glob import glob
-import os
-
 
 @contextmanager
 def timeout(duration):
+    """
+    Timeout context manager.
+    Taken from: https://stackoverflow.com/questions/492519/timeout-on-a-function-call
+    """
     def timeout_handler(signum, frame):
         raise TimeoutError(f"block timedout after {duration} seconds")
 

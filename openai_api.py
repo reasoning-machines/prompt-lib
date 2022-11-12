@@ -3,7 +3,6 @@ from typing import Dict, Any
 import openai
 import random
 import time
-import logging
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 

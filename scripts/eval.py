@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from glob import glob
 import os
-from src.eval_utils import timeout
+from scripts.eval_utils import timeout
 
 
 def get_exact_match_acc(
@@ -47,7 +47,7 @@ def run(
     return get_exact_match_acc(data, answer_field, generated_field)
 
 
-def evaluate_code_prompt(
+def get_acc_from_python_thoughts(
     data: pd.DataFrame,
     answer_field: str = "answer",
     generated_field: str = "generated_answer",
@@ -70,7 +70,7 @@ def evaluate_code_prompt(
         return abs(result - correct_solution) < tol
 
     num_corr = 0
-    for i, row in tqdm(data.iterrows(), total=len(data)):
+    for i, row in tqdm(data.iterrows(), total=len(data), desc="Evaluating generated python thoughts"):
         soln = row[generated_field]
         
         os.system("rm -rf __pycache__")

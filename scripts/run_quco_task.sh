@@ -17,16 +17,21 @@ fi
 NUM_QUESTIONS_PER_THREAD=200
 MAX_TOKENS=600
 
-QUESTION_PREFIX="# Question: "
+QUESTION_PREFIX="# Q: "
 ANSWER_PREFIX="# solution using Python:\n"
 FINAL_ANSWER_PREFIX=""
 INTRA_EXAMPLE_SEP="\n\n"
 INTER_EXAMPLE_SEP="\n\n\n"
 
-TEMP=0.7
+EVAL_FUNC="get_acc_from_python_thoughts"
+
+TEMP=0.0
 NUM_EXAMPLES=-1
 
-declare -a ALL_TASKS=($1)
+declare -a ALL_TASKS=("gsm_quco" "gsmhard_quco" "svamp_quco" "mawpsaddsub_quco" "mawpsmultiarith_quco" "mawpssingleeq_quco" "mawpssingleop_quco" "asdiv_quco")
+
+declare -a ALL_TASKS=("fiveexamples_quco")
+
 declare -a SEEDS=(0)
 
 # declare -a ALL_TASKS=("humaneval_stream")
@@ -50,8 +55,9 @@ for TASK in "${ALL_TASKS[@]}"; do
             --final_answer_prefix "${FINAL_ANSWER_PREFIX}"
             --intra_example_sep "${INTRA_EXAMPLE_SEP}"
             --inter_example_sep "${INTER_EXAMPLE_SEP}"
+            --wandb_project "pal"
+            --eval_function "${EVAL_FUNC}"
             --temperature ${TEMP}
-            --is_debug
             )  # number of tokens in completion
 
 
