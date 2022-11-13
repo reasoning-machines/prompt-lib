@@ -142,15 +142,15 @@ def query_openai_over_inputs(
                 prompt=inputs[i]["question"],
                 max_tokens=task_config.max_tokens,
                 engine=task_config.model_name,
-                stop_token=task_config.prompt_config.question_prefix,  # generate till the model starts generating a new question
+                stop_token=task_config.prompt_config.inter_example_sep,  # generate till the model starts generating a new question
             )
 
-            print(OpenaiAPIWrapper.parse_response(response))
+            print(OpenaiAPIWrapper.parse_response(response).split(task_config.prompt_config.inter_example_sep)[0])
             
             outputs.append(
                 {
                     "question": inputs[i]["question"],
-                    "generated_answer": OpenaiAPIWrapper.parse_response(response),
+                    "generated_answer": OpenaiAPIWrapper.parse_response(response).split(task_config.prompt_config.inter_example_sep)[0],
                     "answer": inputs[i]["answer"],
                 }
             )
