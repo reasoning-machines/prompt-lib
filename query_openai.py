@@ -27,7 +27,11 @@ def run_inference(task_config: TaskConfig) -> None:
     else:
         time_stamp = task_config.cached_timestamp
 
-    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/{time_stamp}/k{task_config.num_examples}/"
+    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/{time_stamp}/temp_{task_config.temperature}/seed_{task_config.seed}"
+    if task_config.num_examples == -1:
+        outdir += "/k_all/"
+    else:
+        outdir += f"/k_{task_config.num_examples}/"
     if task_config.tag is not None:
         outdir += f"{task_config.tag}/"
 
