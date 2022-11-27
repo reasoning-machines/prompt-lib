@@ -14,11 +14,10 @@ import glob
 import re
 import os
 import logging
-import sys
 
 from openai_api import OpenaiAPIWrapper
 from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config
-from scripts.eval_utils import read_jsonl
+from eval.eval_utils import read_jsonl
 
 logging.basicConfig(level=logging.INFO)
 

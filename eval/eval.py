@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from glob import glob
 import os
-from scripts.eval_utils import timeout
+from eval.eval_utils import timeout
 
 
 def get_exact_match_acc(

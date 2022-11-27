@@ -53,8 +53,9 @@ def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
                 print(f"Could not find prompt for {task_id} in {example_list_or_prompt_path}")
 
 try:
-    update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
-except ModuleNotFoundError:
+    # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
+    update_task_id_to_prompt_with_dynamic_import("pir_prompts.prompt_list")
+except ModuleNotFoundError as e:
     pass # no quco prompts
 
 # TODO: make the above dynamic import more robust
