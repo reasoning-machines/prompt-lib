@@ -36,17 +36,13 @@ def retry_with_exponential_backoff(
 
                 # Check if max retries has been reached
                 if num_retries > max_retries:
-                    raise Exception(
-                        f"Maximum number of retries ({max_retries}) exceeded."
-                    )
+                    raise Exception(f"Maximum number of retries ({max_retries}) exceeded.")
 
                 # Increment the delay
                 delay *= exponential_base * (1 + jitter * random.random())
 
                 # Sleep for the delay
                 time.sleep(delay)
-                
-                
 
             # Raise exceptions for any errors not specified
             except Exception as e:
@@ -54,10 +50,13 @@ def retry_with_exponential_backoff(
 
     return wrapper
 
+
 class OpenaiAPIWrapper:
     @staticmethod
     @retry_with_exponential_backoff
-    def call(prompt: str, max_tokens: int, engine: str, stop_token: str, temperature: float) -> dict:
+    def call(
+        prompt: str, max_tokens: int, engine: str, stop_token: str, temperature: float
+    ) -> dict:
         response = openai.Completion.create(
             engine=engine,
             prompt=prompt,
@@ -68,7 +67,7 @@ class OpenaiAPIWrapper:
             presence_penalty=0,
             stop=[stop_token],
             # logprobs=3,
-            best_of=1
+            best_of=1,
         )
         return response
 
@@ -76,4 +75,3 @@ class OpenaiAPIWrapper:
     def parse_response(response) -> Dict[str, Any]:
         text = response["choices"][0]["text"]
         return text
-
