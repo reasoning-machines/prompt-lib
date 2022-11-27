@@ -7,11 +7,9 @@ from prompts.date import date_task_id_to_prompt
 from prompts.sorting import sorting_task_id_to_prompt
 from prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
 
-from prompts.codenet.codenet import codnet_task_id_to_prompt
 
 from prompts.plot_generation import plot_generation_task_id_to_prompt
 from prompts.human_eval import humaneval_task_id_to_prompt
-from prompts.effgen import effgen_task_id_to_prompt
 from prompts.quco_gsm import quco_gsm_task_id_to_prompt
 from prompts.example import PromptStr
 
@@ -24,9 +22,7 @@ task_id_to_prompt.update(sorting_task_id_to_prompt)
 task_id_to_prompt.update(bool_simplify_taskid_to_prompt)
 task_id_to_prompt.update(plot_generation_task_id_to_prompt)
 task_id_to_prompt.update(humaneval_task_id_to_prompt)
-task_id_to_prompt.update(effgen_task_id_to_prompt)
 task_id_to_prompt.update(quco_gsm_task_id_to_prompt)
-task_id_to_prompt.update(codnet_task_id_to_prompt)
 
 
 def get_prompt_from_file(prompt_path: str) -> PromptStr:
