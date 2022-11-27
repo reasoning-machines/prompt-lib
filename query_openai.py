@@ -16,7 +16,7 @@ import os
 
 from openai_api import OpenaiAPIWrapper
 from prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config
-
+from scripts.eval_utils import read_jsonl
 
 def run_inference(task_config: TaskConfig) -> None:
     """Query a language model API for each line in the file."""
@@ -27,7 +27,7 @@ def run_inference(task_config: TaskConfig) -> None:
     else:
         time_stamp = task_config.cached_timestamp
 
-    outdir = f"data/logs/{task_config.task_id}/{time_stamp}/k{task_config.num_examples}/"
+    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/{time_stamp}/k{task_config.num_examples}/"
     if task_config.tag is not None:
         outdir += f"{task_config.tag}/"
 
@@ -35,7 +35,7 @@ def run_inference(task_config: TaskConfig) -> None:
     thread_offset = 0
     if pathlib.Path(outdir).exists():
         for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
-            cached = pd.read_json(r_file, orient="records", lines=True)
+            cached = read_jsonl(r_file)
             for i, row in cached.iterrows():
                 cached_examples.add(row["question"])
             part_idx = re.search('outputs_part(\d+).jsonl',
@@ -91,7 +91,7 @@ def run_inference(task_config: TaskConfig) -> None:
 
     # post-process cached examples and newly queried examples
     for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
-        cached = pd.read_json(r_file, orient="records", lines=True)
+        cached = read_jsonl(r_file)
         outputs = pd.concat([outputs, cached])
 
     # remove duplicates
