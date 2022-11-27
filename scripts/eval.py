@@ -67,11 +67,33 @@ def get_acc_from_python_thoughts(
         the accuracy and/or the dataframe with the evaluation results
     """
     def _check_corr(result: float, correct_solution: float):
-        return abs(result - correct_solution) < tol
+        if result.strip() == correct_solution.strip():
+            return 1
+        try:
+            result = float(result)
+            correct_solution = float(correct_solution)
+            return abs(result - correct_solution) < tol
+        except:
+            return 0
 
     num_corr = 0
     for i, row in tqdm(data.iterrows(), total=len(data), desc="Evaluating generated python thoughts"):
         soln = row[generated_field]
+        
+        # soln can have multiple functions. We only want to run the first function
+        imports = ""
+        if "nltk" in soln:
+            imports += "import nltk\n"
+        if "numpy" in soln:
+            imports += "import numpy as np\n"
+        if "pandas" in soln:
+            imports += "import pandas as pd\n"
+        
+        if "spacy" in soln:
+            imports += "import spacy\n"
+            imports += "nlp = spacy.load('en_core_web_sm')\n"
+            
+        soln = imports + "\ndef " + soln.split("def ")[1] + "\n"
         
         os.system("rm -rf __pycache__")
         os.system("rm -f temp_result.pyc")
@@ -86,14 +108,14 @@ def get_acc_from_python_thoughts(
             exec(soln)
             with timeout(timeout_seconds):
                 result = temp_result.solution()
+            is_corr = _check_corr(result, correct_solution)
+            num_corr += int(is_corr)
+            data.loc[i, "is_correct"] = is_corr
+            data.loc[i, "execution_result"] = result
         except:
-            continue
-        if not (isinstance(result, int) or isinstance(result, float)):
+            data.loc[i, "is_correct"] = 0
             continue
         # compare float values
-        is_corr = _check_corr(result, correct_solution)
-        num_corr += int(is_corr)
-        data.loc[i, "is_correct"] = is_corr
 
     os.system("rm -rf __pycache__")
     os.system("rm -f temp_result.pyc")
@@ -131,4 +153,13 @@ def get_acc_from_python_thoughts(
 if __name__ == "__main__":
     import sys
 
-    run(sys.argv[1], answer_field="target", generated_field="prediction")
+    if len(sys.argv) < 2:
+        print("Please provide the path to the test file")
+        sys.exit(1)
+
+    
+    answer_field = sys.argv[2] if len(sys.argv) > 2 else "answer"
+    
+    generated_field = sys.argv[3] if len(sys.argv) > 3 else "generated_answer"
+
+    run(sys.argv[1], answer_field=answer_field, generated_field=generated_field)

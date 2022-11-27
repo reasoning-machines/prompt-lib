@@ -650,6 +650,13 @@ gsm_task_id_to_prompt = {
     "gsmsample_stream": math_qa_examples_original,
     "gsmsample_symb_abs": symbolic_greek,
     "gsmhard_stream": math_qa_examples_original,
-    
+    "gsmhard_direct": math_qa_examples_original,
+        
+    "svamp_stream": math_qa_examples_original,
+    "mawpsaddsub_stream": math_qa_examples_original,
+    "mawpsmultiarith_stream": math_qa_examples_original,
+    "mawpssingleeq_stream": math_qa_examples_original,
+    "mawpssingleop_stream": math_qa_examples_original,
+    "asdiv_stream": math_qa_examples_original,
     "aqua_stream": aqua_prompts,
 }
