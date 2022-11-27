@@ -3,7 +3,7 @@ set -u
 
 declare -a TASK_TO_RUN=$1
 
-declare -a SEEDS=(0 1 2)
+declare -a SEEDS=(0)
 
 # model name should be one of `text-davinci-002` (GPT-3) or `code-davinci-002` (CODEX)
 MODEL_NAME="code-davinci-002"
@@ -18,7 +18,7 @@ else
 fi
 
 MAX_TOKENS=600
-
+TEMP=0.0
 
 NUM_QUESTIONS_PER_THREAD=500
 
@@ -36,6 +36,7 @@ for TASK in "${TASK_TO_RUN[@]}"; do
             --max_requests_per_min ${REQ_PER_MIN}
             --seed ${SEED}   # decides order of examples in the prompt
             --num_questions_per_thread ${NUM_QUESTIONS_PER_THREAD}  # number of questions to ask per thread
+            --temperature ${TEMP}  # temperature for sampling
             # --is_debug # if set, wandb logging is disabled
             ) 
 
@@ -43,7 +44,8 @@ for TASK in "${TASK_TO_RUN[@]}"; do
             ARGS+=("--cot_task")
         fi
         echo "python3 run.py ${ARGS[@]}"
-        python -u query_openai.py "${ARGS[@]}"
+        python -u prompt-lib/query_openai.py "${ARGS[@]}" > logs/"${TASK}_${MODEL_NAME}_s${SEED}.log" 2>&1
+
     done
 done
 
