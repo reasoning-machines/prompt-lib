@@ -1,3 +1,4 @@
+from collections import Counter
 import os
 from typing import Dict, Any
 import openai
@@ -68,10 +69,23 @@ class OpenaiAPIWrapper:
             stop=[stop_token],
             # logprobs=3,
             best_of=best_of,
+            n=best_of,
         )
         return response
 
     @staticmethod
-    def parse_response(response) -> Dict[str, Any]:
+    def get_first_response(response) -> Dict[str, Any]:
+        """Returns the first response from the list of responses."""
         text = response["choices"][0]["text"]
         return text
+    
+    @staticmethod
+    def get_majority_answer(response) -> Dict[str, Any]:
+        """Returns the majority answer from the list of responses."""
+        answers = [choice["text"] for choice in response["choices"]]
+        answers = Counter(answers)
+        # if there is a tie, return the first answer
+        if answers.most_common(1)[0][1] == answers.most_common(2)[1][1]:
+            return OpenaiAPIWrapper.get_first_response(response)
+        
+        return answers.most_common(1)[0][0]
