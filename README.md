@@ -11,6 +11,9 @@ bash scripts/run_single_task.sh boolsimplify_stream
 
 ```
 
+## Notebooks
+
+* Querying OpenAI example: `notebooks/QueryOpenAI.ipynb`
 
 - The outputs are stored in `data/logs/boolsimplify_stream/`
 
