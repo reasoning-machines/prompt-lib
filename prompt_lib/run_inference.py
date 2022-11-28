@@ -15,7 +15,7 @@ import re
 import os
 import logging
 
-from prompt_lib.openai_api import OpenaiAPIWrapper
+from prompt_lib.backends.openai_api import OpenaiAPIWrapper
 from prompt_lib.prompts.utils import PromptConfig, TaskConfig, make_task_file_from_config
 from eval.eval_utils import read_jsonl
 

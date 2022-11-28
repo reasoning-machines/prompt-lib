@@ -44,7 +44,7 @@ for TASK in "${TASK_TO_RUN[@]}"; do
             ARGS+=("--cot_task")
         fi
         echo "python3 run.py ${ARGS[@]}"
-        python -u prompt-lib/query_openai.py "${ARGS[@]}" > logs/"${TASK}_${MODEL_NAME}_s${SEED}.log" 2>&1
+        python -u prompt-lib/prompt_lib/run_inference.py  "${ARGS[@]}" > logs/"${TASK}_${MODEL_NAME}_s${SEED}.log" 2>&1
 
     done
 done
