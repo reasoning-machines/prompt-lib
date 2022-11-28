@@ -85,7 +85,7 @@ class Example:
 - The next step is to register the task. The file `task_id_to_prompt` maintains a global dictionary that maps task_ids to prompts. We can add our task to this dictionary by adding the following line to `task_id_to_prompt`:
 
 ```py
-from prompts.boolsimplify import boolsimplify_taskid_to_prompt
+from prompt_lib.prompts.boolsimplify import boolsimplify_taskid_to_prompt
 
 task_id_to_prompt.update(bool_simple_taskid_to_prompt)
 ```

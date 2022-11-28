@@ -55,7 +55,7 @@ class OpenaiAPIWrapper:
     @staticmethod
     @retry_with_exponential_backoff
     def call(
-        prompt: str, max_tokens: int, engine: str, stop_token: str, temperature: float
+        prompt: str, max_tokens: int, engine: str, stop_token: str, temperature: float, best_of: int = 1
     ) -> dict:
         response = openai.Completion.create(
             engine=engine,
@@ -67,7 +67,7 @@ class OpenaiAPIWrapper:
             presence_penalty=0,
             stop=[stop_token],
             # logprobs=3,
-            best_of=1,
+            best_of=best_of,
         )
         return response
 
