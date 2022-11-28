@@ -3,10 +3,10 @@ from typing import List, Union
 import pandas as pd
 import random
 import logging
-from prompts.example import PromptStr
+from prompt_lib.prompts.example import PromptStr
 from eval import eval
-from prompts.example import Example
-from prompts.task_id_to_prompt import task_id_to_prompt
+from prompt_lib.prompts.example import Example
+from prompt_lib.prompts.task_id_to_prompt import task_id_to_prompt
 
 logging.basicConfig(level=logging.INFO)
 

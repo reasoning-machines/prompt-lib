@@ -1,4 +1,4 @@
-from prompts.example import Example
+from prompt_lib.prompts.example import Example
 
 date_examples_original = [
       

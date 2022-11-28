@@ -1,4 +1,4 @@
-from prompts.example import Example
+from prompt_lib.prompts.example import Example
 
 boolsimplify_examples = [
     Example(
@@ -25,5 +25,5 @@ boolsimplify_examples = [
 
 bool_simplify_taskid_to_prompt = {
     "boolsimplify_stream": boolsimplify_examples,
-    "boolsimplify_txt": "prompts/boolsimplify/boolsimplify.txt"
+    "boolsimplify_txt": "prompt_lib/prompts/boolsimplify/boolsimplify.txt"
 }

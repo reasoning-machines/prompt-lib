@@ -1,17 +1,17 @@
 import sys
 sys.path.append("prompt-lib")  # to allow imports from outside the project directory
 import os
-from prompts.gsm import gsm_task_id_to_prompt
-from prompts.sports import sports_task_id_to_prompt
-from prompts.date import date_task_id_to_prompt
-from prompts.sorting import sorting_task_id_to_prompt
-from prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
+from prompt_lib.prompts.gsm import gsm_task_id_to_prompt
+from prompt_lib.prompts.sports import sports_task_id_to_prompt
+from prompt_lib.prompts.date import date_task_id_to_prompt
+from prompt_lib.prompts.sorting import sorting_task_id_to_prompt
+from prompt_lib.prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
 
 
-from prompts.plot_generation import plot_generation_task_id_to_prompt
-from prompts.human_eval import humaneval_task_id_to_prompt
-from prompts.quco_gsm import quco_gsm_task_id_to_prompt
-from prompts.example import PromptStr
+from prompt_lib.prompts.plot_generation import plot_generation_task_id_to_prompt
+from prompt_lib.prompts.human_eval import humaneval_task_id_to_prompt
+from prompt_lib.prompts.quco_gsm import quco_gsm_task_id_to_prompt
+from prompt_lib.prompts.example import PromptStr
 
 
 task_id_to_prompt = dict()
@@ -56,13 +56,14 @@ try:
     # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
     update_task_id_to_prompt_with_dynamic_import("pir_prompts.prompt_list")
 except ModuleNotFoundError as e:
+    raise e
     pass # no quco prompts
 
 # TODO: make the above dynamic import more robust
 
 if __name__ == '__main__':
     import argparse
-    from prompts.utils import format_prompt, PromptConfig
+    from prompt_lib.prompts.utils import format_prompt, PromptConfig
 
     args = argparse.ArgumentParser()
     args.add_argument("--task_id", type=str)
