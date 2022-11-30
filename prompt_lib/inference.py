@@ -82,6 +82,7 @@ def inference_loop(task_config: TaskConfig, num_inference_examples: int = None) 
 
     with open(f"{outdir}/task_config.json", "w") as f:
         f.write(json.dumps(task_config.to_dict(), indent=4))
+    return outputs
 
 
 def create_task_batches(task_config: TaskConfig, task_file: List) -> List:

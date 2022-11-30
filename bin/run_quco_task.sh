@@ -50,7 +50,6 @@ for SEED in "${SEEDS[@]}"; do
         ARGS=(--task_id ${TASK}
             --num_prompt_examples ${num_prompt_examples} # -1 means use all examples in the prompt
             --name "${TASK}_${MODEL_NAME}_s${SEED}"  # name of the run
-            --timeout 1440  # timeout in minutes
             --model_name "${MODEL_NAME}"
             --max_requests_per_min ${REQ_PER_MIN}
             --seed ${SEED}   # decides order of examples in the prompt

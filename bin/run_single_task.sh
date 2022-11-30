@@ -17,6 +17,8 @@ else
     exit 1
 fi
 
+mkdir -p logs
+
 MAX_TOKENS=600
 TEMP=0.0
 
@@ -30,13 +32,13 @@ for TASK in "${TASK_TO_RUN[@]}"; do
         ARGS=(--task_id ${TASK}
             --num_prompt_examples -1  # -1 means use all examples in the prompt
             --name "${TASK}_${MODEL_NAME}_s${SEED}"  # name of the run
-            --timeout 1440  # timeout in minutes
             --model_name "${MODEL_NAME}"
             --max_tokens ${MAX_TOKENS}
             --max_requests_per_min ${REQ_PER_MIN}
             --seed ${SEED}   # decides order of examples in the prompt
             --num_questions_per_thread ${NUM_QUESTIONS_PER_THREAD}  # number of questions to ask per thread
             --temperature ${TEMP}  # temperature for sampling
+            --num_inference_examples 3
             # --is_debug # if set, wandb logging is disabled
             ) 
 
