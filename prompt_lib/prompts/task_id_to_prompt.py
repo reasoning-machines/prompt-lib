@@ -56,7 +56,6 @@ try:
     # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
     update_task_id_to_prompt_with_dynamic_import("pir_prompts.prompt_list")
 except ModuleNotFoundError as e:
-    raise e
     pass # no quco prompts
 
 # TODO: make the above dynamic import more robust

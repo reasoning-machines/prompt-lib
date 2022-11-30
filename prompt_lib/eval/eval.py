@@ -4,9 +4,8 @@ from importlib import reload
 import pandas as pd
 from tqdm import tqdm
 
-from glob import glob
 import os
-from eval.eval_utils import timeout
+from prompt_lib.eval.eval_utils import timeout
 
 
 def get_exact_match_acc(

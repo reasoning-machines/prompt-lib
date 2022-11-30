@@ -4,7 +4,7 @@ import pandas as pd
 import random
 import logging
 from prompt_lib.prompts.example import PromptStr
-from eval import eval
+from prompt_lib.eval import eval
 from prompt_lib.prompts.example import Example
 from prompt_lib.prompts.task_id_to_prompt import task_id_to_prompt
 
