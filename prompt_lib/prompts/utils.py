@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import json
 from typing import List, Union
 import pandas as pd
 import random
@@ -18,16 +19,20 @@ class PromptConfig:
     final_answer_prefix: str = "The answer is "
     intra_example_sep: str = "\n"
     inter_example_sep: str = "\n\n"
-    
+
     @staticmethod
     def from_args(args):
         return PromptConfig(
-            question_prefix=args.question_prefix.replace('\\n', '\n'),
-            answer_prefix=args.answer_prefix.replace('\\n', '\n'),
-            final_answer_prefix=args.final_answer_prefix.replace('\\n', '\n'),
-            intra_example_sep=args.intra_example_sep.replace('\\n', '\n'),
-            inter_example_sep=args.inter_example_sep.replace('\\n', '\n'),
+            question_prefix=args.question_prefix.replace("\\n", "\n"),
+            answer_prefix=args.answer_prefix.replace("\\n", "\n"),
+            final_answer_prefix=args.final_answer_prefix.replace("\\n", "\n"),
+            intra_example_sep=args.intra_example_sep.replace("\\n", "\n"),
+            inter_example_sep=args.inter_example_sep.replace("\\n", "\n"),
         )
+    
+    @staticmethod
+    def from_dict(config_dict: dict) -> "PromptConfig":
+        return PromptConfig(**config_dict)
 
 
 @dataclass
@@ -47,22 +52,21 @@ class TaskConfig:
     tag: str
     num_examples: int
     max_tokens: int
-    timeout: int
     seed: int
     num_questions_per_thread: int
     is_cot_task: bool
     model_name: str
-    cached_timestamp: str # reload a cached folder and rerun the error examples
+    cached_timestamp: str  # reload a cached folder and rerun the error examples
     max_requests_per_min: int
     prompt_config: PromptConfig
     temperature: float = 0.0
     eval_function: str = "get_exact_match_acc"
-    
+
     def __post_init__(self):
         # we want to be able to configure the eval function. It is provided by the user as a string,
         # and then initialized here.
         self.eval_function = getattr(eval, self.eval_function)
-    
+
     def to_dict(self):
         res = self.__dict__.copy()
         for k, v in self.__dict__.items():
@@ -71,7 +75,47 @@ class TaskConfig:
             elif not isinstance(v, (int, float, str, bool)):
                 res[k] = str(v)
         return res
-            
+
+    @staticmethod
+    def from_args(args, prompt_config: PromptConfig) -> "TaskConfig":
+        task_config = TaskConfig(
+            task_id=args.task_id,
+            num_questions_per_thread=args.num_questions_per_thread,
+            max_tokens=args.max_tokens,
+            num_examples=args.num_examples,
+            seed=args.seed,
+            is_cot_task=args.cot_task,
+            model_name=args.model_name,
+            cached_timestamp=args.cached_timestamp,
+            max_requests_per_min=args.max_requests_per_min,
+            prompt_config=prompt_config,
+            tag=args.tag,
+            temperature=args.temperature,
+            eval_function=args.eval_function,
+        )
+        return task_config
+    
+    @staticmethod
+    def from_config_dict(config_dict) -> "TaskConfig":
+        prompt_config = PromptConfig.from_dict(config_dict["prompt_config"])
+        task_config = TaskConfig(
+            task_id=config_dict["task_id"],
+            num_questions_per_thread=config_dict["num_questions_per_thread"],
+            max_tokens=config_dict["max_tokens"],
+            num_examples=config_dict["num_examples"],
+            seed=config_dict["seed"],
+            is_cot_task=config_dict["is_cot_task"],
+            model_name=config_dict["model_name"],
+            cached_timestamp=config_dict["cached_timestamp"],
+            max_requests_per_min=config_dict["max_requests_per_min"],
+            prompt_config=prompt_config,
+            tag=config_dict["tag"],
+            temperature=config_dict["temperature"],
+            eval_function=config_dict["eval_function"])
+        return task_config
+
+
+
 
 def format_prompt(
     prompt_examples: Union[List[Example], PromptStr],
@@ -107,9 +151,7 @@ def format_prompt(
                 prompt_config.answer_prefix + example.thought + " "
             )  # "A: " + thought + " "
             prompt_str += (
-                prompt_config.final_answer_prefix
-                + example.answer
-                + prompt_config.intra_example_sep
+                prompt_config.final_answer_prefix + example.answer + prompt_config.intra_example_sep
             )  # "The answer is " + answer + "\n"
         else:
             prompt_str += (
@@ -137,13 +179,14 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
 
     task_file_path = f"data/tasks/{task_config.task_id.split('_')[0]}.jsonl"
     import json
+
     rows = []
     with open(task_file_path, "r") as f:
         for line in f:
             rows.append(json.loads(line))
-    
+
     task_df = pd.DataFrame(rows)
-        
+
     # task_df = pd.read_json(task_file_path, lines=True, orient="records")
 
     # format the prompt
@@ -165,7 +208,11 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
         + task_config.prompt_config.question_prefix
         + task_df["input"]
         + task_config.prompt_config.intra_example_sep
-        + (task_config.prompt_config.answer_prefix.strip() if is_non_code_model else task_config.prompt_config.answer_prefix)
+        + (
+            task_config.prompt_config.answer_prefix.strip()
+            if is_non_code_model
+            else task_config.prompt_config.answer_prefix
+        )
     )
     # davinci doesn't like prompts that end with a space
     task_df["answer"] = task_df["target"]

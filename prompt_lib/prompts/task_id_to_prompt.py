@@ -10,7 +10,7 @@ from prompt_lib.prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to
 
 from prompt_lib.prompts.plot_generation import plot_generation_task_id_to_prompt
 from prompt_lib.prompts.human_eval import humaneval_task_id_to_prompt
-from prompt_lib.prompts.quco_gsm import quco_gsm_task_id_to_prompt
+from prompt_lib.prompts.pal_gsm import pal_maths_task_id_to_prompt
 from prompt_lib.prompts.example import PromptStr
 
 
@@ -22,7 +22,7 @@ task_id_to_prompt.update(sorting_task_id_to_prompt)
 task_id_to_prompt.update(bool_simplify_taskid_to_prompt)
 task_id_to_prompt.update(plot_generation_task_id_to_prompt)
 task_id_to_prompt.update(humaneval_task_id_to_prompt)
-task_id_to_prompt.update(quco_gsm_task_id_to_prompt)
+task_id_to_prompt.update(pal_maths_task_id_to_prompt)
 
 
 def get_prompt_from_file(prompt_path: str) -> PromptStr:

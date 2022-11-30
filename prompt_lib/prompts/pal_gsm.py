@@ -99,7 +99,7 @@ def solution():
 """
 
 
-quco_gsm = [
+pal_gsm = [
     Example(
         question="Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?",
         answer=eg_1_solution_string,
@@ -143,8 +143,13 @@ quco_gsm = [
 ]
 
 
-quco_gsm_task_id_to_prompt = {
-    "quco_stream": quco_gsm,
-    "gsmhard_quco": quco_gsm,
-    "qucofailed_stream": quco_gsm,
+pal_maths_task_id_to_prompt = {
+    "gsm_pal": pal_gsm,
+    "gsmhard_pal": pal_gsm,
+    "svamp_pal": pal_gsm,
+    "mawpsaddsub_pal": pal_gsm,
+    "mawpsmultiarith_pal": pal_gsm,
+    "mawpssingleeq_pal": pal_gsm,
+    "mawpssingleop_pal": pal_gsm,
+    "asdiv_pal": pal_gsm,
 }
