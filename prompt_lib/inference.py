@@ -15,7 +15,7 @@ import logging
 
 from prompt_lib.backends.openai_api import OpenaiAPIWrapper
 from prompt_lib.prompts.utils import TaskConfig, make_task_file_from_config
-from eval.eval_utils import read_jsonl
+from prompt_lib.eval.eval_utils import read_jsonl
 
 logging.basicConfig(level=logging.INFO)
 
