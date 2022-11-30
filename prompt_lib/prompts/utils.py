@@ -38,7 +38,7 @@ class PromptConfig:
 @dataclass
 class TaskConfig:
     """
-    num_examples (int): Number of examples to include in the prompt.
+    num_prompt_examples (int): Number of examples to include in the prompt.
     task_id (str): A unique id for the task. Task id is used to recover task_file. Specifically,
                    data/tasks/task_id.split("_")[0].jsonl should be the task file.
                    The task file should be a jsonl file with two columns: input and target.
@@ -50,7 +50,7 @@ class TaskConfig:
 
     task_id: str
     tag: str
-    num_examples: int
+    num_prompt_examples: int
     max_tokens: int
     seed: int
     num_questions_per_thread: int
@@ -82,7 +82,7 @@ class TaskConfig:
             task_id=args.task_id,
             num_questions_per_thread=args.num_questions_per_thread,
             max_tokens=args.max_tokens,
-            num_examples=args.num_examples,
+            num_prompt_examples=args.num_prompt_examples,
             seed=args.seed,
             is_cot_task=args.cot_task,
             model_name=args.model_name,
@@ -102,7 +102,7 @@ class TaskConfig:
             task_id=config_dict["task_id"],
             num_questions_per_thread=config_dict["num_questions_per_thread"],
             max_tokens=config_dict["max_tokens"],
-            num_examples=config_dict["num_examples"],
+            num_prompt_examples=config_dict["num_prompt_examples"],
             seed=config_dict["seed"],
             is_cot_task=config_dict["is_cot_task"],
             model_name=config_dict["model_name"],
@@ -120,7 +120,7 @@ class TaskConfig:
 def format_prompt(
     prompt_examples: Union[List[Example], PromptStr],
     prompt_config: PromptConfig,
-    num_examples: int,
+    num_prompt_examples: int,
     seed: int,
     is_cot_prompt: bool,
 ) -> str:
@@ -128,7 +128,7 @@ def format_prompt(
     Args:
         prompt (List[Example]): List of examples for the prompt.
         prompt_config (PromptConfig): Configuration for the prompt.
-        num_examples (int): Number of examples to include in the prompt.
+        num_prompt_examples (int): Number of examples to include in the prompt.
         seed (int): Seed for random number generator. This will ensure that the same examples are used for each prompt.
         is_cot_prompt (bool): Whether the prompt is a COT prompt.
     Returns:
@@ -137,9 +137,9 @@ def format_prompt(
     if isinstance(prompt_examples, PromptStr):
         return prompt_examples.prompt_str
     # shuffle the examples, but use the same seed for each prompt
-    if num_examples == -1:
-        num_examples = len(prompt_examples)
-    examples = random.Random(seed).sample(prompt_examples, num_examples)
+    if num_prompt_examples == -1:
+        num_prompt_examples = len(prompt_examples)
+    examples = random.Random(seed).sample(prompt_examples, num_prompt_examples)
     # format the prompt
     prompt_str = ""
     for example in examples:
@@ -196,7 +196,7 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
         prompt_str = format_prompt(
             prompt_examples=task_id_to_prompt[task_config.task_id],
             prompt_config=task_config.prompt_config,
-            num_examples=task_config.num_examples,
+            num_prompt_examples=task_config.num_prompt_examples,
             seed=task_config.seed,
             is_cot_prompt=task_config.is_cot_task,
         )

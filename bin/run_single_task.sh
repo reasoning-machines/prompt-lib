@@ -28,7 +28,7 @@ for TASK in "${TASK_TO_RUN[@]}"; do
 
         echo "Running $TASK with seed $SEED"
         ARGS=(--task_id ${TASK}
-            --num_examples -1  # -1 means use all examples in the prompt
+            --num_prompt_examples -1  # -1 means use all examples in the prompt
             --name "${TASK}_${MODEL_NAME}_s${SEED}"  # name of the run
             --timeout 1440  # timeout in minutes
             --model_name "${MODEL_NAME}"

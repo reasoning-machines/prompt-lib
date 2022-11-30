@@ -29,7 +29,7 @@ INTER_EXAMPLE_SEP="\n\n"
 EVAL_FUNC="get_acc_from_python_thoughts"
 
 TEMP=0.0
-NUM_EXAMPLES=-1
+num_prompt_examples=-1
 
 # declare -a ALL_TASKS=("gsm_quco" "gsmhard_quco" "svamp_quco" "mawpsaddsub_quco" "mawpsmultiarith_quco" "mawpssingleeq_quco" "mawpssingleop_quco" "asdiv_quco")
 
@@ -48,7 +48,7 @@ for SEED in "${SEEDS[@]}"; do
     for TASK in "${ALL_TASKS[@]}"; do
         echo "Running $TASK with seed $SEED"
         ARGS=(--task_id ${TASK}
-            --num_examples ${NUM_EXAMPLES} # -1 means use all examples in the prompt
+            --num_prompt_examples ${num_prompt_examples} # -1 means use all examples in the prompt
             --name "${TASK}_${MODEL_NAME}_s${SEED}"  # name of the run
             --timeout 1440  # timeout in minutes
             --model_name "${MODEL_NAME}"

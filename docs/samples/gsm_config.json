@@ -1,0 +1,22 @@
+{
+    "task_id": "gsm_stream",
+    "tag": "gsm_stream",
+    "num_prompt_examples": 5,
+    "max_tokens": 600,
+    "num_questions_per_thread": 100,
+    "seed": 0,
+    "is_cot_task": true,
+    "model_name": "code-davinci-002",
+    "max_requests_per_min": 20,
+    "cached_timestamp": null,
+    "temperature": 0.0,
+    "is_debug": false,
+    "prompt_config": {
+        "question_prefix": "Q: ",
+        "answer_prefix": "A: ",
+        "final_answer_prefix": "The answer is ",
+        "intra_example_sep": "\n",
+        "inter_example_sep": "\n\n"
+    },
+    "eval_function": "get_exact_match_acc"
+}

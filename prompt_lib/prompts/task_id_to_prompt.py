@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     args = argparse.ArgumentParser()
     args.add_argument("--task_id", type=str)
-    args.add_argument("--num_examples", type=int, default=-1)
+    args.add_argument("--num_prompt_examples", type=int, default=-1)
     args.add_argument("--seed", type=int)
     args.add_argument("--cot_task", action="store_true")
 
@@ -85,20 +85,9 @@ if __name__ == '__main__':
     prompt_str = format_prompt(
         prompt_examples=task_id_to_prompt[args.task_id],
         prompt_config=prompt_config,
-        num_examples=args.num_examples,
+        num_prompt_examples=args.num_prompt_examples,
         seed=args.seed,
         is_cot_prompt=args.cot_task,
     )
     
     print(prompt_str)
-    
-    # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
-    # prompt_str = format_prompt(
-    #     prompt_examples=task_id_to_prompt["gsmhard_interactive"],
-    #     prompt_config=prompt_config,
-    #     num_examples=args.num_examples,
-    #     seed=args.seed,
-    #     is_cot_prompt=args.cot_task,
-    # )
-    # print(prompt_str)
-    
