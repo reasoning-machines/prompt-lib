@@ -11,13 +11,22 @@ bash scripts/run_single_task.sh boolsimplify_stream
 
 ```
 
-## Notebooks
-
-* Querying OpenAI example: `notebooks/QueryOpenAI.ipynb`
-
 - The outputs are stored in `data/logs/boolsimplify_stream/`
 
+
+## Colabs
+
+You can run these colabs directly in the browser. Supporting bulk-inference is the main goal of `prompt-lib`, but these notebooks should give you a good idea of some of the functionality.
+
+
+* [Querying OpenAI](https://github.com/reasoning-machines/prompt-lib/blob/main/notebooks/QueryOpenAI.ipynb)
+
+* [Custom task](https://github.com/reasoning-machines/prompt-lib/blob/main/notebooks/PromptLibCustomTask.ipynb)
+
 ## Running on a custom task
+
+`prompt-lib` comes with a large number of tasks. To register a new task, please follow these instructions: 
+
 
 ### Step 1: Defining a custom task
 
