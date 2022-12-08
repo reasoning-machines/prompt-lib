@@ -1,4 +1,5 @@
 # evaluates the generated output
+from glob import glob
 import re
 from importlib import reload
 import pandas as pd
@@ -79,39 +80,43 @@ def get_acc_from_python_thoughts(
     for i, row in tqdm(data.iterrows(), total=len(data), desc="Evaluating generated python thoughts"):
         soln = row[generated_field]
         
-        # soln can have multiple functions. We only want to run the first function
-        imports = ""
-        if "nltk" in soln:
-            imports += "import nltk\n"
-        if "numpy" in soln:
-            imports += "import numpy as np\n"
-        if "pandas" in soln:
-            imports += "import pandas as pd\n"
-        
-        if "spacy" in soln:
-            imports += "import spacy\n"
-            imports += "nlp = spacy.load('en_core_web_sm')\n"
-            
-        soln = imports + "\ndef " + soln.split("def ")[1] + "\n"
-        
-        os.system("rm -rf __pycache__")
-        os.system("rm -f temp_result.pyc")
-        # soln is a python string, write it to a file, and then run it, get the output
-        with open("temp_result.py", "w") as f:
-            f.write(soln)
-
         try:
+            # soln can have multiple functions. We only want to run the first function
+            imports = ""
+            if "nltk" in soln:
+                imports += "import nltk\n"
+            if "numpy" in soln:
+                imports += "import numpy as np\n"
+            if "pandas" in soln:
+                imports += "import pandas as pd\n"
+            
+            if "spacy" in soln:
+                imports += "import spacy\n"
+                imports += "nlp = spacy.load('en_core_web_sm')\n"
+                
+            if "def solution():" not in soln:
+                soln = "def solution():\n" + soln
+            soln = "\ndef " + soln.split("def ")[1] + "\n"
+            
+            soln = imports + soln
+            os.system("rm -rf __pycache__")
+            os.system("rm -f temp_result.pyc")
+            # soln is a python string, write it to a file, and then run it, get the output
+            with open("temp_result.py", "w") as f:
+                f.write(soln)
+
             import temp_result
             reload(temp_result)
-            correct_solution = row[answer_field]
+            correct_solution = str(row[answer_field])
             exec(soln)
             with timeout(timeout_seconds):
-                result = temp_result.solution()
+                result = str(temp_result.solution())
             is_corr = _check_corr(result, correct_solution)
             num_corr += int(is_corr)
             data.loc[i, "is_correct"] = is_corr
             data.loc[i, "execution_result"] = result
-        except:
+            print(f"Correct: {is_corr}, Result: {result}, Correct Solution: {correct_solution}")
+        except Exception as e:
             data.loc[i, "is_correct"] = 0
             continue
         # compare float values
@@ -129,36 +134,28 @@ def get_acc_from_python_thoughts(
     
 
 # TODO: make the following function more general
-# if __name__ == "__main__":
-#     import argparse
-
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("--path", type=str, default="data/quco/quco_test.jsonl")
-#     parser.add_argument("--type", type=str, default="code")
-#     args = parser.parse_args()
-#     if args.type == "code":
-#         func = evaluate_code_prompt
-#     else:
-#         func = evaluate_text_prompt
-#     if "*" in args.path:
-#         avg_acc = 0
-#         for path in glob(args.path):
-#             print(f"Evaluating {path}")
-#             avg_acc += func(path)
-#         print(f"Average accuracy = {avg_acc / len(glob(args.path)):.2%}")
-#     else:
-#         func(args.path)
-
 if __name__ == "__main__":
-    import sys
+    import argparse
 
-    if len(sys.argv) < 2:
-        print("Please provide the path to the test file")
-        sys.exit(1)
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--path", type=str, default="data/quco/quco_test.jsonl")
+    parser.add_argument("--type", type=str, default="code")
+    parser.add_argument("--answer_field", type=str, default="answer")
+    parser.add_argument("--generated_field", type=str, default="generated_answer")
     
-    answer_field = sys.argv[2] if len(sys.argv) > 2 else "answer"
+    args = parser.parse_args()
     
-    generated_field = sys.argv[3] if len(sys.argv) > 3 else "generated_answer"
-
-    run(sys.argv[1], answer_field=answer_field, generated_field=generated_field)
+    if args.type == "code":
+        func = get_acc_from_python_thoughts
+    else:
+        func = get_exact_match_acc
+    if "*" in args.path:
+        avg_acc = 0
+        for path in glob(args.path):
+            print(f"Evaluating {path}")
+            data = pd.read_json(path, lines=True, orient="records")
+            avg_acc += func(data)
+        print(f"Average accuracy = {avg_acc / len(glob(args.path)):.2%}")
+    else:
+        data = pd.read_json(args.path, lines=True, orient="records")
+        func(data)
