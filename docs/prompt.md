@@ -69,11 +69,13 @@ Consider a prompt with two examples:
 
 * The special symbols are:
 
+```
 QUESTION_PREFIX="# Q: "
 ANSWER_PREFIX="Let's think step by step:\n"
 FINAL_ANSWER_PREFIX="Answer"
 INTRA_EXAMPLE_SEP="\n"
 INTER_EXAMPLE_SEP="\n\n"
+```
 
 
 The prompt will be:
