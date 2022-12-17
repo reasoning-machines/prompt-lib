@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import json
 from typing import List, Union
 import pandas as pd
 import random
@@ -117,7 +116,7 @@ class TaskConfig:
 
 
 
-def format_prompt(
+def make_prompt(
     prompt_examples: Union[List[Example], PromptStr],
     prompt_config: PromptConfig,
     num_prompt_examples: int,
@@ -193,7 +192,7 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     if isinstance(task_id_to_prompt[task_config.task_id], PromptStr):
         prompt_str = task_id_to_prompt[task_config.task_id].prompt_str
     else:
-        prompt_str = format_prompt(
+        prompt_str = make_prompt(
             prompt_examples=task_id_to_prompt[task_config.task_id],
             prompt_config=task_config.prompt_config,
             num_prompt_examples=task_config.num_prompt_examples,
