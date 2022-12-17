@@ -177,7 +177,6 @@ def query_openai_over_inputs(
 
             entire_response = OpenaiAPIWrapper.get_first_response(response)
             generated_answer = entire_response.split(task_config.prompt_config.inter_example_sep)[0]
-            print(generated_answer)
 
             # nicely print the question and generated answer
             prompt_only = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[
@@ -186,8 +185,8 @@ def query_openai_over_inputs(
             prompt_only = task_config.prompt_config.inter_example_sep.join(prompt_only)
 
             question = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[-1]
-            logging.info("\n" + f"Question ({i}): {question}")
-            logging.info("\n" + f"Answer ({i}): {generated_answer}")
+            logging.info("\n" + f"Question ({i}):" + "\n" + question)
+            logging.info("\n" + f"Answer ({i}):" + "\n" + generated_answer)
             outputs.append(
                 {
                     "prompt": prompt_only,

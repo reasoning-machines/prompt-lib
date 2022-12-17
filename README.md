@@ -140,6 +140,9 @@ bash scripts/run_single_task.sh boolsimplify_stream
 
 
 
+### Structure of a prompt
+
+- We highly recommend reading [this document](docs/prompt.md) to understand the structure of a prompt better.
 
 ### Additional notes
 
