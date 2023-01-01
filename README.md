@@ -7,11 +7,11 @@ TLDR: This library makes it easy to write prompts for few-shot prompting tasks. 
 - To get started, run:
 ```bash
 export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-bash scripts/run_single_task.sh boolsimplify_stream
+python prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_examples -1 --name boolsimplify_stream_code-davinci-002_s1 --model_name code-davinci-002 --max_tokens 600 --max_requests_per_min 16 --seed 1 --num_questions_per_thread 500 --temperature 0.0 --num_inference_examples 3 --cot_task --is_debug
 
 ```
 
-- The outputs are stored in `data/logs/boolsimplify_stream/`
+- The outputs are stored in `data/logs/boolsimplify_stream/code-davinci-002/temp_0.0/seed_1/k_all/`
 
 
 ## Colabs
