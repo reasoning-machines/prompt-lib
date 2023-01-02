@@ -61,7 +61,7 @@ class OpenaiAPIWrapper:
         engine: str,
         stop_token: str,
         temperature: float,
-        num_completions: int,
+        num_completions: int = 1
     ) -> dict:
         response = openai.Completion.create(
             engine=engine,
