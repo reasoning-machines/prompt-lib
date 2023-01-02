@@ -55,6 +55,7 @@ def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
 try:
     # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
     update_task_id_to_prompt_with_dynamic_import("pir_prompts.prompt_list")
+    update_task_id_to_prompt_with_dynamic_import("autofb_prompts.prompt_list")
 except ModuleNotFoundError as e:
     pass # no quco prompts
 
@@ -62,7 +63,7 @@ except ModuleNotFoundError as e:
 
 if __name__ == '__main__':
     import argparse
-    from prompt_lib.prompts.utils import format_prompt, PromptConfig
+    from prompt_lib.prompts.utils import make_prompt, PromptConfig
 
     args = argparse.ArgumentParser()
     args.add_argument("--task_id", type=str)
@@ -82,7 +83,7 @@ if __name__ == '__main__':
 
     prompt_config = PromptConfig.from_args(args)
     
-    prompt_str = format_prompt(
+    prompt_str = make_prompt(
         prompt_examples=task_id_to_prompt[args.task_id],
         prompt_config=prompt_config,
         num_prompt_examples=args.num_prompt_examples,

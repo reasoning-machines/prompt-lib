@@ -67,7 +67,7 @@ class ShadowFireWrapper:
             conn = nemollm.Connection(host=API_HOST, access_token=API_KEY)
 
         response = conn.generate_completion(
-            model_id=engine,
+            model_id=API_MODEL_NAME,
             prompt=prompt,
             tokens_to_generate=max_tokens,
             logprobs=False,
