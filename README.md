@@ -158,3 +158,8 @@ python prompt-lib/scripts/shuffle_prompt.py --prompt_path quco_prompts/gsm/funct
 ### Custom Evaluation
 
 - You can also run custom evaluation scripts. This is highly recommended. If you are running a large number of prompt variations, consider writing the custom evaluation function in `scripts/eval.py`, and then passing it as an argument `--eval_function`. Combined with `wandb`, this can be a powerful way to track the performance of your prompts without having to track the outputs of each prompt variation.
+
+
+### Multiple outputs
+
+- You can specify `--num_completions` to get multiple outputs. The output file is stored in the same location, with an extra field `generated_answers` that is a list of outputs. The `generated_answer` field is still present, and is the first element of `generated_answers`.
