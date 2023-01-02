@@ -89,6 +89,8 @@ if __name__ == "__main__":
     args.add_argument("--tag", type=str, default=None)
     args.add_argument("--wandb_project", type=str, default="cot")
     args.add_argument("--config_file", type=str, default=None)
+    
+    args.add_argument("--num_completions", type=int, default=1, help="Number of completions to generate per prompt")
 
     args = args.parse_args()
 
@@ -112,4 +114,4 @@ if __name__ == "__main__":
             project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name
         )
 
-    inference_loop(task_config=task_config, num_inference_examples=args.num_inference_examples)
+    inference_loop(task_config=task_config, num_inference_examples=args.num_inference_examples, num_completions=args.num_completions)

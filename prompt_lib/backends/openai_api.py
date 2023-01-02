@@ -56,7 +56,12 @@ class OpenaiAPIWrapper:
     @staticmethod
     @retry_with_exponential_backoff
     def call(
-        prompt: str, max_tokens: int, engine: str, stop_token: str, temperature: float, best_of: int = 1
+        prompt: str,
+        max_tokens: int,
+        engine: str,
+        stop_token: str,
+        temperature: float,
+        num_completions: int,
     ) -> dict:
         response = openai.Completion.create(
             engine=engine,
@@ -64,12 +69,9 @@ class OpenaiAPIWrapper:
             temperature=temperature,
             max_tokens=max_tokens,
             top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
             stop=[stop_token],
             # logprobs=3,
-            best_of=best_of,
-            n=best_of,
+            n=num_completions,
         )
         return response
 
@@ -78,7 +80,7 @@ class OpenaiAPIWrapper:
         """Returns the first response from the list of responses."""
         text = response["choices"][0]["text"]
         return text
-    
+
     @staticmethod
     def get_majority_answer(response) -> Dict[str, Any]:
         """Returns the majority answer from the list of responses."""
@@ -87,5 +89,11 @@ class OpenaiAPIWrapper:
         # if there is a tie, return the first answer
         if answers.most_common(1)[0][1] == answers.most_common(2)[1][1]:
             return OpenaiAPIWrapper.get_first_response(response)
-        
+
         return answers.most_common(1)[0][0]
+
+
+    @staticmethod
+    def get_all_responses(response) -> Dict[str, Any]:
+        """Returns the list of responses."""
+        return [choice["text"] for choice in response["choices"]]  # type: ignore

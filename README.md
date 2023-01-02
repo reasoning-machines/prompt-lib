@@ -158,3 +158,32 @@ python prompt-lib/scripts/shuffle_prompt.py --prompt_path quco_prompts/gsm/funct
 ### Custom Evaluation
 
 - You can also run custom evaluation scripts. This is highly recommended. If you are running a large number of prompt variations, consider writing the custom evaluation function in `scripts/eval.py`, and then passing it as an argument `--eval_function`. Combined with `wandb`, this can be a powerful way to track the performance of your prompts without having to track the outputs of each prompt variation.
+
+
+### Multiple outputs
+
+- You can specify `--num_completions` to get multiple outputs. The output file is stored in the same location, with an extra field `generated_answers` that is a list of outputs. The `generated_answer` field is still present, and is the first element of `generated_answers`.
+
+For example:
+
+```sh
+python3 prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_examples -1 --name boolsimplify_stream_code-davinci-002_s1 --model_name code-davinci-002 --max_tokens 600 --max_requests_per_min 16 --seed 1 --num_questions_per_thread 500 --temperature 0.9 --num_inference_examples 3 --cot_task --is_debug --num_completions 3
+```
+
+Generates an output file `data/logs/boolsimplify_stream/code-davinci-002/temp_0.9/seed_1/k_all/2023-01-02_10-16-39/outputs.jsonl` (the timestamp will be different). One entry in the file is:
+
+```
+{
+    "prompt": "Q: a & b | a & c\nA: a & (b | c) is the same as a & b | a & c The answer is a & (b | c)\n\n\nQ: a & b | a & b\nA: expr | expr is the same as expr The answer is a & b\n\n\nQ: !a & a & (a ^ c & d | !b)\nA: false & expr is false The answer is false\n\n\nQ: (a | !a) | ((b & !c | c & !b) & (a | !a) | (b & !c | c & !b))\nA: true | expr is true The answer is true",
+    "question": "\nQ: a & b | a & b\nA: ",
+    "answer": "a & b",
+    "generated_answers": [
+        "expr | expr is the same as expr The answer is a & b",
+        "expr | expr is the same as expr The answer is a & b",
+        "!b & a is the same as a & !b The answer is !b & a"
+    ],
+    "generated_answer": "expr | expr is the same as expr The answer is a & b",
+    "is_correct": 1
+}
+```
+
