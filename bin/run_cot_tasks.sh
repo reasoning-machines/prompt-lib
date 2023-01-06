@@ -3,7 +3,7 @@ set -u
 
 
 # model name should be one of `text-davinci-002` (GPT-3) or `code-davinci-002` (CODEX)
-MODEL_NAME="code-davinci-002"
+MODEL_NAME="code-cushman-001"
 
 if [ "${MODEL_NAME}" == "text-davinci-002" ]; then
     REQ_PER_MIN=1600000
@@ -60,6 +60,7 @@ for SEED in "${SEEDS[@]}"; do
             --final_answer_prefix "${FINAL_ANSWER_PREFIX}"
             --intra_example_sep "${INTRA_EXAMPLE_SEP}"
             --inter_example_sep "${INTER_EXAMPLE_SEP}"
+            --cot_task
             )  # number of tokens in completion
 
 
