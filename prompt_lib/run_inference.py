@@ -66,7 +66,6 @@ if __name__ == "__main__":
     args.add_argument("--temperature", type=float, default=0.0)
 
     args.add_argument("--model_name", type=str, default="code-davinci-002")
-    args.add_argument("--max_requests_per_min", type=int, default=20)
     args.add_argument("--cached_timestamp", type=str, default=None)
     args.add_argument("--is_debug", action="store_true")
 

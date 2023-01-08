@@ -56,7 +56,6 @@ class TaskConfig:
     is_cot_task: bool
     model_name: str
     cached_timestamp: str  # reload a cached folder and rerun the error examples
-    max_requests_per_min: int
     prompt_config: PromptConfig
     temperature: float = 0.0
     eval_function: str = "get_exact_match_acc"
@@ -86,7 +85,6 @@ class TaskConfig:
             is_cot_task=args.cot_task,
             model_name=args.model_name,
             cached_timestamp=args.cached_timestamp,
-            max_requests_per_min=args.max_requests_per_min,
             prompt_config=prompt_config,
             tag=args.tag,
             temperature=args.temperature,
@@ -106,7 +104,6 @@ class TaskConfig:
             is_cot_task=config_dict["is_cot_task"],
             model_name=config_dict["model_name"],
             cached_timestamp=config_dict["cached_timestamp"],
-            max_requests_per_min=config_dict["max_requests_per_min"],
             prompt_config=prompt_config,
             tag=config_dict["tag"],
             temperature=config_dict["temperature"],

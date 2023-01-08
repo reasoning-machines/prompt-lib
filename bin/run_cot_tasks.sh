@@ -1,22 +1,8 @@
 #!/bin/bash
 set -u
 
+MODEL_NAME="code-davinci-002"
 
-# model name should be one of `text-davinci-002` (GPT-3) or `code-davinci-002` (CODEX)
-MODEL_NAME="code-cushman-001"
-
-if [ "${MODEL_NAME}" == "text-davinci-002" ]; then
-    REQ_PER_MIN=1600000
-elif [ "${MODEL_NAME}" == "code-davinci-002" ]; then
-    REQ_PER_MIN=16  # code-davinci-002 has a much lower throughput
-elif [ "${MODEL_NAME}" == "code-davinci-001" ]; then
-    REQ_PER_MIN=16  # code-davinci-001 has a much lower throughput
-elif [ "${MODEL_NAME}" == "code-cushman-001" ]; then
-    REQ_PER_MIN=16  # code-cushman-001 has a much lower throughput
-else
-    echo "Invalid model name"
-    exit 1
-fi
 
 NUM_QUESTIONS_PER_THREAD=200
 MAX_TOKENS=600
@@ -49,7 +35,6 @@ for SEED in "${SEEDS[@]}"; do
             --num_prompt_examples ${num_prompt_examples} # -1 means use all examples in the prompt
             --name "${TASK}_${MODEL_NAME}_s${SEED}"  # name of the run
             --model_name "${MODEL_NAME}"
-            --max_requests_per_min ${REQ_PER_MIN}
             --seed ${SEED}   # decides order of examples in the prompt
             --num_questions_per_thread ${NUM_QUESTIONS_PER_THREAD}  # number of questions to ask per thread
             --max_tokens ${MAX_TOKENS}
@@ -64,7 +49,7 @@ for SEED in "${SEEDS[@]}"; do
             )  # number of tokens in completion
 
 
-        echo "python3 run.py ${ARGS[@]}"
+        echo "python3 prompt-lib/prompt_lib/run_inference.py ${ARGS[@]}"
         python -u prompt-lib/prompt_lib/run_inference.py  "${ARGS[@]}" > logs/"${TASK}_${MODEL_NAME}_s${SEED}.log" 2>&1
     done
 done
