@@ -7,7 +7,7 @@ TLDR: This library makes it easy to write prompts for few-shot prompting tasks. 
 - To get started, run:
 ```bash
 export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-python prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_examples -1 --name boolsimplify_stream_code-davinci-002_s1 --model_name code-davinci-002 --max_tokens 600 --max_requests_per_min 16 --seed 1 --num_questions_per_thread 500 --temperature 0.0 --num_inference_examples 3 --cot_task --is_debug
+python prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_examples -1 --name boolsimplify_stream_code-davinci-002_s1 --model_name code-davinci-002 --max_tokens 600 --seed 1 --num_questions_per_thread 500 --temperature 0.0 --num_inference_examples 3 --cot_task --is_debug
 
 ```
 
@@ -167,7 +167,7 @@ python prompt-lib/scripts/shuffle_prompt.py --prompt_path quco_prompts/gsm/funct
 For example:
 
 ```sh
-python3 prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_examples -1 --name boolsimplify_stream_code-davinci-002_s1 --model_name code-davinci-002 --max_tokens 600 --max_requests_per_min 16 --seed 1 --num_questions_per_thread 500 --temperature 0.9 --num_inference_examples 3 --cot_task --is_debug --num_completions 3
+python3 prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_examples -1 --name boolsimplify_stream_code-davinci-002_s1 --model_name code-davinci-002 --max_tokens 600 --seed 1 --num_questions_per_thread 500 --temperature 0.9 --num_inference_examples 3 --cot_task --is_debug --num_completions 3
 ```
 
 Generates an output file `data/logs/boolsimplify_stream/code-davinci-002/temp_0.9/seed_1/k_all/2023-01-02_10-16-39/outputs.jsonl` (the timestamp will be different). One entry in the file is:
