@@ -23,6 +23,8 @@ You can run these colabs directly in the browser. Supporting bulk-inference is t
 
 * [Custom task](https://github.com/reasoning-machines/prompt-lib/blob/main/notebooks/PromptLibCustomTask.ipynb)
 
+- If your goal is not to do bulk inference (typically required for research papers/benchmarking), we recommend checking out https://langchain.readthedocs.io/.
+
 ## Running on a custom task
 
 `prompt-lib` comes with a large number of tasks. To register a new task, please follow these instructions: 
