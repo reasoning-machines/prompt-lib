@@ -187,3 +187,11 @@ Generates an output file `data/logs/boolsimplify_stream/code-davinci-002/temp_0.
 }
 ```
 
+
+### TODOs:
+
+- [ ] Allow formatting functions to be used for creating a prompt dynamically. Currently, prompts are created either by reading from a file or by using prefixes for question/answer. This excludes use cases like https://github.com/reasoning-machines/CoCoGen
+
+- [ ] Cache previous outputs in a memory during a run.
+
+- [ ] Add example of using `--cached_timestamp`
