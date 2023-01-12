@@ -24,7 +24,7 @@ declare -a ALL_TASKS=("$@")
 
 
 
-declare -a SEEDS=(0)
+declare -a SEEDS=(0 1 2)
 
 # declare -a ALL_TASKS=("humaneval_stream")
 
@@ -38,11 +38,11 @@ for SEED in "${SEEDS[@]}"; do
             --seed ${SEED}   # decides order of examples in the prompt
             --num_questions_per_thread ${NUM_QUESTIONS_PER_THREAD}  # number of questions to ask per thread
             --max_tokens ${MAX_TOKENS}
-            --question_prefix  $\'"${QUESTION_PREFIX}"\'
-            --answer_prefix $\'"${ANSWER_PREFIX}"\'
-            --final_answer_prefix $\'"${FINAL_ANSWER_PREFIX}"\'
-            --intra_example_sep $\'"${INTRA_EXAMPLE_SEP}"\'
-            --inter_example_sep $\'"${INTER_EXAMPLE_SEP}"\'
+            --question_prefix  "${QUESTION_PREFIX}"
+            --answer_prefix "${ANSWER_PREFIX}"
+            --final_answer_prefix "${FINAL_ANSWER_PREFIX}"
+            --intra_example_sep "${INTRA_EXAMPLE_SEP}"
+            --inter_example_sep "${INTER_EXAMPLE_SEP}"
             --wandb_project "pal"
             --eval_function "${EVAL_FUNC}"
             --temperature ${TEMP}
