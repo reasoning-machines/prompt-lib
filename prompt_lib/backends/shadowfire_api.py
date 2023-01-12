@@ -60,7 +60,7 @@ class ShadowFireWrapper:
     @staticmethod
     @retry_with_exponential_backoff
     def call(
-        prompt: str, max_tokens: int, stop_token: str, temperature: float, engine: str=API_MODEL_NAME, best_of: int = 1
+        prompt: str, max_tokens: int, stop_token: str, temperature: float, engine: str=API_MODEL_NAME, num_completions: int = 1
     ) -> dict:
         global conn
         if conn is None:
@@ -98,7 +98,7 @@ class ShadowFireWrapper:
 
 def test():
     prompt = """Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now? Answer: Let's think step by step."""
-    output = ShadowFireWrapper.call(prompt=prompt, max_tokens=100, stop_token="###", temperature=0.5, best_of=1)
+    output = ShadowFireWrapper.call(prompt=prompt, max_tokens=100, stop_token="###", temperature=0.5, num_completions=1)
     print(ShadowFireWrapper.get_first_response(output))
 
 if __name__ == "__main__":
