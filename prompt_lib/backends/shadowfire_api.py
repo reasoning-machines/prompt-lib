@@ -19,7 +19,7 @@ def retry_with_exponential_backoff(
     exponential_base: float = 2,
     jitter: bool = True,
     max_retries: int = 10,
-    errors: tuple = (TimeoutError,),
+    errors: tuple = (TimeoutError,nemollm.exceptions.ApiException,),
 ):
     """Retry a function with exponential backoff."""
 
@@ -60,14 +60,14 @@ class ShadowFireWrapper:
     @staticmethod
     @retry_with_exponential_backoff
     def call(
-        prompt: str, max_tokens: int, stop_token: str, temperature: float, engine: str=API_MODEL_NAME, num_completions: int = 1
+        prompt: str, max_tokens: int, stop_token: str, temperature: float, engine: str, num_completions: int = 1
     ) -> dict:
         global conn
         if conn is None:
             conn = nemollm.Connection(host=API_HOST, access_token=API_KEY)
 
         response = conn.generate_completion(
-            model_id=API_MODEL_NAME,
+            model_id=API_MODEL_NAME,  # default to the model specified in the environment variable
             prompt=prompt,
             tokens_to_generate=max_tokens,
             logprobs=False,
