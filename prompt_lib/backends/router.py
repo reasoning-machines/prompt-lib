@@ -27,17 +27,21 @@ engine_to_backend = {e: "openai" for e in openai_engines}
 engine_to_backend.update({e: "shadowfire" for e in shadowfire_engines})
 
 
-def few_shot_query(
-    prompt: str, engine: str, return_entire_response: bool = False, **kwargs
-):  
+def few_shot_query(prompt: str, engine: str, return_entire_response: bool = False, **kwargs):
     backend_name = engine_to_backend[engine]
-    
+
     output = backend_map[backend_name].call(prompt=prompt, engine=engine, **kwargs)
     top_response = backend_map[backend_name].get_first_response(output)
     if return_entire_response:
         return output
     else:
         return top_response
+
+
+def call(prompt: str, engine: str, return_entire_response: bool = False, **kwargs):
+    return few_shot_query(
+        prompt=prompt, engine=engine, return_entire_response=return_entire_response, **kwargs
+    )
 
 
 def test():
