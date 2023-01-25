@@ -28,7 +28,7 @@ def inference_loop(task_config: TaskConfig, num_inference_examples: int = None, 
         task_file = task_file[:num_inference_examples]
 
     # make output directory
-    outdir = get_outdir(task_config)
+    outdir = get_outdir(task_config, num_completions)
 
     # remove cached examples from task_file
 
@@ -133,13 +133,13 @@ def load_cached_examples(outdir):
     return cached_examples, thread_offset
 
 
-def get_outdir(task_config):
+def get_outdir(task_config: TaskConfig, num_completions: int) -> str:
     if task_config.cached_timestamp is None:
         time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     else:
         time_stamp = task_config.cached_timestamp
 
-    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/temp_{task_config.temperature}/seed_{task_config.seed}"
+    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/temp_{task_config.temperature}/seed_{task_config.seed}/num_completions_{num_completions}/"
     if task_config.num_prompt_examples == -1:
         outdir += "/k_all/"
     else:
