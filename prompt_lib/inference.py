@@ -187,6 +187,7 @@ def query_openai_over_inputs(
                 "prompt": prompt_only,
                 "question": question,
                 "answer": inputs[i]["answer"],
+                "entire_prompt": inputs[i]["question"],
             }
             if num_completions == 1:
                 entire_response = OpenaiAPIWrapper.get_first_response(response)
