@@ -83,7 +83,7 @@ if __name__ == "__main__":
         help="The function to use for evaluation. Should be defined in scripts/eval.py. The signature should be the same as `get_exact_match_acc`",
     )
 
-    args.add_argument("--num_inference_examples", type=int, default=None)
+    args.add_argument("--num_inference_examples", type=int, default=None, help="Number of examples for which inference will run.")
 
     args.add_argument("--tag", type=str, default=None)
     args.add_argument("--wandb_project", type=str, default="cot")
