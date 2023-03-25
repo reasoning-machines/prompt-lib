@@ -43,6 +43,48 @@ math_qa_examples_original = [
     ),
 ]
 
+math_qa_examples_emoji = [
+    Example(
+        question="Shawn has 🍏 toys. For Christmas, he got 😃 toys each from his mom and dad. How many toys does he have now?",
+        thought="Shawn started with 🍏 toys. If he got 😃 toys each from his mom and dad, then that is 🌞 more toys. 🍏 + 🌞 = 🎉.",
+        answer="🎉",
+    ),
+    Example(
+        question="If there are 🐱 cars in the parking lot and 😃 more cars arrive, how many cars are in the parking lot?",
+        thought="There are originally 🐱 cars. 😃 more cars arrive. 🐱 + 😃 = 🍏.",
+        answer="🍏",
+    ),
+    Example(
+        question="Jason had 🍩 lollipops. He gave Denny some lollipops. Now Jason has 🎈 lollipops. How many lollipops did Jason give to Denny?",
+        thought="Jason started with 🍩 lollipops. Then he had 🎈 after giving some to Denny. So he gave Denny 🍩 - 🎈 = 🍦.",
+        answer="🍦",
+    ),
+    Example(
+        question="There were 🍍 computers in the server room. 🌹 more computers were installed each day, from monday to thursday. How many computers are now in the server room?",
+        thought="There were originally 🍍 computers. For each of 🌞 days, 🌹 more computers were added. So 🌹 * 🌞 = 🍩 computers were added. 🍍 + 🍩 is 🌷.",
+        answer="🌷",
+    ),
+    Example(
+        question="There are 🐘 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 🌟 trees. How many trees did the grove workers plant today?",
+        thought="There are 🐘 trees originally. Then there were 🌟 trees after some more were planted. So there must have been 🌟 - 🐘 = 🍁.",
+        answer="🍁",
+    ),
+    Example(
+        question="Leah had 🎠 chocolates and her sister had 🚀. If they ate 🌷, how many pieces do they have left in total?",
+        thought="Originally, Leah had 🎠 chocolates. Her sister had 🚀. So in total they had 🎠 + 🚀 = 🌈. After eating 🌷, they had 🌈 - 🌷 = 🌟.",
+        answer="🌟",
+    ),
+    Example(
+        question="Olivia has 🌎. She bought 🍏 bagels for 😃 each. How much money does she have left?",
+        thought="Olivia had 🌎 dollars. 🍏 bagels for 😃 dollars each will be 🍏 x 😃 = 🍍 dollars. So she has 🌎 - 🍍 dollars left. 🌎 - 🍍 is 🍦.",
+        answer="🍦",
+    ),
+    Example(
+        question="Michael had 🍕 golf balls. On tuesday, he lost 🎩 golf balls. On wednesday, he lost 😃 more. How many golf balls did he have at the end of wednesday?",
+        thought="Michael started with 🍕 golf balls. After losing 🎩 on tuesday, he had 🍕 - 🎩 = 🎶. After losing 😃 more, he had 🎶 - 😃 = 🍜 golf balls.",
+        answer="🍜",
+    ),
+]
 no_equation = [
     Example(
         question="Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?",
@@ -607,28 +649,117 @@ equation = [
 ]
 
 
+math_qa_examples_hard = [
+    Example(
+        question="Shawn has 10312864 toys. For Christmas, he got 13267894 toys each from his mom and dad. How many toys does he have now?",
+        thought="Shawn started with 10312864 toys. If he got 13267894 toys each from his mom and dad, then that is 26535788 more toys. 10312864 + 26535788 = 36848652.",
+        answer="36848652",
+    ),
+    Example(
+        question="If there are 8996478 cars in the parking lot and 13257894 more cars arrive, how many cars are in the parking lot?",
+        thought="There are originally 8996478 cars. 13257894 more cars arrive. 8996478 + 13257894 = 22254372.",
+        answer="22254372",
+    ),
+    Example(
+        question="Jason had 10312864 lollipops. He gave Denny some lollipops. Now Jason has 13267894 lollipops. How many lollipops did Jason give to Denny?",
+        thought="Jason started with 10312864 lollipops. Then he had 13267894 after giving some to Denny. So he gave Denny 10312864 - 13267894 = -2955030.",
+        answer="-2955030",
+    ),
+    Example(
+        question="There were 13267894 computers in the server room. 8996478 more computers were installed each day, from monday to thursday. How many computers are now in the server room?",
+        thought="There were originally 13267894 computers. For each of 4 days, 8996478 more computers were added. So 8996478 * 4 = 35985912 computers were added. 13267894 + 35985912 is 49253806.",
+        answer="49253806",
+    ),
+    Example(
+        question="There are 8996478 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 10312864 trees. How many trees did the grove workers plant today?",
+        thought="There are 8996478 trees originally. Then there were 10312864 trees after some more were planted. So there must have been 10312864 - 8996478 = 1316386.",
+        answer="1316386",
+    ),
+    Example(
+        question="Leah had 10312864 chocolates and her sister had 13267894. If they ate 8996478, how many pieces do they have left in total?",
+        thought="Originally, Leah had 10312864 chocolates. Her sister had 13267894. So in total they had 10312864 + 13267894 = 23580758. After eating 8996478, they had 23580758 - 8996478 = 14584280.",
+        answer="14584280",
+    ),
+    Example(
+        question="Olivia has $10312864. She bought 8996478 bagels for $13267894 each. How much money does she have left?",
+        thought="Olivia had 10312864 dollars. 8996478 bagels for 13267894 dollars each will be 8996478 x 13267894 = 119364316477332. So she has 10312864 - 119364316477332 dollars left. 10312864 - 119364316477332 = -119364306164468.",
+        answer="-119364306164468",
+    ),
+    Example(
+        question="Michael had 8996478 golf balls. On tuesday, he lost 13267894 golf balls. On wednesday, he lost 10312864 more. How many golf balls did he have at the end of wednesday?",
+        thought="Michael started with 8996478 golf balls. After losing 13267894 on tuesday, he had 8996478 - 13267894 = -4271416. After losing 10312864 more, he had -4271416 - 10312864 = -14584280 golf balls.",
+        answer="-14584280",
+    ),
+]
+
 
 aqua_prompts = [
     Example(
-    question="A person is traveling at 20 km/hr and reached his destiny in 2.5 hr then find the distance?",
-    thought="The distance that the person traveled would have been 20 km/hr * 2.5 hrs = 50 km.",
-    answer="(e)",
-),
-Example(
-    question="John found that the average of 15 numbers is 40. If 10 is added to each number then the mean of the numbers is?",
-    thought="If 10 is added to each number, then the mean of the numbers also increases by 10. So the new mean would be 50. So the answer is (a).",
-    answer="(a)",
-),
-Example(
-    question="If a / b = 3/4 and 8a + 5b = 22,then find the value of a.",
-    thought="If a / b = 3/4, then b = 4a / 3. So 8a + 5(4a / 3) = 22. This simplifies to 8a + 20a / 3 = 22, which means 44a / 3 = 22. So a is equal to 3/2. So the answer is (b).",
-    answer="(b)",
-),
-Example(
-    question="How many keystrokes are needed to type the numbers from 1 to 500?",
-    thought="There are 9 one-digit numbers from 1 to 9. There are 90 two-digit numbers from 10 to 99. There are 401 three-digit numbers from 100 to 500. 9 + 90(2) + 401(3) = 1392 So the answer is (b).",
-    answer="(b)",
-)]
+        question="A person is traveling at 20 km/hr and reached his destiny in 2.5 hr then find the distance?",
+        thought="The distance that the person traveled would have been 20 km/hr * 2.5 hrs = 50 km.",
+        answer="(e)",
+    ),
+    Example(
+        question="John found that the average of 15 numbers is 40. If 10 is added to each number then the mean of the numbers is?",
+        thought="If 10 is added to each number, then the mean of the numbers also increases by 10. So the new mean would be 50. So the answer is (a).",
+        answer="(a)",
+    ),
+    Example(
+        question="If a / b = 3/4 and 8a + 5b = 22,then find the value of a.",
+        thought="If a / b = 3/4, then b = 4a / 3. So 8a + 5(4a / 3) = 22. This simplifies to 8a + 20a / 3 = 22, which means 44a / 3 = 22. So a is equal to 3/2. So the answer is (b).",
+        answer="(b)",
+    ),
+    Example(
+        question="How many keystrokes are needed to type the numbers from 1 to 500?",
+        thought="There are 9 one-digit numbers from 1 to 9. There are 90 two-digit numbers from 10 to 99. There are 401 three-digit numbers from 100 to 500. 9 + 90(2) + 401(3) = 1392 So the answer is (b).",
+        answer="(b)",
+    ),
+]
+
+
+abstract_names = [
+    Example(
+        question="PERSON_A has five toys. For Christmas, they got two toys each from their parents. How many toys do they have now?",
+        thought="PERSON_A started with 5 toys. If they got 2 toys each from their parents, then that is 4 more toys. 5 + 4 = 9.",
+        answer="9",
+    ),
+    Example(
+        question="If there are 3 cars in the parking lot and 2 more cars arrive, how many cars are in the parking lot?",
+        thought="There are originally 3 cars. 2 more cars arrive. 3 + 2 = 5.",
+        answer="5",
+    ),
+    Example(
+        question="PERSON_A had 20 lollipops. They gave some lollipops to PERSON_B. Now PERSON_A has 12 lollipops. How many lollipops did PERSON_A give to PERSON_B?",
+        thought="PERSON_A started with 20 lollipops. Then they had 12 after giving some to PERSON_B. So they gave PERSON_B 20 - 12 = 8.",
+        answer="8",
+    ),
+    Example(
+        question="There were nine computers in the server room. Five more computers were installed each day, from monday to thursday. How many computers are now in the server room?",
+        thought="There were originally 9 computers. For each of 4 days, 5 more computers were added. So 5 * 4 = 20 computers were added. 9 + 20 is 29.",
+        answer="29",
+    ),
+    Example(
+        question="There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. How many trees did the grove workers plant today?",
+        thought="There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6 trees planted today.",
+        answer="6",
+    ),
+    Example(
+        question="PERSON_A had 32 chocolates and PERSON_B had 42. If they ate 35, how many pieces do they have left in total?",
+        thought="Originally, PERSON_A had 32 chocolates. PERSON_B had 42. So in total they had 32 + 42 = 74 chocolates. After eating 35, they had 74 - 35 = 39 pieces left.",
+        answer="39",
+    ),
+    Example(
+        question="PERSON_A has $23. They bought five bagels for $3 each. How much money do they have left?",
+        thought="PERSON_A had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars. So they have 23 - 15 dollars left. 23 - 15 is 8.",
+        answer="8",
+    ),
+    Example(
+        question="PERSON_A had 58 golf balls. On Tuesday, they lost 23 golf balls. On Wednesday, they lost 2 more. How many golf balls did they have at the end of Wednesday?",
+        thought="PERSON_A started with 58 golf balls. After losing 23 on Tuesday, they had 58 - 23 = 35. After losing 2 more, they had 35 - 2 = 33 golf balls.",
+        answer="33",
+    ),
+]
+
 
 gsm_task_id_to_prompt = {
     "test": math_qa_examples_original,
@@ -650,8 +781,9 @@ gsm_task_id_to_prompt = {
     "gsmsample_stream": math_qa_examples_original,
     "gsmsample_symb_abs": symbolic_greek,
     "gsmhard_stream": math_qa_examples_original,
+    "gsmhardv2_stream": math_qa_examples_original,
+    "gsmhardv2_hard_prompt": math_qa_examples_hard,
     "gsmhard_direct": math_qa_examples_original,
-        
     "svamp_stream": math_qa_examples_original,
     "mawpsaddsub_stream": math_qa_examples_original,
     "mawpsmultiarith_stream": math_qa_examples_original,
@@ -659,4 +791,6 @@ gsm_task_id_to_prompt = {
     "mawpssingleop_stream": math_qa_examples_original,
     "asdiv_stream": math_qa_examples_original,
     "aqua_stream": aqua_prompts,
+    "gsm_abstract_names": abstract_names,
+    "gsm_emoji": math_qa_examples_emoji
 }
