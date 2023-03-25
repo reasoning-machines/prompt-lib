@@ -6,6 +6,7 @@ from prompt_lib.prompts.sports import sports_task_id_to_prompt
 from prompt_lib.prompts.date import date_task_id_to_prompt
 from prompt_lib.prompts.sorting import sorting_task_id_to_prompt
 from prompt_lib.prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
+from prompt_lib.prompts.strategy import strategy_task_id_to_prompt
 
 
 from prompt_lib.prompts.plot_generation import plot_generation_task_id_to_prompt
@@ -23,6 +24,7 @@ task_id_to_prompt.update(bool_simplify_taskid_to_prompt)
 task_id_to_prompt.update(plot_generation_task_id_to_prompt)
 task_id_to_prompt.update(humaneval_task_id_to_prompt)
 task_id_to_prompt.update(pal_maths_task_id_to_prompt)
+task_id_to_prompt.update(strategy_task_id_to_prompt)
 
 
 def get_prompt_from_file(prompt_path: str) -> PromptStr:
@@ -52,12 +54,13 @@ def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
             except ValueError:
                 print(f"Could not find prompt for {task_id} in {example_list_or_prompt_path}")
 
-try:
-    # update_task_id_to_prompt_with_dynamic_import("quco_prompts.prompt_list")
-    update_task_id_to_prompt_with_dynamic_import("pir_prompts.prompt_list")
-    update_task_id_to_prompt_with_dynamic_import("autofb_prompts.prompt_list")
-except ModuleNotFoundError as e:
-    pass # no quco prompts
+dynamic_modules = ["struct_code_prompts.prompt_list", "quco_prompts.prompt_list", "autofb_prompts.prompt_list", "pir_prompts.prompt_list"]
+
+for module in dynamic_modules:
+    try:
+        update_task_id_to_prompt_with_dynamic_import(module)
+    except ModuleNotFoundError as e:
+        pass
 
 # TODO: make the above dynamic import more robust
 
