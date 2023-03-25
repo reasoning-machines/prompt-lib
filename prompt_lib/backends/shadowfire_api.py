@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 import random
 import time
 import nemollm
@@ -57,15 +57,36 @@ def retry_with_exponential_backoff(
 
 
 class ShadowFireWrapper:
+    
+    trimmed_prompt_cache: Dict[Tuple[str, int, str], str] = {}    
+    @staticmethod
+    def trim_prompt(prompt: str, max_tokens: int, stop_token: str) -> str:
+        # assumes that prompt consists of blocks of text separated by stop_token
+        # retains as many blocks as possible while keeping the total length of the prompt
+        # also maintains a cache of trimmed prompts to avoid re-computing the same thing
+
+        if (prompt, max_tokens, stop_token) in ShadowFireWrapper.trimmed_prompt_cache:
+            return ShadowFireWrapper.trimmed_prompt_cache[(prompt, max_tokens, stop_token)]
+        prompt_examples = prompt.split(stop_token)
+        max_allowed_prompt_length = ShadowFireWrapper.SHADOWFIRE_MAX_PROMPT_CHARS - max_tokens - 10
+        while len(stop_token.join(prompt_examples)) > max_allowed_prompt_length:
+            prompt_examples.pop(0)
+        trimmed_prompt = stop_token.join(prompt_examples)
+        ShadowFireWrapper.trimmed_prompt_cache[(prompt, max_tokens, stop_token)] = trimmed_prompt
+        return trimmed_prompt
+    
+    SHADOWFIRE_MAX_PROMPT_CHARS: int = 4096
     @staticmethod
     @retry_with_exponential_backoff
     def call(
-        prompt: str, max_tokens: int, stop_token: str, temperature: float, engine: str, num_completions: int = 1
+        prompt: str, max_tokens: int, stop_token: str, temperature: float, engine: str = None, num_completions: int = 1
     ) -> dict:
         global conn
         if conn is None:
             conn = nemollm.Connection(host=API_HOST, access_token=API_KEY)
-
+        
+        if len(prompt) + max_tokens > ShadowFireWrapper.SHADOWFIRE_MAX_PROMPT_CHARS:
+            prompt = ShadowFireWrapper.trim_prompt(prompt, max_tokens, stop_token)
         response = conn.generate_completion(
             model_id=API_MODEL_NAME,  # default to the model specified in the environment variable
             prompt=prompt,
@@ -73,7 +94,7 @@ class ShadowFireWrapper:
             logprobs=False,
             temperature=temperature,
             top_p=1.,
-            top_k=10,
+            top_k=64,
             stop=[stop_token],
             random_seed=0,
             repetition_penalty=1.,

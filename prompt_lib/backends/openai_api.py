@@ -86,7 +86,6 @@ class  OpenaiAPIWrapper:
                     num_completions=min(num_completions_remaining, 2),
                 )
                 num_completions_remaining -= 2
-                print(f"num_completions_remaining: {num_completions_remaining}")
                 if i == 0:
                     response_combined = response
                 else:
