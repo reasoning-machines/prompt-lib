@@ -55,8 +55,32 @@ def retry_with_exponential_backoff(
 
     return wrapper
 
+class BaseAPIWrapper:
+    @staticmethod
+    def call(
+        prompt: str,
+        max_tokens: int,
+        engine: str,
+        stop_token: str,
+        temperature: float,
+        num_completions: int = 1,
+    ) -> dict:
+        raise NotImplementedError()
 
-class CompletionAPIWrapper:
+    @staticmethod
+    def get_first_response(response) -> Dict[str, Any]:
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_majority_answer(response) -> Dict[str, Any]:
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_all_responses(response) -> Dict[str, Any]:
+        raise NotImplementedError()
+
+
+class CompletionAPIWrapper(BaseAPIWrapper):
     @staticmethod
     @retry_with_exponential_backoff
     def call(
@@ -126,7 +150,7 @@ class CompletionAPIWrapper:
         return [choice["text"] for choice in response["choices"]]  # type: ignore
 
 
-class ChatGPTAPIWrapper:
+class ChatGPTAPIWrapper(BaseAPIWrapper):
     @staticmethod
     @retry_with_exponential_backoff
     def call(
@@ -204,7 +228,15 @@ class ChatGPTAPIWrapper:
 
 
 class OpenaiAPIWrapper:
-    chat_engines = ["gpt-3.5-turbo", "gpt-4"]
+    chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0301"]
+
+    @staticmethod
+    def get_api_wrapper(engine: str) -> BaseAPIWrapper:
+        if engine in OpenaiAPIWrapper.chat_engines:
+            return ChatGPTAPIWrapper
+        else:
+            return CompletionAPIWrapper
+
 
     @staticmethod
     def call(
@@ -215,46 +247,18 @@ class OpenaiAPIWrapper:
         temperature: float,
         num_completions: int = 1,
     ) -> dict:
-        """Calls the OpenAI API.
-
-        if the num_completions is > 2, we call the API multiple times. This is to prevent
-        overflow issues that can occur when the number of completions is too large.
-        """
-        if engine in OpenaiAPIWrapper.chat_engines:
-            return ChatGPTAPIWrapper.call(
-                prompt=prompt,
-                max_tokens=max_tokens,
-                engine=engine,
-                stop_token=stop_token,
-                temperature=temperature,
-                num_completions=num_completions,
-            )
-        return CompletionAPIWrapper.call(
-            prompt=prompt,
-            max_tokens=max_tokens,
-            engine=engine,
-            stop_token=stop_token,
-            temperature=temperature,
-            num_completions=num_completions,
-        )
+        api_wrapper = OpenaiAPIWrapper.get_api_wrapper(engine)
+        return api_wrapper.call(prompt, max_tokens, engine, stop_token, temperature, num_completions)
 
     @staticmethod
     def get_first_response(response) -> Dict[str, Any]:
-        if "text" in response["choices"][0]:
-            return CompletionAPIWrapper.get_first_response(response)
-        elif "message" in response["choices"][0]:
-            return ChatGPTAPIWrapper.get_first_response(response)
-        else:
-            raise ValueError("Invalid response")
+        api_wrapper = OpenaiAPIWrapper.get_api_wrapper(response["model"])
+        return api_wrapper.get_first_response(response)
 
     @staticmethod
     def get_majority_answer(response) -> Dict[str, Any]:
-        if "text" in response["choices"][0]:
-            return CompletionAPIWrapper.get_majority_answer(response)
-        elif "message" in response["choices"][0]:
-            return ChatGPTAPIWrapper.get_majority_answer(response)
-        else:
-            raise ValueError("Invalid response")
+        api_wrapper = OpenaiAPIWrapper.get_api_wrapper(response["model"])
+        return api_wrapper.get_majority_answer(response)
 
 
 def test_completion():
@@ -288,6 +292,7 @@ def test_chat():
         temperature=0.7,
         num_completions=num_completions,
     )
+    print(response)
     print(OpenaiAPIWrapper.get_first_response(response))
     print(OpenaiAPIWrapper.get_majority_answer(response))
 
