@@ -228,7 +228,7 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
 
 
 class OpenaiAPIWrapper:
-    chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0301"]
+    chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0301", "gpt-4-0314"]
 
     @staticmethod
     def get_api_wrapper(engine: str) -> BaseAPIWrapper:
