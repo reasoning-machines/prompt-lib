@@ -259,6 +259,13 @@ class OpenaiAPIWrapper:
     def get_majority_answer(response) -> Dict[str, Any]:
         api_wrapper = OpenaiAPIWrapper.get_api_wrapper(response["model"])
         return api_wrapper.get_majority_answer(response)
+    
+    
+    @staticmethod
+    def get_all_responses(response) -> Dict[str, Any]:
+        api_wrapper = OpenaiAPIWrapper.get_api_wrapper(response["model"])
+        return api_wrapper.get_all_responses(response)
+    
 
 
 def test_completion():
