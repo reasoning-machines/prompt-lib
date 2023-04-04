@@ -22,6 +22,7 @@ def get_exact_match_acc(
         float: the accuracy
     """
 
+
     def _is_correct(row):
         if row[generated_field] is None:
             return 0
@@ -75,6 +76,7 @@ def get_acc_from_python_thoughts(
             return abs(result - correct_solution) < tol
         except:
             return 0
+    
 
     num_corr = 0
     for i, row in tqdm(data.iterrows(), total=len(data), desc="Evaluating generated python thoughts"):
@@ -90,12 +92,22 @@ def get_acc_from_python_thoughts(
             if "pandas" in soln:
                 imports += "import pandas as pd\n"
             
+            if "datetime" in soln:
+                imports += "from datetime import datetime\n" + "from dateutil.relativedelta import relativedelta\n"
+                soln = soln.replace("timedelta", "relativedelta")
             if "spacy" in soln:
                 imports += "import spacy\n"
                 imports += "nlp = spacy.load('en_core_web_sm')\n"
                 
             if "def solution():" not in soln:
+                # indent each line and prepend "def solution():"
+                soln = "\n".join(["    " + line for line in soln.split("\n")])
                 soln = "def solution():\n" + soln
+            
+            if "return" not in soln:
+                soln = soln.splitlines()
+                soln[-1] = "    return " + soln[-1].lstrip()
+                soln = "\n".join(soln)
             soln = "\ndef " + soln.split("def ")[1] + "\n"
             
             soln = imports + soln
@@ -117,13 +129,16 @@ def get_acc_from_python_thoughts(
             data.loc[i, "execution_result"] = result
             print(f"Correct: {is_corr}, Result: {result}, Correct Solution: {correct_solution}")
         except Exception as e:
+            raise e
             data.loc[i, "is_correct"] = 0
             continue
         # compare float values
+        
+    data["is_correct"] = data["is_correct"].fillna(0)
 
-    os.system("rm -rf __pycache__")
-    os.system("rm -f temp_result.pyc")
-    os.system("rm -f temp_result.py")
+    # os.system("rm -rf __pycache__")
+    # os.system("rm -f temp_result.pyc")
+    # os.system("rm -f temp_result.py")
 
     acc = data["is_correct"].mean() * 100
     print(f"Accuracy: {acc:.2f}")
