@@ -83,6 +83,27 @@ class BaseAPIWrapper:
 class CompletionAPIWrapper(BaseAPIWrapper):
     @staticmethod
     @retry_with_exponential_backoff
+    def _call_api(
+        prompt: str,
+        max_tokens: int,
+        engine: str,
+        stop_token: str,
+        temperature: float,
+        num_completions: int = 1,
+    ) -> dict:
+        response = openai.Completion.create(
+            engine=engine,
+            prompt=prompt,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=1,
+            stop=[stop_token],
+            n=num_completions,
+            logprobs=5
+        )
+        return response
+
+    @staticmethod
     def call(
         prompt: str,
         max_tokens: int,
@@ -91,17 +112,11 @@ class CompletionAPIWrapper(BaseAPIWrapper):
         temperature: float,
         num_completions: int = 1,
     ) -> dict:
-        """Calls the completion API.
-
-        if the num_completions is > 2, we call the API multiple times. This is to prevent
-        overflow issues that can occur when the number of completions is too large.
-        """
         if num_completions > 2:
             response_combined = dict()
             num_completions_remaining = num_completions
             for i in range(0, num_completions, 2):
-                # note that we are calling the same function --- this prevents backoff from being reset for the entire function
-                response = CompletionAPIWrapper.call(
+                response = CompletionAPIWrapper._call_api(
                     prompt=prompt,
                     max_tokens=max_tokens,
                     engine=engine,
@@ -115,17 +130,16 @@ class CompletionAPIWrapper(BaseAPIWrapper):
                 else:
                     response_combined["choices"] += response["choices"]
             return response_combined
-        response = openai.Completion.create(
-            engine=engine,
+        response = CompletionAPIWrapper._call_api(
             prompt=prompt,
-            temperature=temperature,
             max_tokens=max_tokens,
-            top_p=1,
-            stop=[stop_token],
-            # logprobs=3,
-            n=num_completions,
+            engine=engine,
+            stop_token=stop_token,
+            temperature=temperature,
+            num_completions=num_completions,
         )
         return response
+
 
     @staticmethod
     def get_first_response(response) -> Dict[str, Any]:
@@ -202,6 +216,7 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
             # logprobs=3,
             n=num_completions,
         )
+
         return response
 
     @staticmethod
@@ -270,7 +285,7 @@ class OpenaiAPIWrapper:
 
 def test_completion():
     prompt = 'Optimize the following Python code:\n\n# Start of code\n\nimport sys\n\nimport numpy as np\n\nn,m = [int(x) for x in sys.stdin.readline().split()]\n\nr = np.zeros(n)\n\nfor i in range(m):\n\n\ta, b = [int(x) for x in sys.stdin.readline().split()]\n\n\tr[a-1] += 1\n\n\tr[b-1] += 1\n\nfor i in range(n):\n\n\tprint((int(r[i])))\n\n# End of code\nRewrite the above Python code only from "Start of code" to "End of code", to make it more efficient WITHOUT CHANGING ITS RESULTS. Assume the code has already executed all the imports; do NOT include them in the optimized code.\n\nUse native libraries if that would make it faster than pure Python.\n\nYour output should only consist of valid Python code. Output the resulting Python with brief explanations only included as comments prefaced with #. Include a detailed explanatory comment before the code, starting with the text "# Proposed optimization:". Make the code as clear and simple as possible, while also making it as fast and memory-efficient as possible. Use vectorized operations whenever it would substantially increase performance, and quantify the speedup in terms of orders of magnitude. Eliminate as many for loops, while loops, and list or dict comprehensions as possible, replacing them with vectorized equivalents. If the performance is not likely to increase, leave the code unchanged. Fix any errors in the optimized code.'
-    engine = "code-davinci-002"
+    engine = "text-davinci-003"
     num_completions = 3
     max_tokens = 300
     response = OpenaiAPIWrapper.call(
