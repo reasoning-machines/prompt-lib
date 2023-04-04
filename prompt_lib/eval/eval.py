@@ -129,7 +129,6 @@ def get_acc_from_python_thoughts(
             data.loc[i, "execution_result"] = result
             print(f"Correct: {is_corr}, Result: {result}, Correct Solution: {correct_solution}")
         except Exception as e:
-            raise e
             data.loc[i, "is_correct"] = 0
             continue
         # compare float values
