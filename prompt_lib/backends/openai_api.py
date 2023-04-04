@@ -129,6 +129,8 @@ class CompletionAPIWrapper(BaseAPIWrapper):
                     response_combined = response
                 else:
                     response_combined["choices"] += response["choices"]
+            
+
             return response_combined
         response = CompletionAPIWrapper._call_api(
             prompt=prompt,
@@ -138,6 +140,7 @@ class CompletionAPIWrapper(BaseAPIWrapper):
             temperature=temperature,
             num_completions=num_completions,
         )
+
         return response
 
 
@@ -161,7 +164,13 @@ class CompletionAPIWrapper(BaseAPIWrapper):
     @staticmethod
     def get_all_responses(response) -> Dict[str, Any]:
         """Returns the list of responses."""
-        return [choice["text"] for choice in response["choices"]]  # type: ignore
+        return [
+            {
+                "generated_answer": choice["text"],
+                "logprobs": choice["logprobs"] if "logprobs" in choice else None,
+            }
+            for choice in response["choices"]
+        ]
 
 
 class ChatGPTAPIWrapper(BaseAPIWrapper):
