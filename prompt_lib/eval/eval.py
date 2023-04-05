@@ -135,9 +135,9 @@ def get_acc_from_python_thoughts(
         
     data["is_correct"] = data["is_correct"].fillna(0)
 
-    # os.system("rm -rf __pycache__")
-    # os.system("rm -f temp_result.pyc")
-    # os.system("rm -f temp_result.py")
+    os.system("rm -rf __pycache__")
+    os.system("rm -f temp_result.pyc")
+    os.system("rm -f temp_result.py")
 
     acc = data["is_correct"].mean() * 100
     print(f"Accuracy: {acc:.2f}")
