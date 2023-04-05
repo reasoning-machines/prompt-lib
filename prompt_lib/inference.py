@@ -79,12 +79,14 @@ def inference_loop(
         outputs = pd.concat([outputs, cached])
 
     # remove duplicates
-    outputs = outputs.drop_duplicates(subset=["question"])
+    outputs = outputs.drop_duplicates(subset=["question"]).drop("logprobs", axis=1)
 
     wandb.log({"accuracy": task_config.eval_function(outputs)})
     wandb.log({"num_inference_examples": len(outputs)})
     wandb.log({"num_inference_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
     wandb.log({"outputs": wandb.Table(dataframe=outputs)})
+
+
 
     logging.info(f"Number of successful queries: {len(outputs)}")
     outputs.to_json(f"{outdir}/outputs.jsonl", orient="records", lines=True)

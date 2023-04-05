@@ -20,6 +20,8 @@ openai_engines = [
     "text-davinci-003",
     "code-davinci-002",
     "code-cushman-001",
+    "gpt-3.5-turbo",
+    "gpt-4"
 ]
 shadowfire_engines = ["shadowfire"]
 
