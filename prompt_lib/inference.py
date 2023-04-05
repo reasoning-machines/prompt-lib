@@ -27,6 +27,7 @@ def inference_loop(
     """Query a language model API for each line in the file."""
 
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
+    n_task_original = len(task_file)
     if num_inference_examples is not None:
         task_file = task_file[:num_inference_examples]
 
@@ -35,16 +36,17 @@ def inference_loop(
 
     # remove cached examples from task_file
 
-    cached_examples, thread_offset = load_cached_examples(outdir)
+    cached_examples, thread_offset = load_cached_examples(outdir, task_config)
 
     task_file = [
         example
         for example in task_file
-        if get_question_from_prompt(example["question"], task_config) not in cached_examples
+        if not (get_question_from_prompt(example["question"], task_config) in cached_examples or example["question"] in cached_examples)
     ]
     logging.info(
-        f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query"
+        f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query, found {n_task_original - len(task_file)} in cache"
     )
+
 
 
     pathlib.Path(f"{outdir}").mkdir(parents=True, exist_ok=True)
@@ -84,6 +86,10 @@ def inference_loop(
     wandb.log({"accuracy": task_config.eval_function(outputs)})
     wandb.log({"num_inference_examples": len(outputs)})
     wandb.log({"num_inference_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
+    
+    # convert all columns to type string
+    for col in outputs.columns:
+        outputs[col] = outputs[col].astype(str)
     wandb.log({"outputs": wandb.Table(dataframe=outputs)})
 
 
@@ -128,7 +134,7 @@ def create_task_batches(task_config: TaskConfig, task_file: List) -> List:
     return load_per_task
 
 
-def load_cached_examples(outdir):
+def load_cached_examples(outdir, task_config):
     """Loads cached examples from a directory."""
     cached_examples = set()
     thread_offset = 0
@@ -136,7 +142,7 @@ def load_cached_examples(outdir):
         for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
             cached = read_jsonl(r_file)
             for i, row in cached.iterrows():
-                cached_examples.add(row["question"].strip())
+                cached_examples.add(get_question_from_prompt(row["question"], task_config))
             part_idx = re.search("outputs_part(\d+).jsonl", os.path.basename(r_file)).group(1)
             thread_offset = max(thread_offset, int(part_idx))
         thread_offset += 1
@@ -237,7 +243,7 @@ def query_openai_over_inputs(
             pbar.update(1)
 
         except Exception as e:
-            logging.info(f"Exception: {e}")
+            # logging.info(f"Exception: {e}")
             if "code" not in task_config.model_name:  # usually codex models throw rate limit errors
                 i += 1
             elif num_retries < max_retries:
