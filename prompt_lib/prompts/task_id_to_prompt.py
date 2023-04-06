@@ -55,21 +55,24 @@ def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
             except ValueError:
                 print(f"Could not find prompt for {task_id} in {example_list_or_prompt_path}")
 
-dynamic_modules = []
 
 
 # we also read dynamic modules listed in prompts_list.txt file. This helps projects using prompt-lib to add their own prompts.
 
 # The prompt_list.txt should be in the current directory or configs/ directory or defined as ${PROMPTS_AT} environment variable
 
-if os.path.exists("prompts_list.txt"):
-    dynamic_modules += [line.strip() for line in open("prompts_list.txt").readlines()]
 
-if os.path.exists("configs/prompts_list.txt"):
-    dynamic_modules += [line.strip() for line in open("configs/prompts_list.txt").readlines()]
+dynamic_modules = []
 
+
+dynamic_modules_paths = ["prompts_list.txt", "configs/prompts_list.txt"]
 if "PROMPTS_AT" in os.environ:
-    dynamic_modules += [line.strip() for line in open(os.environ["PROMPTS_AT"]).readlines()]
+    dynamic_modules_paths.append(os.environ["PROMPTS_PATH"])
+
+for dynamic_modules_path in dynamic_modules_paths:
+    if os.path.exists(dynamic_modules_path):
+        dynamic_modules += [line.strip() for line in open(dynamic_modules_path).readlines()]
+
 
 logging.info(f"Dynamic modules: {dynamic_modules}")
 
