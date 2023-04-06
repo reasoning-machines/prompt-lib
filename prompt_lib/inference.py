@@ -88,6 +88,8 @@ def inference_loop(
     wandb.log({"num_inference_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
     
     # convert all columns to type string
+    # drop all rows with any nan values
+    outputs = outputs.dropna()
     for col in outputs.columns:
         outputs[col] = outputs[col].astype(str)
     wandb.log({"outputs": wandb.Table(dataframe=outputs)})
