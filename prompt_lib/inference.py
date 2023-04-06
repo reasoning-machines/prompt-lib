@@ -15,24 +15,26 @@ import os
 import logging
 
 from prompt_lib.backends.openai_api import OpenaiAPIWrapper
-from prompt_lib.prompts.utils import TaskConfig, make_task_file_from_config, get_question_from_prompt
+from prompt_lib.prompts.utils import (
+    TaskConfig,
+    make_task_file_from_config,
+    get_question_from_prompt,
+)
 from prompt_lib.eval.eval_utils import read_jsonl
 
 logging.basicConfig(level=logging.INFO)
 
 
-def inference_loop(
-    task_config: TaskConfig, num_inference_examples: int = None, num_completions: int = 1
-) -> None:
+def inference_loop(task_config: TaskConfig) -> None:
     """Query a language model API for each line in the file."""
 
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
     n_task_original = len(task_file)
-    if num_inference_examples is not None:
-        task_file = task_file[:num_inference_examples]
+
+    task_file = task_file[: task_config.num_inference_examples]
 
     # make output directory
-    outdir = get_outdir(task_config, num_completions)
+    outdir = get_outdir(task_config)
 
     # remove cached examples from task_file
 
@@ -41,13 +43,14 @@ def inference_loop(
     task_file = [
         example
         for example in task_file
-        if not (get_question_from_prompt(example["question"], task_config) in cached_examples or example["question"] in cached_examples)
+        if not (
+            get_question_from_prompt(example["question"], task_config) in cached_examples
+            or example["question"] in cached_examples
+        )
     ]
     logging.info(
         f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query, found {n_task_original - len(task_file)} in cache"
     )
-
-
 
     pathlib.Path(f"{outdir}").mkdir(parents=True, exist_ok=True)
 
@@ -59,9 +62,7 @@ def inference_loop(
 
     # run inference
     for (batch, batch_idx) in tqdm(batched_tasks):
-        thread_outputs = query_openai_over_inputs(
-            batch, batch_idx, task_config=task_config, num_completions=num_completions
-        )
+        thread_outputs = query_openai_over_inputs(batch, batch_idx, task_config=task_config)
         outputs.append(thread_outputs)
         progress_perc = round(len(outputs) * 100 / len(batched_tasks), 2)
         wandb.log({"progress_so_far": progress_perc})
@@ -81,20 +82,21 @@ def inference_loop(
         outputs = pd.concat([outputs, cached])
 
     # remove duplicates
-    outputs = outputs.drop_duplicates(subset=["question"]).drop("logprobs", axis=1)
+    outputs = outputs.drop_duplicates(subset=["question"])
+    
+    if "logprobs" in outputs.columns:
+        outputs = outputs.drop("logprobs", axis=1)
 
     wandb.log({"accuracy": task_config.eval_function(outputs)})
     wandb.log({"num_inference_examples": len(outputs)})
     wandb.log({"num_inference_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
-    
+
     # convert all columns to type string
     # drop all rows with any nan values
     outputs = outputs.dropna()
     for col in outputs.columns:
         outputs[col] = outputs[col].astype(str)
     wandb.log({"outputs": wandb.Table(dataframe=outputs)})
-
-
 
     logging.info(f"Number of successful queries: {len(outputs)}")
     outputs.to_json(f"{outdir}/outputs.jsonl", orient="records", lines=True)
@@ -151,13 +153,13 @@ def load_cached_examples(outdir, task_config):
     return cached_examples, thread_offset
 
 
-def get_outdir(task_config: TaskConfig, num_completions: int) -> str:
+def get_outdir(task_config: TaskConfig) -> str:
     if task_config.cached_timestamp is None:
         time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     else:
         time_stamp = task_config.cached_timestamp
 
-    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/temp_{task_config.temperature}/seed_{task_config.seed}/num_completions_{num_completions}/"
+    outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/temp_{task_config.temperature}/seed_{task_config.seed}/num_completions_{task_config.num_completions}/"
     if task_config.num_prompt_examples == -1:
         outdir += "/k_all/"
     else:
@@ -174,7 +176,6 @@ def query_openai_over_inputs(
     thread_id: int,
     task_config: TaskConfig,
     max_retries: int = 10,
-    num_completions: int = 1,
 ) -> List[dict]:
     outputs = []
     i = 0
@@ -192,7 +193,7 @@ def query_openai_over_inputs(
                 max_tokens=task_config.max_tokens,
                 engine=task_config.model_name,
                 stop_token=task_config.prompt_config.inter_example_sep,  # generate till the model starts generating a new question
-                num_completions=num_completions,
+                num_completions=task_config.num_completions,
             )
             prompt_only = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[
                 :-1
@@ -207,7 +208,7 @@ def query_openai_over_inputs(
                 "answer": inputs[i]["answer"],
                 "entire_prompt": inputs[i]["question"],
             }
-            if num_completions == 1:
+            if task_config.num_completions == 1:
                 entire_response = OpenaiAPIWrapper.get_first_response(response)
                 generated_answer = extract_answer_from_response(entire_response, task_config)
 

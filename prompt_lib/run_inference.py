@@ -1,9 +1,13 @@
 # Given the path to a text file, queries alpa for each line in the file.
 import json
+import os
 from pprint import pprint
+import sys
 import wandb
 import dataclasses
 import logging
+
+import yaml
 
 from prompt_lib.prompts.utils import PromptConfig, TaskConfig
 from prompt_lib.inference import inference_loop
@@ -22,8 +26,16 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
     Returns:
         dict: a dictionary with all the required fields.
     """
+    _, file_ext = os.path.splitext(config_path)
+
     with open(config_path, "r") as f:
-        config = json.load(f)
+        if file_ext.lower() == '.yaml' or file_ext.lower() == '.yml':
+            config = yaml.safe_load(f)
+        elif file_ext.lower() == '.json':
+            config = json.load(f)
+        else:
+            raise ValueError("Unsupported configuration file format. Please use a JSON or YAML file.")
+
 
     prompt_fields = PromptConfig.__dataclass_fields__.keys()
     task_config_fields = TaskConfig.__dataclass_fields__.keys()
@@ -32,9 +44,6 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
         "task_id",
         "model_name",
         "temperature",
-        "seed",
-        "num_prompt_examples",
-        "num_questions_per_thread",
     ]
     for field in critical_fields:
         assert field in config, f"Field {field} not found in config file {config_path}"
@@ -42,39 +51,53 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
     if "prompt_config" not in config:
         config["prompt_config"] = {}
 
+    remaining_args = {}
     for k in vars(args):
         default_val = getattr(args, k)
         if k in prompt_fields and k not in config["prompt_config"]:
             config["prompt_config"][k] = default_val
         elif k in task_config_fields and k not in config:
             config[k] = default_val
+        else:
+            remaining_args[k] = default_val
 
-    return TaskConfig.from_config_dict(config)
+    # Update the args object with the remaining arguments
+    for k, v in remaining_args.items():
+        setattr(args, k, v)
 
+    task_config = TaskConfig.from_config_dict(config)
+    return task_config, args
 
 if __name__ == "__main__":
     import argparse
 
     args = argparse.ArgumentParser()
-    args.add_argument("--task_id", type=str)
-    args.add_argument("--num_questions_per_thread", type=int, default=100)
-    args.add_argument("--max_tokens", type=int, default=100)
-    args.add_argument("--num_prompt_examples", type=int, default=-1)
-    args.add_argument("--name", type=str, required=False)
-    args.add_argument("--seed", type=int, required=False)
-    args.add_argument("--cot_task", action="store_true")
-    args.add_argument("--temperature", type=float, default=0.0)
+    args = argparse.ArgumentParser()
+    args.add_argument("--task_id", type=str, help="Task ID for the specific task. Always has the format <dataset>_<task>, where <dataset>.jsonl is expected to be in ${PWD}/data/<dataset>.jsonl. It should be a jsonl with two fields: `input` and `output`.")
+    args.add_argument("--num_questions_per_thread", type=int, default=200, help="Number of questions to run per thread")
+    args.add_argument("--max_tokens", type=int, default=100, help="Maximum number of tokens in completion")
+    args.add_argument("--num_prompt_examples", type=int, default=-1, help="Number of prompt examples to use (-1 for all)")
+    args.add_argument("--name", type=str, required=False, help="Name of the run")
+    args.add_argument("--seed", type=int, required=False, help="Seed for randomization. Used to decided the order of examples. Not applicable if a text file is supplied as the prompt")
+    args.add_argument("--cot_task", action="store_true", help="Indicate if it's a COT task")
+    args.add_argument("--temperature", type=float, default=0.0, help="Sampling temperature for the model")
 
-    args.add_argument("--model_name", type=str, default="code-davinci-002")
-    args.add_argument("--cached_timestamp", type=str, default=None)
-    args.add_argument("--is_debug", action="store_true")
+    args.add_argument("--model_name", type=str, default="code-davinci-002", help="Model name to use for inference")
+    args.add_argument("--cached_timestamp", type=str, default=None, help="Timestamp for cached data (None for no cache)")
+    args.add_argument("--is_debug", action="store_true", help="Enable debug mode (disables wandb)")
 
-    # prompt config fields: decide how the prompt is constructed
-    args.add_argument("--question_prefix", type=str, default="Q: ")
-    args.add_argument("--answer_prefix", type=str, default="A: ")
-    args.add_argument("--final_answer_prefix", type=str, default="The answer is ")
-    args.add_argument("--intra_example_sep", type=str, default="\n")
-    args.add_argument("--inter_example_sep", type=str, default="\n\n")
+    # prompt config fields: decide how the prompt is constructed. See docs/prompt.md for more details
+    args.add_argument("--question_prefix", type=str, default="Q: ", help="Prefix for questions")
+    args.add_argument("--answer_prefix", type=str, default="A: ", help="Prefix for answers")
+    args.add_argument("--final_answer_prefix", type=str, default="The answer is ", help="Prefix for the final answer")
+    args.add_argument("--intra_example_sep", type=str, default="\n", help="Separator within examples")
+    args.add_argument("--inter_example_sep", type=str, default="\n\n", help="Separator between examples")
+
+    # wandb stuff
+    args.add_argument("--tag", type=str, default=None, help="Tag for the run")
+    args.add_argument("--wandb_project", type=str, default="cot", help="Wandb project name")
+    args.add_argument("--config_file", type=str, default=None, help="Path to the configuration file")
+
 
     args.add_argument(
         "--eval_function",
@@ -85,9 +108,7 @@ if __name__ == "__main__":
 
     args.add_argument("--num_inference_examples", type=int, default=None, help="Number of examples for which inference will run.")
 
-    args.add_argument("--tag", type=str, default=None)
-    args.add_argument("--wandb_project", type=str, default="cot")
-    args.add_argument("--config_file", type=str, default=None)
+
     
     args.add_argument("--num_completions", type=int, default=1, help="Number of completions to generate per prompt")
 
@@ -98,19 +119,20 @@ if __name__ == "__main__":
 
     if args.config_file is not None:
 
-        task_config = read_config_and_populate_defaults(args.config_file, args)
+        task_config, args = read_config_and_populate_defaults(args.config_file, args)
     else:
         assert args.seed is not None
         prompt_config = PromptConfig.from_args(args)
         task_config = TaskConfig.from_args(args, prompt_config)
 
-    pprint(prompt_config)
+    if args.name is None:
+        args.name = f"{task_config.task_id}_{task_config.model_name}_seed{task_config.seed}"
 
     if args.is_debug:
         wandb.init(mode="disabled")
     else:
         wandb.init(
-            project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name
+            project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name, notes=args.tag
         )
 
-    inference_loop(task_config=task_config, num_inference_examples=args.num_inference_examples, num_completions=args.num_completions)
+    inference_loop(task_config=task_config)
