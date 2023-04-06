@@ -1,0 +1,18 @@
+task_id: gsm_pal
+name: gsm_pal-3.5-turbo_s0
+seed: 0
+max_tokens: 600
+is_cot_task: false
+model_name: gpt-3.5-turbo
+num_completions: 1
+question_prefix: "# Q: "
+answer_prefix: "# solution using Python:\n"
+final_answer_prefix: ""
+intra_example_sep: "\n"
+inter_example_sep: "\n\n"
+eval_function: get_acc_from_python_thoughts
+temperature: 0.0
+num_prompt_examples: -1
+wandb_project: pal
+num_inference_examples: 3
+tag: "Sample config run for PAL + GSM."

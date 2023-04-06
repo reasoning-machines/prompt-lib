@@ -1,0 +1,16 @@
+task_id: gsm_stream
+max_tokens: 100
+name: gsm_stream_gpt-code-davinci-002_s0
+seed: 0
+cot_task: true
+temperature: 0.0
+model_name: code-davinci-002
+is_debug: false
+question_prefix: "Q: "
+answer_prefix: "A: "
+final_answer_prefix: "The answer is "
+intra_example_sep: "\n"
+inter_example_sep: "\n\n"
+eval_function: get_exact_match_acc
+wandb_project: cot
+num_completions: 1
