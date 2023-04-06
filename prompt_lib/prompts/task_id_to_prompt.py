@@ -65,7 +65,7 @@ def update_task_id_to_prompt_with_dynamic_import(import_module_name: str):
 dynamic_modules = []
 
 
-dynamic_modules_paths = ["prompts_list.txt", "configs/prompts_list.txt"]
+dynamic_modules_paths = ["prompts_list.txt", "configs/prompts_list.txt", "prompt_list.txt", "configs/prompt_list.txt"]
 if "PROMPTS_AT" in os.environ:
     dynamic_modules_paths.append(os.environ["PROMPTS_PATH"])
 
