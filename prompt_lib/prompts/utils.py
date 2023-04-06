@@ -59,6 +59,8 @@ class TaskConfig:
     prompt_config: PromptConfig
     temperature: float = 0.0
     eval_function: str = "get_exact_match_acc"
+    num_inference_examples: int = None
+    num_completions: int = 1
 
     def __post_init__(self):
         # we want to be able to configure the eval function. It is provided by the user as a string,
@@ -89,6 +91,8 @@ class TaskConfig:
             tag=args.tag,
             temperature=args.temperature,
             eval_function=args.eval_function,
+            num_completions=args.num_completions,
+            num_inference_examples=args.num_inference_examples
         )
         return task_config
     
@@ -107,7 +111,9 @@ class TaskConfig:
             prompt_config=prompt_config,
             tag=config_dict["tag"],
             temperature=config_dict["temperature"],
-            eval_function=config_dict["eval_function"])
+            eval_function=config_dict["eval_function"],
+            num_completions=config_dict["num_completions"],
+            num_inference_examples=config_dict["num_inference_examples"])
         return task_config
 
 
@@ -227,3 +233,67 @@ def get_question_from_prompt(prompt_with_question: str, task_config: TaskConfig)
     # remove the prompt
     question = prompt_with_question.split(task_config.prompt_config.question_prefix)[-1]
     return task_config.prompt_config.question_prefix + question.split(task_config.prompt_config.intra_example_sep)[0]
+
+
+
+def test_make_prompt():
+    import difflib
+    def assert_equal_and_show_diff(expected, actual):
+        if expected != actual:
+            diff = difflib.ndiff(
+                expected.splitlines(keepends=True),
+                actual.splitlines(keepends=True)
+            )
+            print("".join(diff))
+            assert expected == actual
+
+    example1 = Example("What is 2+2?", "4", "Adding 2 and 2")
+    example2 = Example("What is the capital of France?", "Paris", "The capital of France")
+    example3 = Example("What color is the sky?", "Blue", "The sky is generally")
+
+    prompt_config = PromptConfig(
+        question_prefix="Q: ",
+        answer_prefix="A: ",
+        final_answer_prefix="The answer is ",
+        intra_example_sep="\n",
+        inter_example_sep="\n\n"
+    )
+
+    # Test 1: Using PromptStr as input
+    prompt_str = PromptStr("This is a test prompt.")
+    result = make_prompt(prompt_str, prompt_config, 2, 42, False)
+    assert result == "This is a test prompt."
+
+    # Test 2: Using a list of examples and num_prompt_examples = -1 (all examples)
+    result = make_prompt([example1, example2, example3], prompt_config, -1, 42, False)
+    expected_result = (
+        "Q: What color is the sky?\nA: The answer is Blue\n\n\n"
+        "Q: What is 2+2?\nA: The answer is 4\n\n\n"
+        "Q: What is the capital of France?\nA: The answer is Paris\n\n\n"
+    )
+
+    assert_equal_and_show_diff(expected_result, result)
+
+    # Test 3: Using a list of examples and num_prompt_examples = 2 (randomly selected)
+    result = make_prompt([example1, example2, example3], prompt_config, 2, 42, False)
+    expected_result = (
+        "Q: What color is the sky?\nA: The answer is Blue\n\n\n"
+        "Q: What is 2+2?\nA: The answer is 4\n\n\n"
+
+    )
+
+    assert result == expected_result
+
+    # Test 4: Using a list of examples and num_prompt_examples = 2 with is_cot_prompt = True
+    result = make_prompt([example1, example2, example3], prompt_config, 2, 42, True)
+    expected_result = (
+        "Q: What color is the sky?\nA: The sky is generally The answer is Blue\n\n\n"
+        "Q: What is 2+2?\nA: Adding 2 and 2 The answer is 4\n\n\n"
+
+    )
+
+    assert result == expected_result
+
+
+if __name__ == "__main__":
+    test_make_prompt()
