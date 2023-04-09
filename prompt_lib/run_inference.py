@@ -58,6 +58,8 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
             config["prompt_config"][k] = default_val
         elif k in task_config_fields and k not in config:
             config[k] = default_val
+        elif k in config:
+            remaining_args[k] = config[k]
         else:
             remaining_args[k] = default_val
 
@@ -114,6 +116,7 @@ if __name__ == "__main__":
 
     args = args.parse_args()
 
+    args.is_cot_task = args.cot_task
     if args.name is None:
         args.name = args.task_id
 

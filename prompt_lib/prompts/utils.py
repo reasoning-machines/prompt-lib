@@ -105,7 +105,7 @@ class TaskConfig:
             max_tokens=config_dict["max_tokens"],
             num_prompt_examples=config_dict["num_prompt_examples"],
             seed=config_dict["seed"],
-            is_cot_task=config_dict["is_cot_task"],
+            is_cot_task=config_dict["cot_task"],
             model_name=config_dict["model_name"],
             cached_timestamp=config_dict["cached_timestamp"],
             prompt_config=prompt_config,
