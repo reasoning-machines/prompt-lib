@@ -1,10 +1,11 @@
 # Backend for a self-hosted API
 import os
 from pprint import pprint
+from typing import Any, Dict
 
 import requests
 
-from prompt_lib.backends.openai_api import CompletionAPIWrapper
+from prompt_lib.backends.wrapper import BaseAPIWrapper
 
 
 class OpenSourceAPIBackend:
@@ -39,7 +40,7 @@ class OpenSourceAPIBackend:
 api = OpenSourceAPIBackend()
 
 
-class OpenSourceAPIWrapper(CompletionAPIWrapper):
+class OpenSourceAPIWrapper(BaseAPIWrapper):
 
     @staticmethod
     def _call_api(
@@ -101,6 +102,22 @@ class OpenSourceAPIWrapper(CompletionAPIWrapper):
 
         return response
 
+    @staticmethod
+    def get_first_response(response) -> Dict[str, Any]:
+        api_wrapper = OpenSourceAPIWrapper.get_api_wrapper(response["model"])
+        return api_wrapper.get_first_response(response)
+
+    @staticmethod
+    def get_majority_answer(response) -> Dict[str, Any]:
+        api_wrapper = OpenSourceAPIWrapper.get_api_wrapper(response["model"])
+        return api_wrapper.get_majority_answer(response)
+    
+    
+    @staticmethod
+    def get_all_responses(response) -> Dict[str, Any]:
+        api_wrapper = OpenSourceAPIWrapper.get_api_wrapper(response["model"])
+        return api_wrapper.get_all_responses(response)
+    
 
 def test():
     
