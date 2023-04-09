@@ -4,13 +4,14 @@ import os
 from prompt_lib.backends.openai_api import OpenaiAPIWrapper
 from prompt_lib.backends.shadowfire_api import ShadowFireWrapper
 from prompt_lib.backends.alpa_api import AlpaWrapper
-
+from prompt_lib.backends.self_hosted import OpenSourceAPIWrapper
 
 # TODO: all of this should be in a config file
 backend_map = {
     "openai": OpenaiAPIWrapper,
     "shadowfire": ShadowFireWrapper,
     "alpa": AlpaWrapper,
+    "self_hosted": OpenSourceAPIWrapper,
 }
 
 openai_engines = [
@@ -25,8 +26,13 @@ openai_engines = [
 ]
 shadowfire_engines = ["shadowfire"]
 
+self_hosted_engines = [
+    "self-vulcan-13b"
+]
+
 engine_to_backend = {e: "openai" for e in openai_engines}
 engine_to_backend.update({e: "shadowfire" for e in shadowfire_engines})
+engine_to_backend.update({e: "self_hosted" for e in self_hosted_engines})
 
 
 def few_shot_query(prompt: str, engine: str, return_entire_response: bool = False, **kwargs):
@@ -52,9 +58,9 @@ Answer: The Apache Relay
 ###
 Question: Who wrote Never Going Back Again?"""
 
-    for engine_name in ["text-curie-001", "shadowfire"]:
+    for engine_name in ["text-curie-001", "shadowfire", "self-vulcan-13b"]:
 
-        print(engine_name)
+        print(f"Testing {engine_name}\n")
         output = few_shot_query(
             prompt=prompt,
             engine=engine_name,

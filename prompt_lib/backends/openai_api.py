@@ -5,6 +5,9 @@ import openai
 import random
 import time
 
+from prompt_lib.backends.wrapper import BaseAPIWrapper
+from prompt_lib.backends.self_hosted import OpenSourceAPIWrapper
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # check if orgainization is set
@@ -55,29 +58,7 @@ def retry_with_exponential_backoff(
 
     return wrapper
 
-class BaseAPIWrapper:
-    @staticmethod
-    def call(
-        prompt: str,
-        max_tokens: int,
-        engine: str,
-        stop_token: str,
-        temperature: float,
-        num_completions: int = 1,
-    ) -> dict:
-        raise NotImplementedError()
 
-    @staticmethod
-    def get_first_response(response) -> Dict[str, Any]:
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_majority_answer(response) -> Dict[str, Any]:
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_all_responses(response) -> Dict[str, Any]:
-        raise NotImplementedError()
 
 
 class CompletionAPIWrapper(BaseAPIWrapper):
@@ -99,7 +80,7 @@ class CompletionAPIWrapper(BaseAPIWrapper):
             top_p=1,
             stop=[stop_token],
             n=num_completions,
-            logprobs=5
+            logprobs=None
         )
         return response
 
@@ -254,10 +235,14 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
 class OpenaiAPIWrapper:
     chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0301", "gpt-4-0314"]
 
+    opensource_engines = ["self-vulcan-13b"]
+    
     @staticmethod
     def get_api_wrapper(engine: str) -> BaseAPIWrapper:
         if engine in OpenaiAPIWrapper.chat_engines:
             return ChatGPTAPIWrapper
+        elif engine in OpenaiAPIWrapper.opensource_engines:
+            return OpenSourceAPIWrapper
         else:
             return CompletionAPIWrapper
 
