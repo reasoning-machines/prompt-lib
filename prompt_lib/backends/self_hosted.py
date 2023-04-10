@@ -72,19 +72,21 @@ class OpenSourceAPIWrapper(BaseAPIWrapper):
         temperature: float,
         num_completions: int = 1,
     ) -> dict:
-        if num_completions > 2:
+        max_completions_in_one_call = 8
+        if num_completions > max_completions_in_one_call:
             response_combined = dict()
             num_completions_remaining = num_completions
-            for i in range(0, num_completions, 2):
+            for i in range(0, num_completions, max_completions_in_one_call):
                 response = OpenSourceAPIWrapper._call_api(
                     prompt=prompt,
                     max_tokens=max_tokens,
                     engine=engine,
                     stop_token=stop_token,
                     temperature=temperature,
-                    num_completions=min(num_completions_remaining, 2),
+                    num_completions=min(num_completions_remaining, max_completions_in_one_call),
                 )
-                num_completions_remaining -= 2
+                print(f"Remaining completions: {num_completions_remaining}")
+                num_completions_remaining -= max_completions_in_one_call
                 if i == 0:
                     response_combined = response
                 else:

@@ -1,0 +1,17 @@
+task_id: gsm_stream
+max_tokens: 100
+name: gsm_stream_gpt-self-vulcan-13b_s0
+seed: 0
+cot_task: true
+temperature: 1.1
+model_name: self-vulcan-13b
+is_debug: true
+question_prefix: "Q: "
+answer_prefix: "A: "
+final_answer_prefix: "The answer is "
+intra_example_sep: "\n"
+inter_example_sep: "\n\n"
+eval_function: get_exact_match_acc
+wandb_project: cot
+num_completions: 64
+num_inference_examples: 3
