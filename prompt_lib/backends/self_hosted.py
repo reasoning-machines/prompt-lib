@@ -23,7 +23,17 @@ class OpenSourceAPIBackend:
         print(f"Setting base_url to {url}")
         self._base_url = url
 
-    def completions(self, prompt, temperature=0.7, max_tokens=150, n=1, stop=None, top_p=None, engine=None, logprobs=None):
+    def completions(
+        self,
+        prompt,
+        temperature=0.7,
+        max_tokens=150,
+        n=1,
+        stop=None,
+        top_p=0.9,
+        engine=None,
+        logprobs=None,
+    ):
         url = f"{self.base_url}/completion"
         data = {
             "prompt": prompt,
@@ -41,7 +51,6 @@ api = OpenSourceAPIBackend()
 
 
 class OpenSourceAPIWrapper(BaseAPIWrapper):
-
     @staticmethod
     def _call_api(
         prompt: str,
@@ -113,16 +122,15 @@ class OpenSourceAPIWrapper(BaseAPIWrapper):
     def get_majority_answer(response) -> Dict[str, Any]:
         api_wrapper = OpenSourceAPIWrapper.get_api_wrapper(response["model"])
         return api_wrapper.get_majority_answer(response)
-    
-    
+
     @staticmethod
     def get_all_responses(response) -> Dict[str, Any]:
         api_wrapper = OpenSourceAPIWrapper.get_api_wrapper(response["model"])
         return api_wrapper.get_all_responses(response)
-    
+
 
 def test():
-    
+
     wrapper = OpenSourceAPIWrapper()
     api.base_url = "http://pitt.lti.cs.cmu.edu:5000"
 
@@ -133,12 +141,14 @@ def test():
         stop_token="\n",
         temperature=0.7,
     )
-    
+
     pprint(response)
 
     test_api = OpenSourceAPIBackend()
     test_api.base_url = "http://pitt.lti.cs.cmu.edu:5000"
-    assert test_api.base_url == "http://pitt.lti.cs.cmu.edu:5000", f"api.base_url: {test_api.base_url}"
+    assert (
+        test_api.base_url == "http://pitt.lti.cs.cmu.edu:5000"
+    ), f"api.base_url: {test_api.base_url}"
     pprint(
         test_api.completions(
             "The quick brown fox",
