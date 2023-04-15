@@ -1,9 +1,10 @@
 from collections import Counter
 import os
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional, Union
 import openai
 import random
 import time
+import json
 
 from prompt_lib.backends.wrapper import BaseAPIWrapper
 from prompt_lib.backends.self_hosted import OpenSourceAPIWrapper
@@ -59,8 +60,6 @@ def retry_with_exponential_backoff(
     return wrapper
 
 
-
-
 class CompletionAPIWrapper(BaseAPIWrapper):
     @staticmethod
     @retry_with_exponential_backoff
@@ -80,7 +79,7 @@ class CompletionAPIWrapper(BaseAPIWrapper):
             top_p=1,
             stop=[stop_token],
             n=num_completions,
-            logprobs=None
+            logprobs=None,
         )
         return response
 
@@ -110,7 +109,6 @@ class CompletionAPIWrapper(BaseAPIWrapper):
                     response_combined = response
                 else:
                     response_combined["choices"] += response["choices"]
-            
 
             return response_combined
         response = CompletionAPIWrapper._call_api(
@@ -123,7 +121,6 @@ class CompletionAPIWrapper(BaseAPIWrapper):
         )
 
         return response
-
 
     @staticmethod
     def get_first_response(response) -> Dict[str, Any]:
@@ -158,25 +155,37 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
     @staticmethod
     @retry_with_exponential_backoff
     def call(
-        prompt: str,
+        prompt: Union[str, List[Dict[str, str]]],
         max_tokens: int,
         engine: str,
         stop_token: str,
         temperature: float,
         num_completions: int = 1,
+        system_message: Optional[str] = None,
     ) -> dict:
         """Calls the Chat API.
 
         if the num_completions is > 2, we call the API multiple times. This is to prevent
         overflow issues that can occur when the number of completions is too large.
         """
-        messages = [
-            {
-                "role": "system",
-                "content": "You are ChatGPT, a large language model trained by OpenAI.",
-            },
-            {"role": "user", "content": prompt},
-        ]
+        system_message = (
+            system_message or "You are ChatGPT, a large language model trained by OpenAI."
+        )
+
+        if isinstance(prompt, str):
+            messages = []
+            if system_message:
+                messages.append({"role": "system", "content": system_message})
+            messages.append({"role": "user", "content": prompt})
+        elif isinstance(prompt, list):
+            messages = prompt
+            if system_message:
+                messages.insert(0, {"role": "system", "content": system_message})
+        else:
+            raise ValueError(
+                "Invalid prompt type. Prompt should be a string or a list of messages."
+            )
+
         if num_completions > 2:
             response_combined = dict()
             num_completions_remaining = num_completions
@@ -202,7 +211,7 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
             temperature=temperature,
             max_tokens=max_tokens,
             top_p=1,
-            stop=[stop_token],
+            stop=[stop_token] if stop_token else None,
             # logprobs=3,
             n=num_completions,
         )
@@ -221,6 +230,9 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
         answers = [choice["message"]["content"] for choice in response["choices"]]
         answers = Counter(answers)
         # if there is a tie, return the first answer
+        if len(answers) == 1:
+            return answers.most_common(1)[0][0]
+
         if answers.most_common(1)[0][1] == answers.most_common(2)[1][1]:
             return ChatGPTAPIWrapper.get_first_response(response)
 
@@ -235,8 +247,8 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
 class OpenaiAPIWrapper:
     chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0301", "gpt-4-0314"]
 
-    opensource_engines = ["self-vulcan-13b"]
-    
+    opensource_engines = ["self-vulcan-13b", "self-vicuna-13b"]
+
     @staticmethod
     def get_api_wrapper(engine: str) -> BaseAPIWrapper:
         if engine in OpenaiAPIWrapper.chat_engines:
@@ -246,7 +258,6 @@ class OpenaiAPIWrapper:
         else:
             return CompletionAPIWrapper
 
-
     @staticmethod
     def call(
         prompt: str,
@@ -255,9 +266,12 @@ class OpenaiAPIWrapper:
         stop_token: str,
         temperature: float,
         num_completions: int = 1,
+        **kwargs,
     ) -> dict:
         api_wrapper = OpenaiAPIWrapper.get_api_wrapper(engine)
-        return api_wrapper.call(prompt, max_tokens, engine, stop_token, temperature, num_completions)
+        return api_wrapper.call(
+            prompt, max_tokens, engine, stop_token, temperature, num_completions, **kwargs
+        )
 
     @staticmethod
     def get_first_response(response) -> Dict[str, Any]:
@@ -268,13 +282,11 @@ class OpenaiAPIWrapper:
     def get_majority_answer(response) -> Dict[str, Any]:
         api_wrapper = OpenaiAPIWrapper.get_api_wrapper(response["model"])
         return api_wrapper.get_majority_answer(response)
-    
-    
+
     @staticmethod
     def get_all_responses(response) -> Dict[str, Any]:
         api_wrapper = OpenaiAPIWrapper.get_api_wrapper(response["model"])
         return api_wrapper.get_all_responses(response)
-    
 
 
 def test_completion():
@@ -313,9 +325,160 @@ def test_chat():
     print(OpenaiAPIWrapper.get_majority_answer(response))
 
 
+def test_basic_chat():
+    prompt = "What is the capital of France?"
+    engine = "gpt-3.5-turbo"
+    max_tokens = 10
+    response = OpenaiAPIWrapper.call(
+        prompt=prompt,
+        max_tokens=max_tokens,
+        engine=engine,
+        temperature=0.7,
+        stop_token=None,
+        num_completions=1,
+    )
+    print(json.dumps(response, indent=2))
+    print(OpenaiAPIWrapper.get_first_response(response))
+
+
+def test_chat_with_system_message():
+    prompt = "What is the capital of France?"
+    engine = "gpt-3.5-turbo"
+    max_tokens = 10
+    system_message = "You are ChatGPT, a large language model trained by OpenAI."
+    response = OpenaiAPIWrapper.call(
+        prompt=prompt,
+        max_tokens=max_tokens,
+        engine=engine,
+        stop_token=None,
+        temperature=0.7,
+        num_completions=1,
+        system_message=system_message,
+    )
+    print(json.dumps(response, indent=2))
+    print(OpenaiAPIWrapper.get_first_response(response))
+
+
+def test_chat_with_multiple_completions():
+    prompt = "What is the capital of France?"
+    engine = "gpt-3.5-turbo"
+    max_tokens = 10
+    response = OpenaiAPIWrapper.call(
+        prompt=prompt,
+        max_tokens=max_tokens,
+        engine=engine,
+        stop_token=None,
+        temperature=0.7,
+        num_completions=3,
+    )
+    print(json.dumps(response, indent=2))
+    print(OpenaiAPIWrapper.get_first_response(response))
+    print(OpenaiAPIWrapper.get_majority_answer(response))
+    print(OpenaiAPIWrapper.get_all_responses(response))
+
+
+def test_chat_with_message_list():
+    messages = [
+        {"role": "system", "content": "You are ChatGPT, a large language model trained by OpenAI."},
+        {"role": "user", "content": "What is the capital of France?"},
+    ]
+    engine = "gpt-3.5-turbo"
+    max_tokens = 10
+    response = OpenaiAPIWrapper.call(
+        prompt=messages,
+        max_tokens=max_tokens,
+        engine=engine,
+        stop_token=None,
+        temperature=0.7,
+        num_completions=1,
+    )
+    print(json.dumps(response, indent=2))
+    print(OpenaiAPIWrapper.get_first_response(response))
+
+
+# Test case 1: Test with basic parameters
+def test_completion_basic_parameters():
+    prompt = "Once upon a time"
+    max_tokens = 50
+    engine = "text-davinci-002"
+    stop_token = "\n"
+    temperature = 0.8
+
+    response = CompletionAPIWrapper.call(prompt, max_tokens, engine, stop_token, temperature)
+    assert "choices" in response, "Test case 1 failed: 'choices' not found in the response"
+
+    print("Test case 1 passed")
+
+
+# Test case 2: Test with multiple completions
+def test_completion_multiple_completions():
+    prompt = "Once upon a time"
+    max_tokens = 50
+    engine = "text-davinci-002"
+    stop_token = "\n"
+    temperature = 0.8
+    num_completions = 3
+
+    response = CompletionAPIWrapper.call(
+        prompt, max_tokens, engine, stop_token, temperature, num_completions
+    )
+    assert "choices" in response, "Test case 2 failed: 'choices' not found in the response"
+    assert (
+        len(response["choices"]) == num_completions
+    ), f"Test case 2 failed: expected {num_completions} completions, but got {len(response['choices'])}"
+
+    print("Test case 2 passed")
+
+
+# Test case 3: Test helper methods
+def test_completion_helper_methods():
+    prompt = "Once upon a time"
+    max_tokens = 50
+    engine = "text-davinci-002"
+    stop_token = "\n"
+    temperature = 0.8
+    num_completions = 2
+
+    response = CompletionAPIWrapper.call(
+        prompt, max_tokens, engine, stop_token, temperature, num_completions
+    )
+    first_response = CompletionAPIWrapper.get_first_response(response)
+    assert isinstance(
+        first_response, str
+    ), "Test case 3 failed: 'get_first_response' did not return a string"
+
+    majority_answer = CompletionAPIWrapper.get_majority_answer(response)
+    assert isinstance(
+        majority_answer, str
+    ), "Test case 3 failed: 'get_majority_answer' did not return a string"
+
+    all_responses = CompletionAPIWrapper.get_all_responses(response)
+    assert isinstance(
+        all_responses, list
+    ), "Test case 3 failed: 'get_all_responses' did not return a list"
+
+    print("Test case 3 passed")
+
+
 if __name__ == "__main__":
+    print("Testing basic chat")
+    test_basic_chat()
+
+    print("Testing chat with system message")
+    test_chat_with_system_message()
+
+    print("Testing chat with multiple completions")
+    test_chat_with_multiple_completions()
+
+    print("Testing chat with message list")
+    test_chat_with_message_list()
+
     # test the API
     print("Testing completion API")
     test_completion()
     print("Testing chat API")
     test_chat()
+
+    test_completion_basic_parameters()
+    test_completion_multiple_completions()
+    test_completion_helper_methods()
