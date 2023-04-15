@@ -1,15 +1,19 @@
+from abc import ABC, abstractmethod
 from typing import Dict, Any
-class BaseAPIWrapper:
+class BaseAPIWrapper(ABC):
     @staticmethod
+    @abstractmethod
     def call(
         prompt: str,
         max_tokens: int,
         engine: str,
         stop_token: str,
         temperature: float,
-        num_completions: int = 1,
+        num_completions: int,
+        **kwargs,
     ) -> dict:
-        raise NotImplementedError()
+        pass
+
 
     @staticmethod
     def get_first_response(response) -> Dict[str, Any]:
