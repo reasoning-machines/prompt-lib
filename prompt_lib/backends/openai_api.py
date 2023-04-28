@@ -70,16 +70,18 @@ class CompletionAPIWrapper(BaseAPIWrapper):
         stop_token: str,
         temperature: float,
         num_completions: int = 1,
+        top_p: float = 1,
+        logprobs: Optional[int] = None,
     ) -> dict:
         response = openai.Completion.create(
             engine=engine,
             prompt=prompt,
             temperature=temperature,
             max_tokens=max_tokens,
-            top_p=1,
+            top_p=top_p,
             stop=[stop_token],
             n=num_completions,
-            logprobs=None,
+            logprobs=logprobs,
         )
         return response
 
@@ -91,6 +93,8 @@ class CompletionAPIWrapper(BaseAPIWrapper):
         stop_token: str,
         temperature: float,
         num_completions: int = 1,
+        top_p: float = 1,
+        logprobs: Optional[int] = None,
     ) -> dict:
         if num_completions > 2:
             response_combined = dict()
@@ -102,7 +106,9 @@ class CompletionAPIWrapper(BaseAPIWrapper):
                     engine=engine,
                     stop_token=stop_token,
                     temperature=temperature,
+                    top_p=top_p,
                     num_completions=min(num_completions_remaining, 2),
+                    logprobs=logprobs,
                 )
                 num_completions_remaining -= 2
                 if i == 0:
@@ -118,6 +124,8 @@ class CompletionAPIWrapper(BaseAPIWrapper):
             stop_token=stop_token,
             temperature=temperature,
             num_completions=num_completions,
+            logprobs=logprobs,
+            top_p=top_p,
         )
 
         return response
@@ -160,6 +168,7 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
         engine: str,
         stop_token: str,
         temperature: float,
+        top_p: float = 1,
         num_completions: int = 1,
         system_message: Optional[str] = None,
     ) -> dict:
@@ -197,6 +206,7 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
                     engine=engine,
                     stop_token=stop_token,
                     temperature=temperature,
+                    top_p=top_p,
                     num_completions=min(num_completions_remaining, 2),
                 )
                 num_completions_remaining -= 2
@@ -210,7 +220,7 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
-            top_p=1,
+            top_p=top_p,
             stop=[stop_token] if stop_token else None,
             # logprobs=3,
             n=num_completions,
@@ -270,7 +280,7 @@ class OpenaiAPIWrapper:
     ) -> dict:
         api_wrapper = OpenaiAPIWrapper.get_api_wrapper(engine)
         return api_wrapper.call(
-            prompt, max_tokens, engine, stop_token, temperature, num_completions, **kwargs
+            prompt=prompt, max_tokens=max_tokens, engine=engine, stop_token=stop_token, temperature=temperature, num_completions=num_completions, **kwargs
         )
 
     @staticmethod
@@ -458,6 +468,48 @@ def test_completion_helper_methods():
     ), "Test case 3 failed: 'get_all_responses' did not return a list"
 
     print("Test case 3 passed")
+    
+    
+def test_top_p():
+    print(f"Testing top_p")
+    prompt = "Once upon a time"
+    max_tokens = 50
+    engine = "text-davinci-002"
+    stop_token = "\n"
+    temperature = 0.8
+    num_completions = 2
+    top_p = 0.5
+
+    response = CompletionAPIWrapper.call(
+        prompt, max_tokens, engine, stop_token, temperature, num_completions, top_p
+    )
+    first_response = CompletionAPIWrapper.get_first_response(response)
+    assert isinstance(
+        first_response, str
+    ), "Test case 3 failed: 'get_first_response' did not return a string"
+
+    majority_answer = CompletionAPIWrapper.get_majority_answer(response)
+    assert isinstance(
+        majority_answer, str
+    ), "Test case 3 failed: 'get_majority_answer' did not return a string"
+
+    all_responses = CompletionAPIWrapper.get_all_responses(response)
+    assert isinstance(
+        all_responses, list
+    ), "Test case 3 failed: 'get_all_responses' did not return a list"
+
+    print("Test case 3 passed")
+    
+    
+    # top_p with chat
+    
+    engine = "gpt-3.5-turbo"
+    
+    for top_p in [0.0001, 0.01, 0.2, 0.5, 0.75, 0.9]:
+        response = OpenaiAPIWrapper.call(prompt, max_tokens, engine, stop_token, temperature, num_completions=2, top_p=top_p)
+        print(f"Top_p={top_p}: {OpenaiAPIWrapper.get_all_responses(response)}")
+
+        
 
 
 if __name__ == "__main__":
@@ -482,3 +534,4 @@ if __name__ == "__main__":
     test_completion_basic_parameters()
     test_completion_multiple_completions()
     test_completion_helper_methods()
+    test_top_p()
