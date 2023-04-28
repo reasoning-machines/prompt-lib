@@ -46,6 +46,10 @@ def few_shot_query(prompt: str, engine: str, return_entire_response: bool = Fals
         return top_response
 
 
+def get_first_response(output, engine):
+    backend_name = engine_to_backend[engine]
+    return backend_map[backend_name].get_first_response(output)
+
 def call(prompt: str, engine: str, return_entire_response: bool = False, **kwargs):
     return few_shot_query(
         prompt=prompt, engine=engine, return_entire_response=return_entire_response, **kwargs
