@@ -15,6 +15,8 @@ python prompt_lib/run_inference.py --task_id boolsimplify_stream --num_prompt_ex
 
 
 ## News 📢
+[June 2023] Added support for claude series of  models from Anthropic.
+
 [Mar 2023] `prompt-lib` now works with ChatGPT/GPT-4. The addition is backward compatible, so you can simply use`gpt-3.5-turbo` or `gpt-4` as the engine name. However, you may want to checkout how we convert the prompt to messages [here](https://github.com/reasoning-machines/prompt-lib/blob/e55c23080505daa1d3e73d26fadb5cd29bf07d25/prompt_lib/backends/openai_api.py#L169).
 
 ## Colabs
