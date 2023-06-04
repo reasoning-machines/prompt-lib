@@ -8,6 +8,7 @@ import json
 
 from prompt_lib.backends.wrapper import BaseAPIWrapper
 from prompt_lib.backends.self_hosted import OpenSourceAPIWrapper
+from prompt_lib.backends.anthropic_api import AnthropicAPIWrapper
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -265,6 +266,8 @@ class OpenaiAPIWrapper:
             return ChatGPTAPIWrapper
         elif engine in OpenaiAPIWrapper.opensource_engines:
             return OpenSourceAPIWrapper
+        elif "claude" in engine:
+            return AnthropicAPIWrapper
         else:
             return CompletionAPIWrapper
 
