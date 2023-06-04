@@ -36,9 +36,9 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
         else:
             raise ValueError("Unsupported configuration file format. Please use a JSON or YAML file.")
 
-
     prompt_fields = PromptConfig.__dataclass_fields__.keys()
     task_config_fields = TaskConfig.__dataclass_fields__.keys()
+    
 
     critical_fields = [
         "task_id",
@@ -55,7 +55,10 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
     for k in vars(args):
         default_val = getattr(args, k)
         if k in prompt_fields and k not in config["prompt_config"]:
-            config["prompt_config"][k] = default_val
+            if k in config:
+                config["prompt_config"][k] = config[k]
+            else:
+                config["prompt_config"][k] = default_val
         elif k in task_config_fields and k not in config:
             config[k] = default_val
         elif k in config:
@@ -66,14 +69,12 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
     # Update the args object with the remaining arguments
     for k, v in remaining_args.items():
         setattr(args, k, v)
-
     task_config = TaskConfig.from_config_dict(config)
     return task_config, args
 
 if __name__ == "__main__":
     import argparse
 
-    args = argparse.ArgumentParser()
     args = argparse.ArgumentParser()
     args.add_argument("--task_id", type=str, help="Task ID for the specific task. Always has the format <dataset>_<task>, where <dataset>.jsonl is expected to be in ${PWD}/data/<dataset>.jsonl. It should be a jsonl with two fields: `input` and `output`.")
     args.add_argument("--num_questions_per_thread", type=int, default=200, help="Number of questions to run per thread")
@@ -123,6 +124,7 @@ if __name__ == "__main__":
     if args.config_file is not None:
 
         task_config, args = read_config_and_populate_defaults(args.config_file, args)
+        
     else:
         assert args.seed is not None
         prompt_config = PromptConfig.from_args(args)
@@ -138,4 +140,6 @@ if __name__ == "__main__":
             project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name, notes=args.tag
         )
 
+    # print(task_config)
+    # sys.exit(0)
     inference_loop(task_config=task_config)
