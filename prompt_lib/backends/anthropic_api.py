@@ -24,11 +24,12 @@ class AnthropicAPIWrapper(BaseAPIWrapper):
 
         response = client.completion(
             prompt=prompt,
-            stop_sequences=[stop_token],
+            stop_sequences=[anthropic.HUMAN_PROMPT],
             model=engine,
             max_tokens_to_sample=max_tokens,
             temperature=temperature,
         )
+
         return response
 
     @staticmethod

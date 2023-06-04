@@ -4,9 +4,36 @@ import re
 from importlib import reload
 import pandas as pd
 from tqdm import tqdm
+from rouge_score import rouge_scorer
 
 import os
 from prompt_lib.eval.eval_utils import timeout
+
+from rouge_score import rouge_scorer
+
+def get_rouge_l(data: pd.DataFrame,
+                answer_field: str = "answer",
+                generated_field: str = "generated_answer",
+                return_df: bool = False) -> float:
+
+    scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=True)
+
+    def _get_score(row):
+        if row[generated_field] is None:
+            return 0.0
+        generated_answer = row[generated_field].split("Q:")[0].strip()
+        generated_answer = re.sub(r"(\d)([a-zA-Z\.])", r"\1 \2", generated_answer)
+
+        scores = scorer.score(str(row[answer_field]).lower(), generated_answer.lower())
+        return scores['rougeL'].fmeasure
+
+    data["rouge_l"] = data.apply(_get_score, axis=1)
+    rouge_l_avg = data["rouge_l"].mean()
+
+    print(f"Average Rouge-L: {rouge_l_avg:.2f}")
+    if return_df:
+        return rouge_l_avg, data
+    return rouge_l_avg
 
 
 def get_exact_match_acc(
@@ -31,13 +58,18 @@ def get_exact_match_acc(
         generated_answer = re.sub(r"(\d)([a-zA-Z\.])", r"\1 \2", generated_answer)
 
         return int(str(row[answer_field]).lower() in generated_answer.lower())
+    try:
+        data["is_correct"] = data.apply(_is_correct, axis=1)
+        acc = data["is_correct"].mean() * 100
 
-    data["is_correct"] = data.apply(_is_correct, axis=1)
-    acc = data["is_correct"].mean() * 100
-
-    print(f"Accuracy: {acc:.2f}")
-    if return_df:
-        return acc, data
+        print(f"Accuracy: {acc:.2f}")
+        if return_df:
+            return acc, data
+    except:
+        acc = 0
+        print(f"Accuracy: {acc:.2f}")
+        if return_df:
+            return acc, data
     return acc
 
 

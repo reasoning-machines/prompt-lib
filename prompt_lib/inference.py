@@ -44,7 +44,8 @@ def inference_loop(task_config: TaskConfig) -> None:
         example
         for example in task_file
         if not (
-            get_question_from_prompt(example["question"], task_config) in cached_examples
+            (task_config.num_prompt_examples > 0 and
+            get_question_from_prompt(example["question"], task_config) in cached_examples)
             or example["question"] in cached_examples
         )
     ]
@@ -63,6 +64,7 @@ def inference_loop(task_config: TaskConfig) -> None:
     # run inference
     for (batch, batch_idx) in tqdm(batched_tasks):
         thread_outputs = run_inference_on_batch(batch, batch_idx, task_config=task_config)
+
         outputs.append(thread_outputs)
         progress_perc = round(len(outputs) * 100 / len(batched_tasks), 2)
         wandb.log({"progress_so_far": progress_perc})
@@ -195,12 +197,17 @@ def run_inference_on_batch(
                 stop_token=task_config.prompt_config.inter_example_sep,  # generate till the model starts generating a new question
                 num_completions=task_config.num_completions,
             )
-            prompt_only = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[
-                :-1
-            ]
-            prompt_only = task_config.prompt_config.inter_example_sep.join(prompt_only)
+            
+            if task_config.prompt_config.inter_example_sep:
+                prompt_only = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[
+                    :-1
+                ]
+                prompt_only = task_config.prompt_config.inter_example_sep.join(prompt_only)
 
-            question = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[-1]
+                question = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[-1]
+            else:  # zero-shot, everything is the prompt
+                prompt_only = inputs[i]["question"]
+                question = inputs[i]["question"]
 
             res = {
                 "prompt": prompt_only,
@@ -246,6 +253,7 @@ def run_inference_on_batch(
             pbar.update(1)
 
         except Exception as e:
+            # raise e
             logging.info(f"Exception: {e}")
             if "code" not in task_config.model_name:
                 i += 1
@@ -270,7 +278,7 @@ def extract_answer_from_response(response, task_config: TaskConfig) -> str:
     Returns:
         str: Answer
     """
-    if task_config.prompt_config.inter_example_sep in response:
+    if task_config.prompt_config.inter_example_sep and task_config.prompt_config.inter_example_sep in response:
         answer = response.split(task_config.prompt_config.inter_example_sep)[0]
     else:
         answer = response
