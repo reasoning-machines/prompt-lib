@@ -79,6 +79,7 @@ def get_acc_from_python_thoughts(
     
 
     num_corr = 0
+    data["is_correct"] = 0
     for i, row in tqdm(data.iterrows(), total=len(data), desc="Evaluating generated python thoughts"):
         soln = row[generated_field]
         
