@@ -49,6 +49,7 @@ def inference_loop(task_config: TaskConfig) -> None:
             or example["question"] in cached_examples
         )
     ]
+
     logging.info(
         f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query, found {n_task_original - len(task_file)} in cache"
     )
@@ -60,6 +61,11 @@ def inference_loop(task_config: TaskConfig) -> None:
 
     outputs = []
     accuracy_so_far = 0
+
+    # post-process cached examples and newly queried examples
+    for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
+        cached = read_jsonl(r_file)
+        outputs = pd.concat([outputs, cached])
 
     # run inference
     for (batch, batch_idx) in tqdm(batched_tasks):
@@ -78,13 +84,10 @@ def inference_loop(task_config: TaskConfig) -> None:
 
     outputs = pd.DataFrame(chain(*outputs))
 
-    # post-process cached examples and newly queried examples
-    for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
-        cached = read_jsonl(r_file)
-        outputs = pd.concat([outputs, cached])
 
     # remove duplicates
-    outputs = outputs.drop_duplicates(subset=["question"])
+    # BUG: we should not be doing this: there may be good reasons to have duplicates in the input: someone benchmarking
+    # outputs = outputs.drop_duplicates(subset=["question"])
     
     if "logprobs" in outputs.columns:
         outputs = outputs.drop("logprobs", axis=1)
@@ -174,14 +177,14 @@ def get_outdir(task_config: TaskConfig) -> str:
 
 
 def run_inference_on_batch(
-    inputs: List[dict],
+    rows: List[dict],
     thread_id: int,
     task_config: TaskConfig,
     max_retries: int = 10,
 ) -> List[dict]:
     outputs = []
     i = 0
-    n = len(inputs)
+    n = len(rows)
 
     pbar = tqdm(total=n, desc=f"Querying {task_config.model_name} [thread_id={thread_id}]")
     num_retries = 0
@@ -191,7 +194,7 @@ def run_inference_on_batch(
         try:
             response = OpenaiAPIWrapper.call(
                 temperature=task_config.temperature,
-                prompt=inputs[i]["question"],
+                prompt=rows[i]["question"],
                 max_tokens=task_config.max_tokens,
                 engine=task_config.model_name,
                 stop_token=task_config.prompt_config.inter_example_sep,  # generate till the model starts generating a new question
@@ -199,22 +202,23 @@ def run_inference_on_batch(
             )
             
             if task_config.prompt_config.inter_example_sep:
-                prompt_only = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[
+                prompt_only = rows[i]["question"].split(task_config.prompt_config.inter_example_sep)[
                     :-1
                 ]
                 prompt_only = task_config.prompt_config.inter_example_sep.join(prompt_only)
 
-                question = inputs[i]["question"].split(task_config.prompt_config.inter_example_sep)[-1]
+                question = rows[i]["question"].split(task_config.prompt_config.inter_example_sep)[-1]
             else:  # zero-shot, everything is the prompt
-                prompt_only = inputs[i]["question"]
-                question = inputs[i]["question"]
+                prompt_only = rows[i]["question"]
+                question = rows[i]["question"]
 
             res = {
                 "prompt": prompt_only,
                 "question": question,
-                "answer": inputs[i]["answer"],
-                "entire_prompt": inputs[i]["question"],
+                "answer": rows[i]["answer"],
+                "entire_prompt": rows[i]["question"],
             }
+            res.update({k: v for k, v in rows[i].items() if k not in res})
             if task_config.num_completions == 1:
                 entire_response = OpenaiAPIWrapper.get_first_response(response)
                 generated_answer = extract_answer_from_response(entire_response, task_config)
