@@ -43,7 +43,6 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
     critical_fields = [
         "task_id",
         "model_name",
-        "temperature",
     ]
     for field in critical_fields:
         assert field in config, f"Field {field} not found in config file {config_path}"
@@ -81,7 +80,7 @@ if __name__ == "__main__":
     args.add_argument("--max_tokens", type=int, default=100, help="Maximum number of tokens in completion")
     args.add_argument("--num_prompt_examples", type=int, default=-1, help="Number of prompt examples to use (-1 for all)")
     args.add_argument("--name", type=str, required=False, help="Name of the run")
-    args.add_argument("--seed", type=int, required=False, help="Seed for randomization. Used to decided the order of examples. Not applicable if a text file is supplied as the prompt")
+    args.add_argument("--seed", type=int, required=False, help="Seed for randomization. Used to decided the order of examples. Not applicable if a text file is supplied as the prompt", default=0)
     args.add_argument("--cot_task", action="store_true", help="Indicate if it's a COT task")
     args.add_argument("--temperature", type=float, default=0.0, help="Sampling temperature for the model")
 
@@ -109,7 +108,7 @@ if __name__ == "__main__":
         help="The function to use for evaluation. Should be defined in scripts/eval.py. The signature should be the same as `get_exact_match_acc`",
     )
 
-    args.add_argument("--num_inference_examples", type=int, default=None, help="Number of examples for which inference will run.")
+    args.add_argument("--num_inference_examples", type=int, default=-1, help="Number of examples for which inference will run.")
 
 
     
@@ -120,6 +119,8 @@ if __name__ == "__main__":
     args.is_cot_task = args.cot_task
     if args.name is None:
         args.name = args.task_id
+    if args.tag is None:
+        args.tag = args.task_id
 
     if args.config_file is not None:
 
