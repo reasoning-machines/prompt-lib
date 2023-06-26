@@ -218,7 +218,7 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     )
     # davinci doesn't like prompts that end with a space
     task_df["answer"] = task_df["target"]
-    return task_df[["question", "answer"]]
+    return task_df  # keep everything
 
 
 
@@ -231,6 +231,8 @@ def get_question_from_prompt(prompt_with_question: str, task_config: TaskConfig)
         str: The question.
     """
     # remove the prompt
+    if not task_config.prompt_config.question_prefix:
+        return prompt_with_question
     question = prompt_with_question.split(task_config.prompt_config.question_prefix)[-1]
     return task_config.prompt_config.question_prefix + question.split(task_config.prompt_config.intra_example_sep)[0]
 
