@@ -65,7 +65,7 @@ def inference_loop(task_config: TaskConfig) -> None:
     # post-process cached examples and newly queried examples
     for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
         cached = read_jsonl(r_file)
-        outputs = pd.concat([outputs, cached])
+        outputs = cached
 
     # run inference
     for (batch, batch_idx) in tqdm(batched_tasks):
