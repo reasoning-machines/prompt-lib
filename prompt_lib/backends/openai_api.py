@@ -256,13 +256,13 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
 
 
 class OpenaiAPIWrapper:
-    chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0301", "gpt-4-0314"]
+    chat_engines = ["gpt-3.5-turbo", "gpt-4"]
 
     opensource_engines = ["self-vulcan-13b", "self-vicuna-13b"]
 
     @staticmethod
     def get_api_wrapper(engine: str) -> BaseAPIWrapper:
-        if engine in OpenaiAPIWrapper.chat_engines:
+        if any(k in engine for k in OpenaiAPIWrapper.chat_engines):
             return ChatGPTAPIWrapper
         elif engine in OpenaiAPIWrapper.opensource_engines:
             return OpenSourceAPIWrapper
