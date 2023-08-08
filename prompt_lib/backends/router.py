@@ -22,7 +22,9 @@ openai_engines = [
     "code-davinci-002",
     "code-cushman-001",
     "gpt-3.5-turbo",
-    "gpt-4"
+    "gpt-4",
+    "vicuna-33b-v1.3",
+    "meta-llama/Llama-2-70b-hf"
 ]
 shadowfire_engines = ["shadowfire"]
 
