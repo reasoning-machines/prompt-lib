@@ -7,7 +7,8 @@ import requests
 
 from prompt_lib.backends.wrapper import BaseAPIWrapper
 
-client = anthropic.Client(os.environ["ANTHROPIC_API_KEY"])
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "Your_Default_Value")
+client = anthropic.Client(ANTHROPIC_API_KEY)
 
 
 class AnthropicAPIWrapper(BaseAPIWrapper):
@@ -98,7 +99,7 @@ def test():
     response = wrapper.call(
         prompt="The quick brown fox",
         max_tokens=10,
-        engine="claude-v1",
+        engine="claude-2",
         stop_token="\n",
         temperature=0.7,
     )
