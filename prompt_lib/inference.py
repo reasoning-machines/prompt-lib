@@ -50,7 +50,7 @@ def inference_loop(task_config: TaskConfig) -> None:
         )
     ]
 
-    logging.info(
+    print(
         f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query, found {n_task_original - len(task_file)} in cache"
     )
 
@@ -162,6 +162,7 @@ def get_outdir(task_config: TaskConfig) -> str:
     if task_config.cached_timestamp is None:
         time_stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     else:
+        print(f"Using cached timestamp: {task_config.cached_timestamp}")
         time_stamp = task_config.cached_timestamp
 
     outdir = f"data/logs/{task_config.task_id}/{task_config.model_name}/temp_{task_config.temperature}/seed_{task_config.seed}/num_completions_{task_config.num_completions}/"
