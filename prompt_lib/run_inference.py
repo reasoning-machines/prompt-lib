@@ -45,7 +45,8 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
         "model_name",
     ]
     for field in critical_fields:
-        assert field in config, f"Field {field} not found in config file {config_path}"
+        if field not in config and (field not in args or getattr(args, field) is None):
+            raise ValueError(f"Field {field} not found in config file {config_path} or in args")
 
     if "prompt_config" not in config:
         config["prompt_config"] = {}
@@ -98,6 +99,7 @@ if __name__ == "__main__":
     # wandb stuff
     args.add_argument("--tag", type=str, default=None, help="Tag for the run")
     args.add_argument("--wandb_project", type=str, default="cot", help="Wandb project name")
+    args.add_argument("--wandb_entity", type=str, default="cot", help="Wandb entity name")
     args.add_argument("--config_file", type=str, default=None, help="Path to the configuration file")
 
 
@@ -133,14 +135,17 @@ if __name__ == "__main__":
 
     if args.name is None:
         args.name = f"{task_config.task_id}_{task_config.model_name}_seed{task_config.seed}"
-
+        if args.tag is None:
+            args.name += f"_{task_config.tag}"
+    
     if args.is_debug:
         wandb.init(mode="disabled")
     else:
         wandb.init(
-            project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name, notes=args.tag
+            project=args.wandb_project, config=dataclasses.asdict(task_config), name=args.name, notes=args.tag, entity=args.wandb_entity if args.wandb_entity is not None else os.environ.get("WANDB_ENTITY", None)
         )
 
     # print(task_config)
     # sys.exit(0)
+    print(task_config)
     inference_loop(task_config=task_config)
