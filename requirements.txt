@@ -11,7 +11,7 @@ openai == 0.27.2
 pandas == 1.4.4
 
 # prompt-lib/setup.py: 2
-setuptools == 52.0.0.post20210125
+# setuptools == 52.0.0.post20210125
 
 # prompt-lib/eval/eval.py: 5
 # prompt-lib/eval/gsm_quco_eval.py: 3
@@ -22,5 +22,5 @@ tqdm == 4.49.0
 wandb == 0.13.2
 
 
-anthropic
+anthropic == 0.2.8
 rouge_score
