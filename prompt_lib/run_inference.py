@@ -2,7 +2,7 @@
 import json
 import os
 from pprint import pprint
-import sys
+import openai
 import wandb
 import dataclasses
 import logging
@@ -115,12 +115,15 @@ if __name__ == "__main__":
 
     
     args.add_argument("--num_completions", type=int, default=1, help="Number of completions to generate per prompt")
-
+    
+    args.add_argument("--num_threads", type=int, default=1, help="Number of threads to use for inference")
+    
+    args.add_argument("--base_url", type=str, default=None, help="Base URL for OpenAI API, used for vllm servers.")
+    
     args = args.parse_args()
 
     args.is_cot_task = args.cot_task
-    if args.name is None:
-        args.name = args.task_id
+
     if args.tag is None:
         args.tag = args.task_id
 
@@ -134,7 +137,8 @@ if __name__ == "__main__":
         task_config = TaskConfig.from_args(args, prompt_config)
 
     if args.name is None:
-        args.name = f"{task_config.task_id}_{task_config.model_name}_seed{task_config.seed}"
+        model_name_cleaned = task_config.model_name.replace("/", "_")
+        args.name = f"{task_config.task_id}_{model_name_cleaned}_seed{task_config.seed}"
         if args.tag is None:
             args.name += f"_{task_config.tag}"
     
@@ -148,4 +152,8 @@ if __name__ == "__main__":
     # print(task_config)
     # sys.exit(0)
     print(task_config)
-    inference_loop(task_config=task_config)
+    if args.base_url is not None:
+        openai.api_key = "EMPTY"
+        openai.api_base = args.base_url
+    print(task_config.prompt_config.inter_example_sep)
+    inference_loop(task_config=task_config, num_threads=args.num_threads)
