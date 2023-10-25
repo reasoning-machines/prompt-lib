@@ -477,6 +477,157 @@ Example(question = "Is the following sentence plausible ? 'Draymond Green threw 
     answer = "no"),
 ]
 
+# Redefining the function to convert the sports "thought" sentences into passive voice
+def convert_sports_to_passive(thought):
+    # Split the thought into sentences
+    sentences = thought.split('. ')
+    # Convert each sentence to passive
+    for i, sentence in enumerate(sentences):
+        if "Jamal Murray is a basketball player" in sentence:
+            sentences[i] = "Basketball is the game played by Jamal Murray"
+        elif "Joao Moutinho is a soccer player" in sentence:
+            sentences[i] = "Soccer is the game played by Joao Moutinho"
+        elif "Jonas Valanciunas is a basketball player" in sentence:
+            sentences[i] = "Basketball is the game played by Jonas Valanciunas"
+        elif "Sam Darnold is a American football player" in sentence:
+            sentences[i] = "American football is the game played by Sam Darnold"
+        elif "Kyle Palmieri is a hockey player" in sentence:
+            sentences[i] = "Hockey is the game played by Kyle Palmieri"
+        elif "Carson Wentz is an American football player" in sentence:
+            sentences[i] = "American football is the game played by Carson Wentz"
+        elif "Malcolm Brogdon is a basketball player" in sentence:
+            sentences[i] = "Basketball is the game played by Malcolm Brogdon"
+        elif "Draymond Green is an basketball player" in sentence:
+            sentences[i] = "Basketball is the game played by Draymond Green"
+    
+    # Join the sentences back
+    passive_thought = '. '.join(sentences)
+    return passive_thought
+
+# Re-applying the passive voice function
+
+# Function to create nominalization for sports thoughts
+def convert_sports_to_nominalization(thought):
+    if "Jamal Murray is a basketball player." in thought:
+        return "Jamal Murray's identification as a basketball player and the association of being perfect from the line with basketball make it plausible."
+    if "Joao Moutinho is a soccer player." in thought:
+        return "Joao Moutinho's recognition as a soccer player and the NFC championship's link to American football make it implausible."
+    if "Jonas Valanciunas is a basketball player." in thought:
+        return "Jonas Valanciunas's status as a basketball player and the act of beating the buzzer being part of basketball confirm its plausibility."
+    if "Sam Darnold is a American football player." in thought:
+        return "Sam Darnold's association with American football and the act of passing the puck being linked to hockey make it implausible."
+    if "Kyle Palmieri is a hockey player." in thought:
+        return "Kyle Palmieri's identification as a hockey player and the call for slashing being a hockey term confirm its plausibility."
+    if "Carson Wentz is an American football player." in thought:
+        return "Carson Wentz's recognition as a football player and the pick and roll being a basketball move make it implausible."
+    if "Malcolm Brogdon is a basketball player." in thought:
+        return "Malcolm Brogdon's status as a basketball player and the act of banking the shot being part of basketball confirm its plausibility."
+    if "Draymond Green is an basketball player." in thought:
+        return "Draymond Green's association with basketball and the act of throwing a touchdown being a football term make it implausible."
+    
+# Applying the function
+
+
+# Function to create cleft sentences for sports thoughts
+def convert_sports_to_cleft(thought):
+    if "Jamal Murray is a basketball player." in thought:
+        return "It is Jamal Murray who is a basketball player. It is being perfect from the line that is part of basketball."
+    if "Joao Moutinho is a soccer player." in thought:
+        return "It is Joao Moutinho who is a soccer player. It is the NFC championship that is part of American football, not soccer."
+    if "Jonas Valanciunas is a basketball player." in thought:
+        return "It is Jonas Valanciunas who is a basketball player. It is beating the buzzer that is part of basketball."
+    if "Sam Darnold is a American football player." in thought:
+        return "It is Sam Darnold who is an American football player. It is passing the puck that is part of hockey, not American football."
+    if "Kyle Palmieri is a hockey player." in thought:
+        return "It is Kyle Palmieri who is a hockey player. It is being called for slashing that is part of hockey."
+    if "Carson Wentz is an American football player." in thought:
+        return "It is Carson Wentz who is an American football player. It is pick and roll that is part of basketball, not football."
+    if "Malcolm Brogdon is a basketball player." in thought:
+        return "It is Malcolm Brogdon who is a basketball player. It is banking the shot in that is part of basketball."
+    if "Draymond Green is an basketball player." in thought:
+        return "It is Draymond Green who is a basketball player. It is throwing a touchdown that is part of football, not basketball."
+    
+# Applying the function
+
+# Function to create nested clauses for sports thoughts
+def convert_sports_to_nested(thought):
+    if "Jamal Murray is a basketball player." in thought:
+        return "Since Jamal Murray is a basketball player, being perfect from the line, which is part of basketball, makes it plausible."
+    if "Joao Moutinho is a soccer player." in thought:
+        return "While Joao Moutinho is a soccer player, the fact that the NFC championship, which is part of American football and not soccer, makes it implausible."
+    if "Jonas Valanciunas is a basketball player." in thought:
+        return "Given that Jonas Valanciunas is a basketball player, beating the buzzer, which is part of basketball, confirms its plausibility."
+    if "Sam Darnold is a American football player." in thought:
+        return "Because Sam Darnold is an American football player, the act of passing the puck, which is linked to hockey and not American football, makes it implausible."
+    if "Kyle Palmieri is a hockey player." in thought:
+        return "Given that Kyle Palmieri is a hockey player, being called for slashing, which is part of hockey, confirms its plausibility."
+    if "Carson Wentz is an American football player." in thought:
+        return "While Carson Wentz is an American football player, the pick and roll move, which is part of basketball and not football, makes it implausible."
+    if "Malcolm Brogdon is a basketball player." in thought:
+        return "Given that Malcolm Brogdon is a basketball player, banking the shot in, which is part of basketball, confirms its plausibility."
+    if "Draymond Green is an basketball player." in thought:
+        return "Although Draymond Green is a basketball player, the act of throwing a touchdown, which is a football term and not a basketball one, makes it implausible."
+    
+# Applying the function
+
+# Function to create fronting for sports thoughts
+def convert_sports_to_fronting(thought):
+    if "Jamal Murray is a basketball player." in thought:
+        return "A basketball player is what Jamal Murray is. Part of basketball is being perfect from the line."
+    if "Joao Moutinho is a soccer player." in thought:
+        return "A soccer player is what Joao Moutinho is. Not soccer, but part of American football is the NFC championship."
+    if "Jonas Valanciunas is a basketball player." in thought:
+        return "A basketball player is what Jonas Valanciunas is. Part of basketball is beating the buzzer."
+    if "Sam Darnold is a American football player." in thought:
+        return "An American football player is what Sam Darnold is. Not American football, but part of hockey is passing the puck."
+    if "Kyle Palmieri is a hockey player." in thought:
+        return "A hockey player is what Kyle Palmieri is. Part of hockey is being called for slashing."
+    if "Carson Wentz is an American football player." in thought:
+        return "An American football player is what Carson Wentz is. Not football, but part of basketball is pick and roll."
+    if "Malcolm Brogdon is a basketball player." in thought:
+        return "A basketball player is what Malcolm Brogdon is. Part of basketball is banking the shot in."
+    if "Draymond Green is an basketball player." in thought:
+        return "A basketball player is what Draymond Green is. Not basketball, but part of football is throwing a touchdown."
+    
+# Applying the function
+sports_examples_fronting = [
+    Example(question=example.question, thought=convert_sports_to_fronting(example.thought), answer=example.answer) 
+    for example in sports_examples_original
+]
+
+sports_examples_nested_clauses = [
+    Example(question=example.question, thought=convert_sports_to_nested(example.thought), answer=example.answer) 
+    for example in sports_examples_original
+]
+
+sports_examples_cleft_sentences = [
+    Example(question=example.question, thought=convert_sports_to_cleft(example.thought), answer=example.answer) 
+    for example in sports_examples_original
+]
+
+sports_examples_passive_voice = [
+    Example(question=example.question, thought=convert_sports_to_passive(example.thought), answer=example.answer) 
+    for example in sports_examples_original
+]
+
+sports_examples_nominalization = [
+    Example(question=example.question, thought=convert_sports_to_nominalization(example.thought), answer=example.answer) 
+    for example in sports_examples_original
+]
+
+
+
+
+linguistic_variations = {
+    "sports_lv_passive_voice": sports_examples_passive_voice,
+    "sports_lv_nominalization": sports_examples_nominalization,
+    "sports_lv_cleft_sentences": sports_examples_cleft_sentences,
+    "sports_lv_nested_clauses": sports_examples_nested_clauses,
+    "sports_lv_fronting": sports_examples_fronting
+}
+
+
+
 
 
 sports_task_id_to_prompt = {
@@ -499,3 +650,6 @@ sports_task_id_to_prompt = {
     "sports_ccot": ccot,
     "sports_text_rand": text_random
 }
+
+
+sports_task_id_to_prompt.update(linguistic_variations)

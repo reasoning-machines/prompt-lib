@@ -82,26 +82,57 @@ startegy_examples_wrong = [
         thought="Hydrogen has an atomic number of 2. 2 squared is 4. There are 5 Spice Girls. Thus, Hydrogen's atomic number squared is less than 5.",
         answer="no",
     ),
-Example(
-question="Yes or no: Is it common to see frost during some college commencements?",
-thought="College commencement ceremonies typically happen in December, May, and June. December is in the summer, so there cannot be frost. Thus, there could be frost at some commencements.",
-answer="yes",
-),
-
-Example(
-question="Yes or no: Could a llama birth twice during War in Vietnam (1945-46)?",
-thought="The War in Vietnam was 6 months. The gestation period for a llama is 2 months, which is less than 6 months. Thus, a llama could not give birth twice during the War in Vietnam.",
-answer="no",
-),
-
-Example(
-question="Yes or no: Would a pear sink in water?",
-thought="The density of a pear is about 0.6 g/cm^3, which is less than water. Objects more dense than water float. Thus, a pear would float.",
-answer="no",
-)
+    Example(
+        question="Yes or no: Is it common to see frost during some college commencements?",
+        thought="College commencement ceremonies typically happen in December, May, and June. December is in the summer, so there cannot be frost. Thus, there could be frost at some commencements.",
+        answer="yes",
+    ),
+    Example(
+        question="Yes or no: Could a llama birth twice during War in Vietnam (1945-46)?",
+        thought="The War in Vietnam was 6 months. The gestation period for a llama is 2 months, which is less than 6 months. Thus, a llama could not give birth twice during the War in Vietnam.",
+        answer="no",
+    ),
+    Example(
+        question="Yes or no: Would a pear sink in water?",
+        thought="The density of a pear is about 0.6 g/cm^3, which is less than water. Objects more dense than water float. Thus, a pear would float.",
+        answer="no",
+    ),
+]
+strategy_ccot = [
+    Example(
+        question="Can hamsters serve as food for other animals?",
+        thought="Hamsters -> prey animals. Prey -> food for predators.",
+        answer="yes",
+    ),
+    Example(
+        question="Could Brooke Shields succeed at University of Pennsylvania?",
+        thought="Brooke Shields -> Princeton graduate. Princeton -> similar rigor to University of Pennsylvania.",
+        answer="yes",
+    ),
+    Example(
+        question="Is Hydrogen's atomic number squared more than the number of Spice Girls?",
+        thought="Hydrogen's atomic number -> 1. 1 squared -> 1. Number of Spice Girls -> 5.",
+        answer="no",
+    ),
+    Example(
+        question="Is frost a common sight during some college commencements?",
+        thought="Commencement ceremonies -> occur in December. December -> winter season can have frost.",
+        answer="yes",
+    ),
+    Example(
+        question="Could a llama give birth twice during the War in Vietnam (1945-46)?",
+        thought="War in Vietnam duration -> 6 months. Llama's gestation period -> 11 months.",
+        answer="no",
+    ),
+    Example(
+        question="Would a pear sink in water?",
+        thought="Pear's density -> less than water's density. Less dense objects -> float in water.",
+        answer="no",
+    ),
 ]
 strategy_task_id_to_prompt = {
     "strategy_stream": startegy_examples,
     "strategy_stream_abstract": strategy_examples_abstract,
     "strategy_stream_wrong": startegy_examples_wrong,
+    "strategy_stream_ccot": strategy_ccot,
 }

@@ -8,7 +8,7 @@ from prompt_lib.prompts.date import date_task_id_to_prompt
 from prompt_lib.prompts.sorting import sorting_task_id_to_prompt
 from prompt_lib.prompts.boolsimplify.boolsimplify import bool_simplify_taskid_to_prompt
 from prompt_lib.prompts.strategy import strategy_task_id_to_prompt
-
+from prompt_lib.prompts.lrm import task_id_to_prompt as lrm_task_id_to_prompt
 
 from prompt_lib.prompts.plot_generation import plot_generation_task_id_to_prompt
 from prompt_lib.prompts.human_eval import humaneval_task_id_to_prompt
@@ -26,6 +26,7 @@ task_id_to_prompt.update(plot_generation_task_id_to_prompt)
 task_id_to_prompt.update(humaneval_task_id_to_prompt)
 task_id_to_prompt.update(pal_maths_task_id_to_prompt)
 task_id_to_prompt.update(strategy_task_id_to_prompt)
+task_id_to_prompt.update(lrm_task_id_to_prompt)
 
 
 def get_prompt_from_file(prompt_path: str) -> PromptStr:

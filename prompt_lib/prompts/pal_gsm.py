@@ -145,6 +145,7 @@ pal_gsm = [
 
 pal_maths_task_id_to_prompt = {
     "gsm_pal": pal_gsm,
+    "gsmtrainmistakes_pal": pal_gsm,
     "gsmhard_pal": pal_gsm,
     "svamp_pal": pal_gsm,
     "mawpsaddsub_pal": pal_gsm,

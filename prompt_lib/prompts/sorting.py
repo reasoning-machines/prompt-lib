@@ -161,7 +161,7 @@ wrong_4 = [
 symbolic = [
     Example(
         question="υ , 𝛿 , ζ , φ , π , γ , ς , ε , χ",
-        thought="ς, < φ < γ < 𝛿 < ζ < χ < ε < π < υ",
+        thought="ς < φ < γ < 𝛿 < ζ < χ < ε < π < υ",
         answer="ς, , φ , γ , 𝛿 , ζ , χ , ε , π , υ",
     ),
     Example(
@@ -355,6 +355,49 @@ Example(question = "7 , 6 , 8 , 1",
     answer = "1 , 6 , 7 , 8"),
 ]
 
+symbolic_sorted = [
+    Example(
+        question="υ , 𝛿 , ζ , φ , π , γ , ς , ε , χ",
+        thought="ε < ζ < γ < 𝛿 < π < φ < ς < χ < υ",
+        answer="ε , ζ , γ , 𝛿 , π , φ , ς , χ , υ"
+    ),
+    Example(
+        question="ν , ι , λ , ζ , ξ , γ , ψ , π",
+        thought="γ < ζ < ξ < ι < λ < π < ψ < ν",
+        answer="γ , ζ , ξ , ι , λ , π , ψ , ν"
+    ),
+    Example(
+        question="ξ , τ , φ , θ , ζ , η , ι , 𝛿",
+        thought="ζ < 𝛿 < η < θ < ι < ξ < φ < τ",
+        answer="ζ , 𝛿 , η , θ , ι , ξ , φ , τ"
+    ),
+    Example(
+        question="ζ , π , β , σ , φ , ε , λ , ρ",
+        thought="ε < ζ < λ < π < φ < β < ρ < σ",
+        answer="ε , ζ , λ , π , φ , β , ρ , σ"
+    ),
+    Example(
+        question="ω , ρ , 𝛿 , ι , υ , ν",
+        thought="ω < ρ < ν < 𝛿 < ι < υ",
+        answer="ω , ρ , ν , 𝛿 , ι , υ"
+    ),
+    Example(
+        question="μ , ζ , π , χ , λ , ς, , α , γ",
+        thought="α < γ < ζ < λ < π < ς < χ < μ",
+        answer="α , γ , ζ , λ , π , ς , χ , μ"
+    ),
+    Example(
+        question="τ , γ , λ , μ , α , ς, , κ",
+        thought="α < γ < λ < μ < τ < κ < ς",
+        answer="α , γ , λ , μ , τ , κ , ς"
+    ),
+    Example(
+        question="κ , ξ , ν , 𝛿",
+        thought="κ < ξ < 𝛿 < ν",
+        answer="κ , ξ , 𝛿 , ν"
+    ),
+]
+
 
 sorting_task_id_to_prompt = {
     "sorting_stream": sorting_examples,
@@ -364,5 +407,6 @@ sorting_task_id_to_prompt = {
     "sorting_symb_abs": symbolic_alpha_first,
     "sorting_symb_ood": ood,
     "sorting_verbose": verbose,
+    "sorting_symbolic_sorted": symbolic_sorted,
 
 }

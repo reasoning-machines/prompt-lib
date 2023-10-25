@@ -760,10 +760,289 @@ abstract_names = [
     ),
 ]
 
+math_qa_examples_original_with_probs = [
+    Example(
+        question="Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?",
+        thought="Shawn had (high) five toys. (low) He got two (very low) toys from his (very low) mom and two (very high) toys from his (medium) dad. So (low) now he has (very low) 5 + 2 (medium) + 2 = (very high) 9 toys. (high)",
+        answer="9",
+    ),
+    Example(
+        question="If there are 3 cars in the parking lot and 2 more cars arrive, how many cars are in the parking lot?",
+        thought="There were initially (very low) 3 cars in (high) the parking lot. (very high) After 2 more cars (medium) arrived, the total (low) number is 3 + (very low) 2 = 5. (very high)",
+        answer="5",
+    ),
+    Example(
+        question="Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?",
+        thought="Jason had 20 (high) lollipops. (very high) After giving some to Denny, (low) he had 12 left. 20 - (very low) 12 is 8.",
+        answer="8",
+    ),
+    Example(
+        question="There were nine computers in the server room. Five more computers were installed each day, from monday to thursday. How many computers are now in the server room?",
+        thought="There were 9 (high) computers in the (very high) server room at (very low) the start. (high) 5 computers were (low) added per day: (very low) 5 x 4 = (very low) 20. So the (low) total number of computers (medium) in the server room (medium) is 9 + 20 (medium) = 29.",
+        answer="29",
+    ),
+    Example(
+        question="Leah had 32 chocolates and her sister had 42. If they ate 35, how many pieces do they have left in total?",
+        thought="Leah had (high) 32 chocolates (high) and her sister had (very high) 42. If they (very low) ate 35, then (low) they have 32 + (low) 42 - 35 = (very high) 39 pieces left. (very low)",
+        answer="39",
+    ),
+    Example(
+        question="Olivia has $23. She bought five bagels for $3 each. How much money does she have left?",
+        thought="Olivia (very high)  started with $23. (very high)  She bought 5 bagels (high)  for $3 each, (medium)  so she spent $15. (very low)  23 - 15 is 8. (very low)  The answer is $8. (low)",
+        answer="8",
+    ),
+    Example(
+        question="Michael had 58 golf balls. On tuesday, he lost 23 golf balls. On wednesday, he lost 2 more. How many golf balls did he have at the end of wednesday?",
+        thought="Michael started with (medium) 58 golf balls. (very high) He lost 23 golf (very low) balls on Tuesday and (high) 2 more on Wednesday. (high) That is 25 in total. (very low) So he has 58 - 25 (low) = 33 golf balls. The (low) answer is 33. (very high)",
+        answer="33",
+    ),
+    Example(
+        question="There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. How many trees did the grove workers plant today?",
+        thought="Originally, there (very low) were 15 trees. (very high) After the grove (low) workers planted trees, (very low) there were 21 trees. (medium) So they planted 21 - (medium) 15 = 6 trees. (very high)",
+        answer="6",
+    ),
+]
+
+
+
+math_qa_examples_original_with_probs_some_wrong = [
+    Example(
+        question="Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?",
+        thought="Shawn had (high) five toys. (low) He got two (very low) toys from his (very low) mom and two (very high) toys from his (medium) dad. So (low) now he has (very low) 5 + 2 (medium) + 2 = (very high) 9 toys. (high)",
+        answer="9",
+    ),
+    Example(
+        question="If there are 3 cars in the parking lot and 2 more cars arrive, how many cars are in the parking lot?",
+        thought="There were initially (very low) 3 cars in (high) the parking lot. (very high) After 2 more cars (medium) arrived, the total (low) number is 3 + (very low) 2 = 5. (very high)",
+        answer="5",
+    ),
+    Example(
+        question="Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?",
+        thought="Jason had 20 (high) lollipops. (very high) After giving some to Denny, (low) he had 12 left. 20 - (very low) 12 is 8.",
+        answer="8",
+    ),
+    Example(
+        question="There were nine computers in the server room. Five more computers were installed each day, from monday to thursday. How many computers are now in the server room?",
+        thought="There were 9 (high) computers in the (very high) server room at (very low) the start. (high) 5 computers were (low) added per day: (very low) 5 x 4 = (very low) 20. So the (low) total number of computers (medium) in the server room (medium) is 9 + 20 (medium) = 29.",
+        answer="29",
+    ),
+    Example(
+        question="Leah had 32 chocolates and her sister had 42. If they ate 35, how many pieces do they have left in total?",
+        thought="Leah had (high) 32 chocolates (high) and her sister had (very high) 42. If they (very low) ate 35, then (low) they have 32 + (low) 42 - 35 = (very high) 39 pieces left. (very low)",
+        answer="39",
+    ),
+    Example(
+        question="Olivia has $23. She bought five bagels for $3 each. How much money does she have left?",
+        thought="Olivia (very high)  started with $23. (very high)  She bought 5 bagels (high)  for $3 each, (medium)  so she spent $15. (very low)  23 - 15 is 8. (very low)  The answer is $8. (low)",
+        answer="8",
+    ),
+    Example(
+        question="Michael had 58 golf balls. On tuesday, he lost 23 golf balls. On wednesday, he lost 2 more. How many golf balls did he have at the end of wednesday?",
+        thought="Michael started with (medium) 58 golf balls. (very high) He lost 23 golf (very low) balls on Tuesday and (high) 2 more on Wednesday. (high) That is 25 in total. (very low) So he has 58 - 25 (low) = 33 golf balls. The (low) answer is 33. (very high)",
+        answer="33",
+    ),
+    Example(
+        question="There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. How many trees did the grove workers plant today?",
+        thought="Originally, there (very low) were 15 trees. (very high) After the grove (low) workers planted trees, (very low) there were 21 trees. (medium) So they planted 21 - (medium) 15 = 6 trees. (very high)",
+        answer="6",
+    ),
+        Example(
+        question="Mary has 15 apples. If she gives 5 apples to her friend and then buys 7 more, how many apples does she have?",
+        thought="Mary had 15 apples. She gave 5 to her friend, leaving her with 10 apples. Then she bought 7 more apples. So, she has 10 + 7 = 16 apples. (very low)",
+        answer="17",
+    ),
+    Example(
+        question="A farmer has 22 cows and 18 sheep. He sold 9 cows and bought 5 more sheep. How many cows and sheep does he have now?",
+        thought="The farmer initially had 22 cows and 18 sheep. After selling 9 cows, he had 22 - 9 = 13 cows left. Then, he bought 5 more sheep, which made the total sheep count 18 + 5 = 23. So, the total number of cows and sheep now is 13 + 23 = 35. (very low)",
+        answer="36",
+    ),
+    Example(
+        question="A train travels 150 miles in 3 hours. How far will it travel in 5 hours at the same speed?",
+        thought="The train travels 150 miles in 3 hours. To find out how far it will travel in 5 hours, we first find its speed per hour: 150 miles / 3 hours = 50 miles per hour. Then, we multiply the speed by 5 hours: 50 miles per hour x 5 hours = 250 miles. (low)",
+        answer="250",
+    ),
+]
+math_qa_shortcut = [
+    Example(
+        question="A construction crew finishes a 30 meter stretch of road every day. If they work for the whole day, they rest on the next day. When the crew works, how much road do they finish each working day?",
+        thought="The crew is consistent and finishes 30 meters of road each full day they work. Their rest days are not accounted for in this measure.",
+        answer="15",
+    ),
+    Example(
+        question="A factory produces 24 types of widgets. However, the factory currently has raw materials that are only required for the even-numbered widget types. How many types of widgets can the factory currently produce?",
+        thought="The factory's production capabilities are currently limited to the even-numbered types of widgets. They have the materials needed for these specific widget types.",
+        answer="12",
+    ),
+    Example(
+        question="A university has 48 departments. Only departments with even numbers are offered courses this semester. How many departments are offering courses?",
+        thought="This semester's course catalog reflects only even-numbered departments. The odd-numbered ones aren't offering any courses for now.",
+        answer="24",
+    ),
+    Example(
+        question="Billy has 20 toy cars. He only likes cars from manufacturers whose names start with the letters A to J. As it happens, exactly half of his cars are from those manufacturers. How many of Billy's favourite cars does he have?",
+        thought="Billy shows a preference for cars from specific manufacturers. Coincidentally, these manufacturers produced exactly half of his total collection of cars.",
+        answer="10",
+    ),
+    Example(
+        question="Shawn is 10 years old. For his 11th birthday week, his grandfather gets him 1 toy a day for every weekday. How many toys did Shawn get?",
+        thought="Shawn receives one toy for each weekday of the week during his birthday. This totals to 5 weekdays, hence, 5 toys.",
+        answer="5",
+    ),
+    Example(
+        question="A farmer has room for 80 trees in her orchard. She decided to keep half the space for future use. How many trees can she plant now?",
+        thought="The farmer decides to safeguard a large portion of her land for future use. Currently, her planting endeavor is confined to half the actual capability.",
+        answer="40",
+    ),
+    Example(
+        question="A marathon begins with 60 participants. After every round, half of the remaining participants drops out. After 4 rounds, how many participants are left running the marathon?",
+        thought="This marathon sees a predictable drop in participation with each round. It falls to half the previous round's count, dwindling the count drastically.",
+        answer="30",
+    ),
+    Example(
+        question="A cookie recipe calls for 36 grams of sugar, which is the double amount Tom prefers in his cookies. If Tom follows this recipe, how much sugar does he add?",
+        thought="Tom has a clear preference for using half the sugar amount stated in any recipe. So, when following this particular recipe, he reduces the sugar amount by his usual half.",
+        answer="18",
+    )]
+
+# Function to create passive voice for thoughts while retaining equations
+
+
+# Function to create nominalization structure for thoughts
+def convert_to_nominalization(thought):
+    if "Shawn started" in thought:
+        return "Shawn's initial possession of 5 toys and his receipt of 4 more toys from his parents results in a total of 9 toys. 5 + 4 = 9."
+    if "There are originally 3 cars" in thought:
+        return "The original count of 3 cars, with the addition of 2 more, leads to a total of 5 cars. 3 + 2 = 5."
+    if "Jason started" in thought:
+        return "Jason's commencement with 20 lollipops and the subtraction of some for Denny leaves a remainder of 12. 20 - 12 = 8."
+    if "There were originally 9 computers" in thought:
+        return "The initial count of 9 computers, combined with the addition of 20 over 4 days, results in 29 computers. 9 + 20 is 29."
+    if "There are 15 trees originally" in thought:
+        return "The grove's initial count of 15 trees and the subsequent plantation increases the total to 21 trees. So there must have been 21 - 15 = 6."
+    if "Originally, Leah had" in thought:
+        return "Leah's starting count of 32 chocolates, combined with her sister's 42, and the subtraction of 35 eaten ones, gives a remainder of 39. 74 - 35 = 39."
+    if "Olivia had" in thought:
+        return "Olivia's original possession of 23 dollars and the expenditure of 15 dollars on bagels leaves a balance of 8 dollars. 23 - 15 is 8."
+    if "Michael started" in thought:
+        return "Michael's beginning with 58 golf balls and the subsequent loss of 25 over two days results in a count of 33 golf balls. 58 - 25 = 33."
+
+# Function to create cleft sentences structure for thoughts
+def convert_to_cleft_sentences(thought):
+    if "Shawn started" in thought:
+        return "It was Shawn who started with 5 toys. It was his parents who gave him 4 more toys. 5 + 4 = 9."
+    if "There are originally 3 cars" in thought:
+        return "It is the parking lot that had 3 cars originally. It was 2 more cars that arrived. 3 + 2 = 5."
+    if "Jason started" in thought:
+        return "It was Jason who started with 20 lollipops. It was Denny to whom he gave some, leaving him with 12. 20 - 12 = 8."
+    if "There were originally 9 computers" in thought:
+        return "It was the server room that had 9 computers originally. It was over 4 days that 20 more computers were added. 9 + 20 is 29."
+    if "There are 15 trees originally" in thought:
+        return "It was the grove that had 15 trees originally. It became 21 trees after more were planted. So there must have been 21 - 15 = 6."
+    if "Originally, Leah had" in thought:
+        return "It was Leah who had 32 chocolates originally. It was her sister who had 42. 32 + 42 = 74. After eating 35, they had 74 - 35 = 39."
+    if "Olivia had" in thought:
+        return "It was Olivia who had 23 dollars. It was on bagels that she spent 15 dollars. 23 - 15 is 8."
+    if "Michael started" in thought:
+        return "It was Michael who started with 58 golf balls. It was on Tuesday and Wednesday that he lost some, leaving him with 33. 58 - 25 = 33."
+    
+# Applying the function
+def convert_to_passive_with_equation(thought):
+    if "Shawn started" in thought:
+        return "5 toys were originally possessed by Shawn. 4 more toys, given by his parents, were received by him. 5 + 4 = 9."
+    if "There are originally 3 cars" in thought:
+        return "Originally, 3 cars were parked in the parking lot. Later, 2 more cars were added. 3 + 2 = 5."
+    if "Jason started" in thought:
+        return "20 lollipops were originally possessed by Jason. Some were given by him to Denny, leaving him with 12. 20 - 12 = 8."
+    if "There were originally 9 computers" in thought:
+        return "Originally, 9 computers were placed in the server room. Over 4 days, 20 more computers were added, with 5 being added each day. 9 + 20 = 29."
+    if "There are 15 trees originally" in thought:
+        return "15 trees were originally found in the grove. More trees were planted, increasing the total number to 21. 21 - 15 = 6."
+    if "Originally, Leah had" in thought:
+        return "32 chocolates were originally possessed by Leah and 42 by her sister. Some chocolates were eaten by them, leaving them with 39. 74 - 35 = 39."
+    if "Olivia had" in thought:
+        return "23 dollars were originally possessed by Olivia. 5 bagels were bought by her, with 3 dollars being spent on each. 23 - 15 = 8."
+    if "Michael started" in thought:
+        return "58 golf balls were originally possessed by Michael. 23 were lost by him on Tuesday and 2 more were lost on Wednesday. 58 - 25 = 33."
+    
+    
+    
+    
+def convert_to_nested_clauses(thought):
+    if "Shawn started" in thought:
+        return "Shawn, who originally had 5 toys, got 4 more from his parents. 5 + 4 = 9."
+    if "There are originally 3 cars" in thought:
+        return "In the parking lot, where there were originally 3 cars, 2 more cars arrived. 3 + 2 = 5."
+    if "Jason started" in thought:
+        return "Jason, who started with 20 lollipops, gave some to Denny, leaving him with 12. 20 - 12 = 8."
+    if "There were originally 9 computers" in thought:
+        return "In the server room, where there were originally 9 computers, 20 more were added over 4 days. 9 + 20 is 29."
+    if "There are 15 trees originally" in thought:
+        return "In the grove, which originally had 15 trees, more trees were planted to make it 21 in total. So there must have been 21 - 15 = 6."
+    if "Originally, Leah had" in thought:
+        return "Leah, who had 32 chocolates, and her sister, who had 42, ate some. 32 + 42 = 74. After eating 35, they had 74 - 35 = 39."
+    if "Olivia had" in thought:
+        return "Olivia, who had 23 dollars, spent 15 on bagels. 23 - 15 is 8."
+    if "Michael started" in thought:
+        return "Michael, who had 58 golf balls, lost some over two days. After Tuesday, he had 35 left. After Wednesday, 33 he had left."
+    
+
+# Function to create fronting structure for thoughts
+def convert_to_fronting(thought):
+    if "Shawn started" in thought:
+        return "With 5 toys, Shawn started. From his mom and dad, 4 more toys he got. 5 + 4 = 9."
+    if "There are originally 3 cars" in thought:
+        return "With 3 cars originally, 2 more cars then arrive. 3 + 2 = 5."
+    if "Jason started" in thought:
+        return "With 20 lollipops, Jason started. After giving some to Denny, 12 he had left. 20 - 12 = 8."
+    if "There were originally 9 computers" in thought:
+        return "With 9 computers originally, 20 more were added over 4 days. 9 + 20 is 29."
+    if "There are 15 trees originally" in thought:
+        return "With 15 trees originally, then there were 21 after more were planted. So there must have been 21 - 15 = 6."
+    if "Originally, Leah had" in thought:
+        return "With 32 chocolates, Leah started. Her sister had 42. 32 + 42 = 74. After eating 35, they had 74 - 35 = 39."
+    if "Olivia had" in thought:
+        return "With 23 dollars, Olivia started. For 5 bagels, 15 dollars she spent. 23 - 15 is 8."
+    if "Michael started" in thought:
+        return "With 58 golf balls, Michael started. After Tuesday, he had 35 left. After Wednesday, 33 he had left."
+    
+math_qa_examples_cleft_sentences = [
+    Example(question=example.question, thought=convert_to_cleft_sentences(example.thought), answer=example.answer) 
+    for example in math_qa_examples_original
+]
+
+math_qa_examples_nested_clauses = [
+    Example(question=example.question, thought=convert_to_nested_clauses(example.thought), answer=example.answer) 
+    for example in math_qa_examples_original
+]
+
+math_qa_examples_fronting = [
+    Example(question=example.question, thought=convert_to_fronting(example.thought), answer=example.answer) 
+    for example in math_qa_examples_original
+]
+
+math_qa_examples_nominalization = [
+    Example(question=example.question, thought=convert_to_nominalization(example.thought), answer=example.answer) 
+    for example in math_qa_examples_original
+]
+
+math_qa_examples_passive_voice = [
+    Example(question=example.question, thought=convert_to_passive_with_equation(example.thought), answer=example.answer) 
+    for example in math_qa_examples_original
+]
+
+linguistic_variations = {
+        "gsm_passive_voice": math_qa_examples_passive_voice,
+        "gsm_nominalization": math_qa_examples_nominalization,
+        "gsm_cleft_sentences": math_qa_examples_cleft_sentences,
+        "gsm_nested_clauses": math_qa_examples_nested_clauses,
+        "gsm_fronting": math_qa_examples_fronting,
+}
 
 gsm_task_id_to_prompt = {
     "test": math_qa_examples_original,
+    "gsm_shortcut": math_qa_shortcut,
     "gsm_stream": math_qa_examples_original,
+    "gsmtrain_stream": math_qa_examples_original,
     "gsm_direct": math_qa_examples_original,
     "gsm_no_equation": no_equation,
     "gsm_symb_abs": symbolic_greek,
@@ -792,5 +1071,11 @@ gsm_task_id_to_prompt = {
     "asdiv_stream": math_qa_examples_original,
     "aqua_stream": aqua_prompts,
     "gsm_abstract_names": abstract_names,
-    "gsm_emoji": math_qa_examples_emoji
+    "gsm_emoji": math_qa_examples_emoji,
+    "gsm_selfcalibrate": math_qa_examples_original_with_probs,
+    "gsm_selfcalibrate_with_wrong": math_qa_examples_original_with_probs_some_wrong,
+
 }
+
+
+gsm_task_id_to_prompt.update(linguistic_variations)

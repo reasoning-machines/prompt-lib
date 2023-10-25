@@ -3,6 +3,8 @@ from typing import List, Union
 import pandas as pd
 import random
 import logging
+import json
+
 from prompt_lib.prompts.example import PromptStr
 from prompt_lib.eval import eval
 from prompt_lib.prompts.example import Example
@@ -180,15 +182,16 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     # read the task file
 
     task_file_path = f"data/tasks/{task_config.task_id.split('_')[0]}.jsonl"
-    import json
+    print(f"Reading task file from {task_file_path}")
+    
 
     rows = []
     with open(task_file_path, "r") as f:
         for line in f:
             rows.append(json.loads(line))
+    
 
     task_df = pd.DataFrame(rows)
-
     # task_df = pd.read_json(task_file_path, lines=True, orient="records")
 
     # format the prompt
@@ -218,6 +221,7 @@ def make_task_file_from_config(task_config: TaskConfig) -> pd.DataFrame:
     )
     # davinci doesn't like prompts that end with a space
     task_df["answer"] = task_df["target"]
+
     return task_df  # keep everything
 
 

@@ -768,6 +768,125 @@ date_abstract_xyz_v2 = [
     ),
 ]
 
+# Function to create passive voice for date thoughts
+def convert_date_to_passive(thought):
+    if "Today is 04/19/1969." in thought:
+        return "04/19/1969 is the date today. 24 hours later, which is one day after today, would be recognized as 04/20/1969."
+    if "One day after 06/01/1943 is 06/02/1943," in thought:
+        return "06/02/1943 is the date which comes one day after 06/01/1943. 10 days before this date, 05/23/1943 is identified."
+    if "If the first day of 2019 was Tuesday, then 01/01/2019 was a Tuesday." in thought:
+        return "01/01/2019 was identified as a Tuesday based on the information that the first day of 2019 was a Tuesday. Being the first Monday, today would be recognized as six days later, which is 01/07/2019."
+    if "The last day of February is the 28th, so Jane was born on 02/28/2001." in thought:
+        return "02/28/2001 is identified as the date of Jane's birth, based on the information that she was born on the last day of February. Given that today is her 16-year-old birthday, 02/28/2017 is identified as today. This means 02/27/2017 was the date yesterday."
+    if "If 2015 is coming in 36 hours, then it is coming in 2 days." in thought:
+        return "12/30/2014 is identified as today based on the information that 2015 is coming in 2 days. Thus, 01/05/2015 is recognized as the date one week from today."
+    if "Today is 03/12/2002." in thought:
+        return "03/12/2002 is the date recognized as today. The date 24 hours later is identified as 03/13/2002."
+    
+# Applying the function
+
+
+# Function to create nominalization for date thoughts
+def convert_date_to_nominalization(thought):
+    if "Today is 04/19/1969." in thought:
+        return "The date's recognition as 04/19/1969 and the addition of 24 hours, which equates to one day, results in the identification of 04/20/1969 as the next day."
+    if "One day after 06/01/1943 is 06/02/1943," in thought:
+        return "The identification of 06/02/1943 as the day following 06/01/1943 leads to the conclusion that 05/23/1943 is the date 10 days prior."
+    if "If the first day of 2019 was Tuesday, then 01/01/2019 was a Tuesday." in thought:
+        return "With 01/01/2019's identification as a Tuesday, the calculation of six days later confirms the date as 01/07/2019, which is a Monday."
+    if "The last day of February is the 28th, so Jane was born on 02/28/2001." in thought:
+        return "Jane's birth on 02/28/2001, identified as the last day of February, and the recognition of today as her 16-year-old birthday, confirms 02/28/2017 as today and 02/27/2017 as yesterday."
+    if "If 2015 is coming in 36 hours, then it is coming in 2 days." in thought:
+        return "The deduction of today as 12/30/2014, based on 2015's arrival in 2 days, results in the identification of 01/05/2015 as the date one week later."
+    if "Today is 03/12/2002." in thought:
+        return "03/12/2002's identification as today leads to the conclusion that 03/13/2002 is the date 24 hours later."
+    
+# Applying the function
+
+# Function to create cleft sentences for date thoughts
+def convert_date_to_cleft(thought):
+    if "Today is 04/19/1969." in thought:
+        return "It is today that is recognized as 04/19/1969. And it is one day later, which translates to 24 hours, that would be 04/20/1969."
+    if "One day after 06/01/1943 is 06/02/1943," in thought:
+        return "It is 06/02/1943 that is the day after 06/01/1943. And it is 05/23/1943 that stands as the date 10 days prior."
+    if "If the first day of 2019 was Tuesday, then 01/01/2019 was a Tuesday." in thought:
+        return "It was on 01/01/2019 that Tuesday was identified. And it is 01/07/2019 that represents today, which is six days later and a Monday."
+    if "The last day of February is the 28th, so Jane was born on 02/28/2001." in thought:
+        return "It is 02/28/2001 that is identified as Jane's birthdate, being the last day of February. And it is 02/28/2017 that stands as today, given her 16-year-old birthday, making 02/27/2017 the date for yesterday."
+    if "If 2015 is coming in 36 hours, then it is coming in 2 days." in thought:
+        return "It is 12/30/2014 that is recognized as today, deducing from 2015's arrival in 2 days. And it is 01/05/2015 that would be the date one week later."
+    if "Today is 03/12/2002." in thought:
+        return "It is 03/12/2002 that is recognized as today. And it is 03/13/2002 that would be the date 24 hours later."
+    
+# Applying the function
+
+
+# Function to create nested clauses for date thoughts
+def convert_date_to_nested_clauses(thought):
+    if "Today is 04/19/1969." in thought:
+        return "Given that today is 04/19/1969, and considering that 24 hours later is one day after today, we can deduce that the date would be 04/20/1969."
+    if "One day after 06/01/1943 is 06/02/1943," in thought:
+        return "Given that 06/02/1943 is the day that comes after 06/01/1943, and considering that we want to know the date 10 days prior, it is evident that the date is 05/23/1943."
+    if "If the first day of 2019 was Tuesday, then 01/01/2019 was a Tuesday." in thought:
+        return "Given that 01/01/2019 was a Tuesday, and considering that today is said to be the first Monday, it is evident that today, which is six days later, is 01/07/2019."
+    if "The last day of February is the 28th, so Jane was born on 02/28/2001." in thought:
+        return "Given that 02/28/2001, which is the last day of February, is when Jane was born, and considering that today is her 16-year-old birthday, it is evident that today is 02/28/2017, making yesterday 02/27/2017."
+    if "If 2015 is coming in 36 hours, then it is coming in 2 days." in thought:
+        return "Given that 2015 is arriving in 2 days, which means in 36 hours, and considering that we want to know the date one week from today, it becomes clear that today is 12/30/2014, leading to the date one week later as 01/05/2015."
+    if "Today is 03/12/2002." in thought:
+        return "Given that today is 03/12/2002, and considering that we are looking for the date 24 hours later, it is evident that the date will be 03/13/2002."
+    
+# Applying the function
+
+# Function to create fronting for date thoughts
+def convert_date_to_fronting(thought):
+    if "Today is 04/19/1969." in thought:
+        return "04/19/1969 is the date today. 24 hours later, or one day after, would be the date 04/20/1969."
+    if "One day after 06/01/1943 is 06/02/1943," in thought:
+        return "06/02/1943, that's the date one day after 06/01/1943. 10 days prior to this, the date would be 05/23/1943."
+    if "If the first day of 2019 was Tuesday, then 01/01/2019 was a Tuesday." in thought:
+        return "01/01/2019, that was a Tuesday. Six days after this, which is the first Monday, the date is 01/07/2019."
+    if "The last day of February is the 28th, so Jane was born on 02/28/2001." in thought:
+        return "02/28/2001, that's the date when Jane was born. 16 years later, which is her birthday today, the date is 02/28/2017. This means yesterday was 02/27/2017."
+    if "If 2015 is coming in 36 hours, then it is coming in 2 days." in thought:
+        return "12/30/2014, that's the date today if 2015 is coming in 2 days. A week later from this date would be 01/05/2015."
+    if "Today is 03/12/2002." in thought:
+        return "03/12/2002, that's the date today. 24 hours later, the date would be 03/13/2002."
+    
+date_examples_nested_clauses = [
+    Example(question=example.question, thought=convert_date_to_nested_clauses(example.thought), answer=example.answer) 
+    for example in date_examples_original
+]
+
+date_examples_fronting = [
+    Example(question=example.question, thought=convert_date_to_fronting(example.thought), answer=example.answer) 
+    for example in date_examples_original
+]
+
+date_examples_nominalization = [
+    Example(question=example.question, thought=convert_date_to_nominalization(example.thought), answer=example.answer) 
+    for example in date_examples_original
+]
+
+date_examples_cleft_sentences = [
+    Example(question=example.question, thought=convert_date_to_cleft(example.thought), answer=example.answer) 
+    for example in date_examples_original
+]
+
+date_examples_passive_voice = [
+    Example(question=example.question, thought=convert_date_to_passive(example.thought), answer=example.answer) 
+    for example in date_examples_original
+]
+
+linguistic_variation_date = {
+    "date_lv_passive_voice": date_examples_passive_voice,
+    "date_lv_nominalization": date_examples_nominalization,
+    "date_lv_cleft_sentences": date_examples_cleft_sentences,
+    "date_lv_nested_clauses": date_examples_nested_clauses,
+    "date_lv_fronting": date_examples_fronting,
+}
+
+
 
 
 date_task_id_to_prompt = {
@@ -800,3 +919,6 @@ date_task_id_to_prompt = {
     "date_text_intra_shuf": intra_shuf,
     "date_ccot": brief,
 }
+
+
+date_task_id_to_prompt.update(linguistic_variation_date)
