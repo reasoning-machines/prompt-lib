@@ -5,6 +5,7 @@ from datetime import datetime
 from itertools import chain
 import pathlib
 import sys
+import time
 from typing import List
 from tqdm import tqdm
 import pandas as pd
@@ -13,6 +14,8 @@ import glob
 import re
 import os
 import logging
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 
 from prompt_lib.backends.openai_api import OpenaiAPIWrapper
 from prompt_lib.prompts.utils import (
@@ -25,70 +28,59 @@ from prompt_lib.eval.eval_utils import read_jsonl
 logging.basicConfig(level=logging.INFO)
 
 
-def inference_loop(task_config: TaskConfig) -> None:
-    """Query a language model API for each line in the file."""
 
+def inference_loop(task_config: TaskConfig, num_threads: int = 1) -> None:
     task_file = make_task_file_from_config(task_config).to_dict(orient="records")
-    n_task_original = len(task_file)
 
-    task_file = task_file[: task_config.num_inference_examples]
-
-    # make output directory
+    if task_config.num_inference_examples != -1:
+        task_file = task_file[: task_config.num_inference_examples]
     outdir = get_outdir(task_config)
 
-    # remove cached examples from task_file
 
-    cached_examples, thread_offset = load_cached_examples(outdir, task_config)
 
+    cached_examples, cached_prompts, thread_offset = load_cached_examples(outdir, task_config)
     task_file = [
-        example
-        for example in task_file
-        if not (
-            (task_config.num_prompt_examples > 0 and
-            get_question_from_prompt(example["question"], task_config) in cached_examples)
-            or example["question"] in cached_examples
+        example for example in task_file if not (
+            (task_config.num_prompt_examples > 0 and get_question_from_prompt(example["question"], task_config) in cached_examples) or
+            example["question"] in cached_examples or 
+            example["question"] in cached_prompts
         )
     ]
 
     print(
-        f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query, found {n_task_original - len(task_file)} in cache"
+        f"Found {len(cached_examples)} cached examples, {len(task_file)} examples to query"
     )
+
+    # sys.exit(0)
 
     pathlib.Path(f"{outdir}").mkdir(parents=True, exist_ok=True)
 
-    # split tasks into subtasks. This is redundant for now, but will be useful when we want to parallelize. Also helps with caching/restarting, as intermediate results are saved.
+    if num_threads > 1:  # if we are parallelizing, we need to split the task file into batches
+        task_config.num_questions_per_thread = len(task_file) // num_threads
+
     batched_tasks = create_task_batches(task_config, task_file)
 
     outputs = []
     accuracy_so_far = 0
-
-    # post-process cached examples and newly queried examples
     for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
         cached = read_jsonl(r_file)
-        outputs = cached
+        outputs.extend(cached)
 
-    # run inference
-    for (batch, batch_idx) in tqdm(batched_tasks):
-        thread_outputs = run_inference_on_batch(batch, batch_idx, task_config=task_config)
+    # Parallel processing using tqdm and executor.map
+    batch_data = [(batch, batch_idx, task_config, thread_offset, outdir) for (batch, batch_idx) in batched_tasks]
+    
+    assert len(batch_data) > 0, "No records to process!"
 
-        outputs.append(thread_outputs)
-        progress_perc = round(len(outputs) * 100 / len(batched_tasks), 2)
-        wandb.log({"progress_so_far": progress_perc})
-        pd.DataFrame(thread_outputs).to_json(
-            f"{outdir}/outputs_part{batch_idx + thread_offset}.jsonl",
-            orient="records",
-            lines=True,
-        )
-        accuracy_so_far += task_config.eval_function(pd.DataFrame(thread_outputs))
-        wandb.log({"accuracy_so_far": accuracy_so_far / len(outputs)})
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        for thread_outputs in tqdm(executor.map(process_batch, batch_data), total=len(batched_tasks), desc="Processing batches"):
+            outputs.append(thread_outputs)
+            progress_perc = round(len(outputs) * 100 / len(batched_tasks), 2)
+            wandb.log({"progress_so_far": progress_perc})
+            accuracy_so_far += task_config.eval_function(pd.DataFrame(thread_outputs))
+            wandb.log({"accuracy_so_far": accuracy_so_far / len(outputs)})
 
     outputs = pd.DataFrame(chain(*outputs))
 
-
-    # remove duplicates
-    # BUG: we should not be doing this: there may be good reasons to have duplicates in the input: someone benchmarking
-    # outputs = outputs.drop_duplicates(subset=["question"])
-    
     if "logprobs" in outputs.columns:
         outputs = outputs.drop("logprobs", axis=1)
 
@@ -96,8 +88,6 @@ def inference_loop(task_config: TaskConfig) -> None:
     wandb.log({"num_inference_examples": len(outputs)})
     wandb.log({"num_inference_examples_with_answer": len(outputs[outputs["answer"].notnull()])})
 
-    # convert all columns to type string
-    # drop all rows with any nan values
     outputs = outputs.dropna()
     for col in outputs.columns:
         outputs[col] = outputs[col].astype(str)
@@ -110,6 +100,19 @@ def inference_loop(task_config: TaskConfig) -> None:
         f.write(json.dumps(task_config.to_dict(), indent=4))
     return outputs
 
+
+def process_batch(batch_data):
+    batch, batch_idx, task_config, thread_offset, outdir = batch_data
+    # print(batch)
+    # print(f"Processing batch {batch_idx}...")
+    # print(1/0)
+    thread_outputs = run_inference_on_batch(batch, batch_idx, task_config=task_config)
+    pd.DataFrame(thread_outputs).to_json(
+        f"{outdir}/outputs_part{batch_idx + thread_offset}.jsonl",
+        orient="records",
+        lines=True,
+    )
+    return thread_outputs
 
 def create_task_batches(task_config: TaskConfig, task_file: List) -> List:
     """Generates batches of tasks. Currently, we don't parallelize, but it's useful for caching and restarting.
@@ -146,16 +149,18 @@ def create_task_batches(task_config: TaskConfig, task_file: List) -> List:
 def load_cached_examples(outdir, task_config):
     """Loads cached examples from a directory."""
     cached_examples = set()
+    cached_prompts = set()
     thread_offset = 0
     if pathlib.Path(outdir).exists():
         for r_file in glob.glob(f"{outdir}/outputs_part*.jsonl"):
             cached = read_jsonl(r_file)
             for i, row in cached.iterrows():
                 cached_examples.add(get_question_from_prompt(row["question"], task_config))
+                cached_prompts.add(row["entire_prompt"])
             part_idx = re.search("outputs_part(\d+).jsonl", os.path.basename(r_file)).group(1)
             thread_offset = max(thread_offset, int(part_idx))
         thread_offset += 1
-    return cached_examples, thread_offset
+    return cached_examples, cached_prompts, thread_offset
 
 
 def get_outdir(task_config: TaskConfig) -> str:
@@ -187,7 +192,7 @@ def run_inference_on_batch(
     i = 0
     n = len(rows)
 
-    pbar = tqdm(total=n, desc=f"Querying {task_config.model_name} [thread_id={thread_id}]")
+    pbar = tqdm(total=n, desc=f"Querying {task_config.model_name} {task_config.task_id} [thread_id={thread_id}]")
     num_retries = 0
 
     while i < n:
@@ -201,7 +206,6 @@ def run_inference_on_batch(
                 stop_token=task_config.prompt_config.inter_example_sep,  # generate till the model starts generating a new question
                 num_completions=task_config.num_completions,
             )
-            
             if task_config.prompt_config.inter_example_sep:
                 prompt_only = rows[i]["question"].split(task_config.prompt_config.inter_example_sep)[
                     :-1
@@ -258,7 +262,7 @@ def run_inference_on_batch(
             pbar.update(1)
 
         except Exception as e:
-            # raise e
+            raise e
             logging.info(f"Exception: {e}")
             if "code" not in task_config.model_name:
                 i += 1
