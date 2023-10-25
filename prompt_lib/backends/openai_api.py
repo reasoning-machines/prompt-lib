@@ -5,6 +5,7 @@ import openai
 import random
 import time
 import json
+import anthropic
 
 from prompt_lib.backends.wrapper import BaseAPIWrapper
 from prompt_lib.backends.self_hosted import OpenSourceAPIWrapper
@@ -17,6 +18,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 if os.getenv("OPENAI_ORG") is not None:
     openai.organization = os.getenv("OPENAI_ORG")
 
+
 # from https://github.com/openai/openai-cookbook/blob/main/examples/How_to_handle_rate_limits.ipynb
 def retry_with_exponential_backoff(
     func,
@@ -24,7 +26,11 @@ def retry_with_exponential_backoff(
     exponential_base: float = 2,
     jitter: bool = True,
     max_retries: int = 10,
-    errors: tuple = (openai.error.RateLimitError,openai.error.ServiceUnavailableError,),
+    errors: tuple = (
+        openai.error.RateLimitError,
+        openai.error.ServiceUnavailableError,
+        anthropic.RateLimitError,
+    ),
 ):
     """Retry a function with exponential backoff."""
 
@@ -36,7 +42,6 @@ def retry_with_exponential_backoff(
         # Loop until a successful response or max_retries is hit or an exception is raised
         while True:
             try:
-
                 return func(*args, **kwargs)
 
             # Retry on specified errors
@@ -53,6 +58,7 @@ def retry_with_exponential_backoff(
 
                 # Sleep for the delay
                 time.sleep(delay)
+                print(f"\nRetrying after {delay:.2f} seconds.")
 
             # Raise exceptions for any errors not specified
             except Exception as e:
@@ -96,11 +102,12 @@ class CompletionAPIWrapper(BaseAPIWrapper):
         num_completions: int = 1,
         top_p: float = 1,
         logprobs: Optional[int] = None,
+        batch_size: int = 2,
     ) -> dict:
-        if num_completions > 2:
+        if num_completions > batch_size:
             response_combined = dict()
             num_completions_remaining = num_completions
-            for i in range(0, num_completions, 2):
+            for i in range(0, num_completions, batch_size):
                 response = CompletionAPIWrapper._call_api(
                     prompt=prompt,
                     max_tokens=max_tokens,
@@ -108,16 +115,17 @@ class CompletionAPIWrapper(BaseAPIWrapper):
                     stop_token=stop_token,
                     temperature=temperature,
                     top_p=top_p,
-                    num_completions=min(num_completions_remaining, 2),
+                    num_completions=min(num_completions_remaining, batch_size),
                     logprobs=logprobs,
                 )
-                num_completions_remaining -= 2
+                num_completions_remaining -= batch_size
                 if i == 0:
                     response_combined = response
                 else:
                     response_combined["choices"] += response["choices"]
 
             return response_combined
+
         response = CompletionAPIWrapper._call_api(
             prompt=prompt,
             max_tokens=max_tokens,
@@ -252,11 +260,15 @@ class ChatGPTAPIWrapper(BaseAPIWrapper):
     @staticmethod
     def get_all_responses(response) -> Dict[str, Any]:
         """Returns the list of responses."""
-        return [choice["message"]["content"] for choice in response["choices"]]  # type: ignore
+        # return [choice["message"]["content"] for choice in response["choices"]]  # type: ignore
+        return [
+            {"generated_answer": choice["message"]["content"], "logprobs": None}
+            for choice in response["choices"]
+        ]
 
 
 class OpenaiAPIWrapper:
-    chat_engines = ["gpt-3.5-turbo", "gpt-4"]
+    chat_engines = ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-0316", "gpt-4-0613", "gpt-3.5-turbo-0613"]
 
     opensource_engines = ["self-vulcan-13b", "self-vicuna-13b", "togethercomputer/llama-2-70b"]
 
@@ -283,7 +295,13 @@ class OpenaiAPIWrapper:
     ) -> dict:
         api_wrapper = OpenaiAPIWrapper.get_api_wrapper(engine)
         return api_wrapper.call(
-            prompt=prompt, max_tokens=max_tokens, engine=engine, stop_token=stop_token, temperature=temperature, num_completions=num_completions, **kwargs
+            prompt=prompt,
+            max_tokens=max_tokens,
+            engine=engine,
+            stop_token=stop_token,
+            temperature=temperature,
+            num_completions=num_completions,
+            **kwargs,
         )
 
     @staticmethod
@@ -471,8 +489,8 @@ def test_completion_helper_methods():
     ), "Test case 3 failed: 'get_all_responses' did not return a list"
 
     print("Test case 3 passed")
-    
-    
+
+
 def test_top_p():
     print(f"Testing top_p")
     prompt = "Once upon a time"
@@ -502,17 +520,16 @@ def test_top_p():
     ), "Test case 3 failed: 'get_all_responses' did not return a list"
 
     print("Test case 3 passed")
-    
-    
-    # top_p with chat
-    
-    engine = "gpt-3.5-turbo"
-    
-    for top_p in [0.0001, 0.01, 0.2, 0.5, 0.75, 0.9]:
-        response = OpenaiAPIWrapper.call(prompt, max_tokens, engine, stop_token, temperature, num_completions=2, top_p=top_p)
-        print(f"Top_p={top_p}: {OpenaiAPIWrapper.get_all_responses(response)}")
 
-        
+    # top_p with chat
+
+    engine = "gpt-3.5-turbo"
+
+    for top_p in [0.0001, 0.01, 0.2, 0.5, 0.75, 0.9]:
+        response = OpenaiAPIWrapper.call(
+            prompt, max_tokens, engine, stop_token, temperature, num_completions=2, top_p=top_p
+        )
+        print(f"Top_p={top_p}: {OpenaiAPIWrapper.get_all_responses(response)}")
 
 
 if __name__ == "__main__":
