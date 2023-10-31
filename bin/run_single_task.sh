@@ -5,7 +5,7 @@ declare -a TASK_TO_RUN=$1
 
 declare -a SEEDS=(0)
 
-MODEL_NAME="code-davinci-002"
+MODEL_NAME="text-davinci-002"
 
 
 mkdir -p logs
@@ -30,7 +30,7 @@ for TASK in "${TASK_TO_RUN[@]}"; do
             --temperature ${TEMP}  # temperature for sampling
             --num_inference_examples 3
             # --is_debug # if set, wandb logging is disabled
-            ) 
+            )
 
         if [[ ! "${TASK}" == *"direct"* ]]; then
             ARGS+=("--cot_task")

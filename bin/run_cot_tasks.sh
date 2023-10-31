@@ -1,7 +1,7 @@
 #!/bin/bash
 set -u
 
-MODEL_NAME="code-davinci-002"
+MODEL_NAME="text-davinci-002"
 
 
 NUM_QUESTIONS_PER_THREAD=200

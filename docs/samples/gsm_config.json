@@ -6,7 +6,7 @@
     "num_questions_per_thread": 100,
     "seed": 0,
     "is_cot_task": true,
-    "model_name": "code-davinci-002",
+    "model_name": "text-davinci-002",
     "max_requests_per_min": 20,
     "cached_timestamp": null,
     "temperature": 0.0,

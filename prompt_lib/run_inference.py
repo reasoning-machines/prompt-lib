@@ -38,7 +38,7 @@ def read_config_and_populate_defaults(config_path: str, args) -> dict:
 
     prompt_fields = PromptConfig.__dataclass_fields__.keys()
     task_config_fields = TaskConfig.__dataclass_fields__.keys()
-    
+
 
     critical_fields = [
         "task_id",
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     args.add_argument("--cot_task", action="store_true", help="Indicate if it's a COT task")
     args.add_argument("--temperature", type=float, default=0.0, help="Sampling temperature for the model")
 
-    args.add_argument("--model_name", type=str, default="code-davinci-002", help="Model name to use for inference")
+    args.add_argument("--model_name", type=str, default="text-davinci-002", help="Model name to use for inference")
     args.add_argument("--cached_timestamp", type=str, default=None, help="Timestamp for cached data (None for no cache)")
     args.add_argument("--is_debug", action="store_true", help="Enable debug mode (disables wandb)")
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     args.add_argument("--num_inference_examples", type=int, default=-1, help="Number of examples for which inference will run.")
 
 
-    
+
     args.add_argument("--num_completions", type=int, default=1, help="Number of completions to generate per prompt")
     
     args.add_argument("--num_threads", type=int, default=1, help="Number of threads to use for inference")
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     if args.config_file is not None:
 
         task_config, args = read_config_and_populate_defaults(args.config_file, args)
-        
+
     else:
         assert args.seed is not None
         prompt_config = PromptConfig.from_args(args)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         args.name = f"{task_config.task_id}_{model_name_cleaned}_seed{task_config.seed}"
         if args.tag is None:
             args.name += f"_{task_config.tag}"
-    
+
     if args.is_debug:
         wandb.init(mode="disabled")
     else:
